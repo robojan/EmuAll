@@ -1,0 +1,220 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug inline|Win32">
+      <Configuration>Debug inline</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release wx|Win32">
+      <Configuration>Release wx</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{34675B79-540F-4BEC-B031-F058B8188BEA}</ProjectGuid>
+    <RootNamespace>Emuall</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LibraryPath>C:\libraries\openal-soft-1.16.0-bin\libs\Win32;C:\libraries\wxWidgets-3.0.2\lib\vc_lib;C:\libraries\SFML-2.0\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\libraries\openal-soft-1.16.0-bin\include;C:\libraries\wxWidgets-3.0.2\include\msvc;C:\libraries\wxWidgets-3.0.2\include;C:\libraries\SFML-2.0\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">
+    <LibraryPath>C:\libraries\openal-soft-1.16.0-bin\libs\Win32;C:\libraries\wxWidgets-3.0.2\lib\vc_lib;C:\libraries\SFML-2.0\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\libraries\openal-soft-1.16.0-bin\include;C:\libraries\wxWidgets-3.0.2\include\msvc;C:\libraries\wxWidgets-3.0.2\include;C:\libraries\SFML-2.0\include;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">
+    <IncludePath>C:\libraries\openal-soft-1.16.0-bin\include;C:\libraries\wxWidgets-3.0.2\include\msvc;C:\libraries\wxWidgets-3.0.2\include;C:\libraries\SFML-2.0\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">
+    <LibraryPath>C:\libraries\openal-soft-1.16.0-bin\libs\Win32;C:\libraries\wxWidgets-3.0.2\lib\vc_lib;C:\libraries\SFML-2.0\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>C:\libraries\openal-soft-1.16.0-bin\include;C:\libraries\wxWidgets-3.0.2\include\msvc;C:\libraries\wxWidgets-3.0.2\include;C:\libraries\SFML-2.0\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LibraryPath>C:\libraries\openal-soft-1.16.0-bin\libs\Win32;C:\libraries\wxWidgets-3.0.2\lib\vc_lib;C:\libraries\SFML-2.0\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>libOpenAL32.dll.a;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>libOpenAL32.dll.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <Profile>true</Profile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>libOpenAL32.dll.a;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>libOpenAL32.dll.a;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="emuAll.cpp" />
+    <ClCompile Include="audio.cpp" />
+    <ClCompile Include="Emulator\Emulator.cpp" />
+    <ClCompile Include="gui\cpuDebugger.cpp" />
+    <ClCompile Include="gui\debugger\DebuggerBoxSizer.cpp" />
+    <ClCompile Include="gui\debugger\DebuggerCheckbox.cpp" />
+    <ClCompile Include="gui\debugger\DebuggerColorbox.cpp" />
+    <ClCompile Include="gui\debugger\DebuggerGrid.cpp" />
+    <ClCompile Include="gui\debugger\DebuggerInfoList.cpp" />
+    <ClCompile Include="gui\debugger\DebuggerLabel.cpp" />
+    <ClCompile Include="gui\debugger\DebuggerManager.cpp" />
+    <ClCompile Include="gui\debugger\DebuggerNotebook.cpp" />
+    <ClCompile Include="gui\debugger\DebuggerRadioBox.cpp" />
+    <ClCompile Include="gui\debugger\DebuggerRoot.cpp" />
+    <ClCompile Include="gui\debugger\debuggerScreen.cpp" />
+    <ClCompile Include="gui\DisView.cpp" />
+    <ClCompile Include="gui\GLPane.cpp" />
+    <ClCompile Include="gui\gpuDebugger.cpp" />
+    <ClCompile Include="gui\HexView.cpp" />
+    <ClCompile Include="gui\InputOptionsFrame.cpp" />
+    <ClCompile Include="gui\keyBindBox.cpp" />
+    <ClCompile Include="gui\MainFrame.cpp" />
+    <ClCompile Include="gui\memDebugger.cpp" />
+    <ClCompile Include="keyhandler.cpp" />
+    <ClCompile Include="util\dir.cpp" />
+    <ClCompile Include="util\Log.cpp" />
+    <ClCompile Include="util\Options.cpp" />
+    <ClCompile Include="util\xml\pugixml.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="emuAll.h" />
+    <ClInclude Include="audio.h" />
+    <ClInclude Include="Emulator\Emulator.h" />
+    <ClInclude Include="gui\cpuDebugger.h" />
+    <ClInclude Include="gui\debugger\DebuggerBoxSizer.h" />
+    <ClInclude Include="gui\debugger\DebuggerCheckbox.h" />
+    <ClInclude Include="gui\debugger\DebuggerColorbox.h" />
+    <ClInclude Include="gui\debugger\DebuggerElement.h" />
+    <ClInclude Include="gui\debugger\DebuggerGrid.h" />
+    <ClInclude Include="gui\debugger\debuggerInfoList.h" />
+    <ClInclude Include="gui\debugger\DebuggerLabel.h" />
+    <ClInclude Include="gui\debugger\DebuggerManager.h" />
+    <ClInclude Include="gui\debugger\DebuggerNotebook.h" />
+    <ClInclude Include="gui\debugger\DebuggerRadioBox.h" />
+    <ClInclude Include="gui\debugger\DebuggerRoot.h" />
+    <ClInclude Include="gui\debugger\DebuggerScreen.h" />
+    <ClInclude Include="gui\DisView.h" />
+    <ClInclude Include="gui\GLPane.h" />
+    <ClInclude Include="gui\gpuDebugger.h" />
+    <ClInclude Include="gui\HexView.h" />
+    <ClInclude Include="gui\IdList.h" />
+    <ClInclude Include="gui\InputOptionsFrame.h" />
+    <ClInclude Include="gui\keyBindBox.h" />
+    <ClInclude Include="gui\MainFrame.h" />
+    <ClInclude Include="gui\memDebugger.h" />
+    <ClInclude Include="keyhandler.h" />
+    <ClInclude Include="util\dir.h" />
+    <ClInclude Include="util\log.h" />
+    <ClInclude Include="util\logWx.h" />
+    <ClInclude Include="util\memDbg.h" />
+    <ClInclude Include="util\Options.h" />
+    <ClInclude Include="util\os_call.h" />
+    <ClInclude Include="util\xml\pugiconfig.hpp" />
+    <ClInclude Include="util\xml\pugixml.hpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

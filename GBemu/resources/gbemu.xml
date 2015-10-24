@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="utf-8"?>
+<emulator>
+	<name>Gameboy Emulator V1.0</name>
+	<description>Gameboy colorbox emulator.</description>
+	<about>Gameboy colorbox emulator made by Robbert-Jan "robojan" de jager.</about>
+	<fileFilter>*.gb;*.gbc;*.cgb</fileFilter>
+	<screen id="0">
+		<width>160</width>
+		<height>140</height>
+	</screen>
+	<audio>
+		<sources>4</sources>
+	</audio>
+	<input>
+		<key key="1">
+			<name>A</name>
+			<defaultKey>88</defaultKey>
+		</key>
+		<key key="2">
+			<name>B</name>
+			<defaultKey>90</defaultKey>
+		</key>
+		<key key="3">
+			<name>Up</name>
+			<defaultKey>315</defaultKey>
+		</key>
+		<key key="4">
+			<name>Down</name>
+			<defaultKey>317</defaultKey>
+		</key>
+		<key key="5">
+			<name>Left</name>
+			<defaultKey>314</defaultKey>
+		</key>
+		<key key="6">
+			<name>Right</name>
+			<defaultKey>316</defaultKey>
+		</key>
+		<key key="7">
+			<name>Start</name>
+			<defaultKey>13</defaultKey>
+		</key>
+		<key key="8">
+			<name>Select</name>
+			<defaultKey>8</defaultKey>
+		</key>
+	</input>
+	<debugging>
+		<cpu>
+			<disassembler>
+				<enabled>true</enabled>
+				<breakpoint>true</breakpoint>
+				<size>0x10000</size>
+				<curLineId>15</curLineId><!-- Same as Register PC -->
+			</disassembler>
+			<step>true</step>
+			<stepOut>false</stepOut>
+			<stepOver>false</stepOver>
+			<registers>
+				<register id="10">
+					<name>AF</name>
+					<size>16</size>
+				</register>
+				<register id="11">
+					<name>BC</name>
+					<size>16</size>
+				</register>
+				<register id="12">
+					<name>DE</name>
+					<size>16</size>
+				</register>
+				<register id="13">
+					<name>HL</name>
+					<size>16</size>
+				</register>
+				<register id="14">
+					<name>SP</name>
+					<size>16</size>
+				</register>
+				<register id="15">
+					<name>PC</name>
+					<size>16</size>
+				</register>
+				<flag id="16">
+					<name>Z</name>
+					<readOnly />
+				</flag>
+				<flag id="17">
+					<name>N</name>
+				</flag>
+				<flag id="18">
+					<name>C</name>
+				</flag>
+				<flag id="19">
+					<name>H</name>
+				</flag>
+				<flag id="20">
+					<name>IME</name>
+				</flag>
+				<flag id="21">
+					<name>Halted</name>
+				</flag>
+				<flag id="22">
+					<name>Stopped</name>
+				</flag>
+			</registers>
+		</cpu>
+		<mem>
+			<memory id="100">
+				<name>Memory map</name>
+				<size>0x10000</size>
+			</memory>
+			<memory id="101">
+				<name>ROM</name>
+				<size var="true">111</size>
+			</memory>
+			<memory id="102">
+				<name>ERAM</name>
+				<size var="true">112</size>
+			</memory>
+			<memory id="103">
+				<name>WRAM</name>
+				<size var="true">113</size>
+			</memory>
+			<memory id="104">
+				<name>VRAM</name>
+				<size var="true">114</size>
+			</memory>
+			<info id="121">
+				<name>ROM bank</name>
+			</info>
+			<info id="122">
+				<name>ERAM bank</name>
+			</info>
+			<info id="123">
+				<name>WRAM bank</name>
+			</info>
+			<info id="124">
+				<name>VRAM bank</name>
+			</info>
+			<readOnly>true</readOnly>
+		</mem>
+		<gpu>
+			<hor prop="1">
+				<hor prop="1">
+					<notebook prop="1">
+					<tab name="Background">
+						<hor>
+							<ver prop="1">
+								<screen id="1">
+									<width>256</width>
+									<height>256</height>
+									<mousex>228</mousex>
+									<mousey>229</mousey>
+								</screen>
+							</ver>
+							<ver>
+								<checkbox id="220">
+									<name>Grid</name>
+								</checkbox>
+								<radio id="221">
+									<name>Background map</name>
+									<option val="0">9800-9BFF</option>
+									<option val="1">9C00-9FFF</option>
+									<option val="2">Auto</option>
+								</radio>
+								<radio id="222">
+									<name>Background data</name>
+									<option val="0">8800-97FF</option>
+									<option val="1">8000-87FF</option>
+									<option val="2">Auto</option>
+								</radio>
+								<infolist prop="1">
+									<info id="223">
+										<name>Number</name>
+										<mode>dec</mode>
+									</info>
+									<info id="224">
+										<name>Palette</name>
+										<mode>dec</mode>
+									</info>
+									<flag id="225">
+										<name>Horizontal flip</name>
+									</flag>
+									<flag id="226">
+										<name>Vertical flip</name>
+									</flag>
+									<flag id="227">
+										<name>Priority</name>
+									</flag>
+								</infolist>
+							</ver>
+						</hor>
+					</tab>
+					<tab name="Tiles">
+						<hor>
+							<ver prop="1">
+								<screen id="2">
+									<width>346</width>
+									<height>260</height>
+									<mousex>230</mousex>
+									<mousey>231</mousey>
+								</screen>
+							</ver>
+							<ver>
+								<infolist>
+									<info id="232">
+										<name>VRAM</name>
+										<mode>dec</mode>
+									</info>
+									<info id="233">
+										<name>Address</name>
+										<size>4</size>
+										<mode>hex</mode>
+									</info>
+									<info id="234">
+										<name>Number</name>
+										<size>3</size>
+										<mode>dec</mode>
+									</info>
+								</infolist>
+							</ver>
+						</hor>
+					</tab>
+					<tab name="OAM objects">
+						<hor>
+							<ver prop="1">
+								<screen id="3">
+									<width>265</width>
+									<height>326</height>
+									<mousex>240</mousex>
+									<mousey>241</mousey>
+								</screen>
+							</ver>
+							<ver>
+								<infolist prop="1">
+									<info id="242">
+										<name>X</name>
+										<mode>dec</mode>
+									</info>
+									<info id="243">
+										<name>Y</name>
+										<mode>dec</mode>
+									</info>
+									<info id="244">
+										<name>Tile</name>
+										<size>2</size>
+										<mode>hex</mode>
+									</info>
+									<info id="245">
+										<name>Palette</name>
+										<mode>string</mode>
+									</info>
+									<flag id="246">
+										<name>Horizontal flip</name>
+									</flag>
+									<flag id="247">
+										<name>Vertical flip</name>
+									</flag>
+									<flag id="248">
+										<name>Priority</name>
+									</flag>
+									<flag id="249">
+										<name>VRAM</name>
+									</flag>
+								</infolist>
+							</ver>
+						</hor>
+
+					</tab>
+					<tab name="palettes">
+						<ver>
+							<hor>
+								<grid name="Background palette">
+									<columns>5</columns>
+									<label>BG Pal 0</label>
+									<colorbox id="250" />
+									<colorbox id="251" />
+									<colorbox id="252" />
+									<colorbox id="253" />
+									<label>BG Pal 1</label>
+									<colorbox id="254" />
+									<colorbox id="255" />
+									<colorbox id="256" />
+									<colorbox id="257" />
+									<label>BG Pal 2</label>
+									<colorbox id="258" />
+									<colorbox id="259" />
+									<colorbox id="260" />
+									<colorbox id="261" />
+									<label>BG Pal 3</label>
+									<colorbox id="262" />
+									<colorbox id="263" />
+									<colorbox id="264" />
+									<colorbox id="265" />
+									<label>BG Pal 4</label>
+									<colorbox id="266" />
+									<colorbox id="267" />
+									<colorbox id="268" />
+									<colorbox id="269" />
+									<label>BG Pal 5</label>
+									<colorbox id="270" />
+									<colorbox id="271" />
+									<colorbox id="272" />
+									<colorbox id="273" />
+									<label>BG Pal 6</label>
+									<colorbox id="274" />
+									<colorbox id="275" />
+									<colorbox id="276" />
+									<colorbox id="277" />
+									<label>BG Pal 7</label>
+									<colorbox id="278" />
+									<colorbox id="279" />
+									<colorbox id="280" />
+									<colorbox id="281" />
+								</grid>
+								<grid name="Object palette">
+									<columns>5</columns>
+									<label>Obj Pal 0</label>
+									<colorbox id="282" />
+									<colorbox id="283" />
+									<colorbox id="284" />
+									<colorbox id="285" />
+									<label>Obj Pal 1</label>
+									<colorbox id="286" />
+									<colorbox id="287" />
+									<colorbox id="288" />
+									<colorbox id="289" />
+									<label>Obj Pal 2</label>
+									<colorbox id="290" />
+									<colorbox id="291" />
+									<colorbox id="292" />
+									<colorbox id="293" />
+									<label>Obj Pal 3</label>
+									<colorbox id="294" />
+									<colorbox id="295" />
+									<colorbox id="296" />
+									<colorbox id="297" />
+									<label>Obj Pal 4</label>
+									<colorbox id="298" />
+									<colorbox id="299" />
+									<colorbox id="300" />
+									<colorbox id="301" />
+									<label>Obj Pal 5</label>
+									<colorbox id="302" />
+									<colorbox id="303" />
+									<colorbox id="304" />
+									<colorbox id="305" />
+									<label>Obj Pal 6</label>
+									<colorbox id="306" />
+									<colorbox id="307" />
+									<colorbox id="308" />
+									<colorbox id="309" />
+									<label>Obj Pal 7</label>
+									<colorbox id="310" />
+									<colorbox id="311" />
+									<colorbox id="312" />
+									<colorbox id="313" />
+								</grid>
+							</hor>
+							<grid name="Monochrome palettes">
+								<columns>5</columns>
+								<label>BGP</label>
+								<colorbox id="314" />
+								<colorbox id="315" />
+								<colorbox id="316" />
+								<colorbox id="317" />
+								<label>OBP 0</label>
+								<colorbox id="318" />
+								<colorbox id="319" />
+								<colorbox id="320" />
+								<colorbox id="321" />
+								<label>OBP 1</label>
+								<colorbox id="322" />
+								<colorbox id="323" />
+								<colorbox id="324" />
+								<colorbox id="325" />
+							</grid>
+						</ver>
+					</tab>
+				</notebook>
+				</hor>
+				<ver>
+					<flag id="209">
+						<name>GPU enabled</name>
+					</flag>
+					<infolist prop="1">
+						<info id="200">
+							<name>LCDC</name>
+							<size>2</size>
+							<mode>hex</mode>
+						</info>
+						<info id="201">
+							<name>STAT</name>
+							<size>2</size>
+							<mode>hex</mode>
+						</info>
+						<info id="202">
+							<name>SCX</name>
+							<mode>dec</mode>
+						</info>
+						<info id="203">
+							<name>SCY</name>
+							<mode>dec</mode>
+						</info>
+						<info id="204">
+							<name>LY</name>
+							<mode>dec</mode>
+						</info>
+						<info id="205">
+							<name>LYC</name>
+							<mode>dec</mode>
+						</info>
+						<info id="206">
+							<name>WY</name>
+							<mode>dec</mode>
+						</info>
+						<info id="207">
+							<name>WX</name>
+							<mode>dec</mode>
+						</info>
+						<info id="208">
+							<name>VRAM bank</name>
+							<mode>dec</mode>
+						</info>
+					</infolist>
+				</ver>
+			</hor>
+		</gpu>
+		<sound>
+		</sound>
+	</debugging>
+	<options>
+	</options>
+</emulator>

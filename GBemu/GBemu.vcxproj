@@ -1,0 +1,294 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug inline|Win32">
+      <Configuration>Debug inline</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release wx|Win32">
+      <Configuration>Release wx</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{E29E3611-350B-4E8B-AE45-87428B26D7DE}</ProjectGuid>
+    <RootNamespace>GBemu</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetExt>.dll</TargetExt>
+    <IncludePath>C:\libraries\openal-soft-1.16.0-bin\include;C:\libraries\glew-1.12.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\libraries\openal-soft-1.16.0-bin\libs\Win32;C:\libraries\glew-1.12.0\lib\Release\Win32;$(LibraryPath)</LibraryPath>
+    <TargetName>$(ProjectName).emu</TargetName>
+    <OutDir>$(SolutionDir)\$(Configuration)\plugins\</OutDir>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">
+    <TargetExt>.dll</TargetExt>
+    <IncludePath>C:\libraries\openal-soft-1.16.0-bin\include;C:\libraries\glew-1.12.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\libraries\openal-soft-1.16.0-bin\libs\Win32;C:\libraries\glew-1.12.0\lib\Release\Win32;$(LibraryPath)</LibraryPath>
+    <TargetName>$(ProjectName).emu</TargetName>
+    <OutDir>$(SolutionDir)\$(Configuration)\plugins\</OutDir>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>C:\libraries\openal-soft-1.16.0-bin\include;C:\libraries\glew-1.12.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\libraries\openal-soft-1.16.0-bin\libs\Win32;C:\libraries\glew-1.12.0\lib\Release\Win32;$(LibraryPath)</LibraryPath>
+    <TargetExt>.dll</TargetExt>
+    <TargetName>$(ProjectName).emu</TargetName>
+    <OutDir>$(SolutionDir)\$(Configuration)\plugins\</OutDir>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">
+    <IncludePath>C:\libraries\openal-soft-1.16.0-bin\include;C:\libraries\glew-1.12.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\libraries\openal-soft-1.16.0-bin\libs\Win32;C:\libraries\glew-1.12.0\lib\Release\Win32;$(LibraryPath)</LibraryPath>
+    <TargetExt>.dll</TargetExt>
+    <TargetName>$(ProjectName).emu</TargetName>
+    <OutDir>$(SolutionDir)\$(Configuration)\plugins\</OutDir>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>EMUDLL;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AssemblerOutput>All</AssemblerOutput>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>libOpenAL32.dll.a;glew32s.lib;opengl32.lib</AdditionalDependencies>
+      <Profile>true</Profile>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+      <Message>
+      </Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>EMUDLL;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AssemblerOutput>All</AssemblerOutput>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>libOpenAL32.dll.a;glew32s.lib;opengl32.lib</AdditionalDependencies>
+      <Profile>true</Profile>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>
+      </Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>EMUDLL;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AssemblerOutput>All</AssemblerOutput>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>libOpenAL32.dll.a;glew32s.lib;opengl32.lib</AdditionalDependencies>
+      <Profile>true</Profile>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+      <Message>
+      </Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>EMUDLL;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AssemblerOutput>All</AssemblerOutput>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>libOpenAL32.dll.a;glew32s.lib;opengl32.lib</AdditionalDependencies>
+      <Profile>true</Profile>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+      <Message>
+      </Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="emu.cpp" />
+    <ClCompile Include="gb\cpu\GbCpu.cpp" />
+    <ClCompile Include="gb\debug\GbDis.cpp" />
+    <ClCompile Include="gb\Gameboy.cpp" />
+    <ClCompile Include="gb\gpu\GbGpu.cpp" />
+    <ClCompile Include="gb\gpu\GbGpuDrawing.cpp" />
+    <ClCompile Include="gb\input\GbInput.cpp" />
+    <ClCompile Include="gb\mem\GbMem.cpp" />
+    <ClCompile Include="gb\sound\gbchannel.cpp" />
+    <ClCompile Include="gb\sound\GbChannel12.cpp" />
+    <ClCompile Include="gb\sound\GbChannel3.cpp" />
+    <ClCompile Include="gb\sound\GbChannel4.cpp" />
+    <ClCompile Include="gb\sound\GbSound.cpp" />
+    <ClCompile Include="Sound\audio.cpp" />
+    <ClCompile Include="types\tree.cpp" />
+    <ClCompile Include="util\Endian.c" />
+    <ClCompile Include="util\file.cpp" />
+    <ClCompile Include="util\shaders.cpp" />
+    <ClCompile Include="util\wavaudiofile.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="emu.h" />
+    <ClInclude Include="gb\cpu\GbCpu.h" />
+    <ClInclude Include="gb\cpu\GbInterrupt.h" />
+    <ClInclude Include="gb\cpu\Gbopcodes.h" />
+    <ClInclude Include="gb\debug\gbDis.h" />
+    <ClInclude Include="gb\defines.h" />
+    <ClInclude Include="gb\Gameboy.h" />
+    <ClInclude Include="gb\gpu\GbGpu.h" />
+    <ClInclude Include="gb\input\GbInput.h" />
+    <ClInclude Include="gb\mem\GbMem.h" />
+    <ClInclude Include="gb\sound\GbChannel.h" />
+    <ClInclude Include="gb\sound\GbChannel12.h" />
+    <ClInclude Include="gb\sound\GbChannel3.h" />
+    <ClInclude Include="gb\sound\GbChannel4.h" />
+    <ClInclude Include="gb\sound\GbSound.h" />
+    <ClInclude Include="resources\resources.h" />
+    <ClInclude Include="Sound\audio.h" />
+    <ClInclude Include="types\general.h" />
+    <ClInclude Include="types\tree.h" />
+    <ClInclude Include="util\Endian.h" />
+    <ClInclude Include="util\exceptions.h" />
+    <ClInclude Include="util\file.h" />
+    <ClInclude Include="util\log.h" />
+    <ClInclude Include="util\memDbg.h" />
+    <ClInclude Include="util\shaders.h" />
+    <ClInclude Include="util\wavaudiofile.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="resources\gb.frag">
+      <FileType>Document</FileType>
+    </Text>
+    <Text Include="resources\gb.vert">
+      <FileType>Document</FileType>
+    </Text>
+    <CustomBuild Include="resources\resources.rlst">
+      <FileType>Text</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename).h</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename).h</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename).h</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename).h</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Preproces resources</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).h</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Preproces resources</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).h</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">Preproces resources</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">%(Filename).h</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">Preproces resources</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">%(Filename).h</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gb.frag; gb.vert; gbemu.xml</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">gb.frag; gb.vert; gbemu.xml</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">gb.frag; gb.vert; gbemu.xml</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">gb.frag; gb.vert; gbemu.xml</AdditionalInputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="resources\gbemu.xml">
+      <SubType>Designer</SubType>
+    </Xml>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
