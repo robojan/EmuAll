@@ -17,8 +17,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GBemu", "GBemu\GBemu.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "resourceCompiler", "resourceCompiler\resourceCompiler.vcxproj", "{A122A494-9AC9-4D75-8CA4-5A6835329F52}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test", "Test\Test.vcxproj", "{977C6EFE-27B5-4629-AA2D-739211AC34FA}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug inline|Win32 = Debug inline|Win32
@@ -70,15 +68,6 @@ Global
 		{A122A494-9AC9-4D75-8CA4-5A6835329F52}.Release|Win32.ActiveCfg = Release|Win32
 		{A122A494-9AC9-4D75-8CA4-5A6835329F52}.Release|Win32.Build.0 = Release|Win32
 		{A122A494-9AC9-4D75-8CA4-5A6835329F52}.Release|x64.ActiveCfg = Release|Win32
-		{977C6EFE-27B5-4629-AA2D-739211AC34FA}.Debug inline|Win32.ActiveCfg = Debug|Win32
-		{977C6EFE-27B5-4629-AA2D-739211AC34FA}.Debug inline|Win32.Build.0 = Debug|Win32
-		{977C6EFE-27B5-4629-AA2D-739211AC34FA}.Debug inline|x64.ActiveCfg = Debug|Win32
-		{977C6EFE-27B5-4629-AA2D-739211AC34FA}.Debug|Win32.ActiveCfg = Debug|Win32
-		{977C6EFE-27B5-4629-AA2D-739211AC34FA}.Debug|Win32.Build.0 = Debug|Win32
-		{977C6EFE-27B5-4629-AA2D-739211AC34FA}.Debug|x64.ActiveCfg = Debug|Win32
-		{977C6EFE-27B5-4629-AA2D-739211AC34FA}.Release|Win32.ActiveCfg = Release|Win32
-		{977C6EFE-27B5-4629-AA2D-739211AC34FA}.Release|Win32.Build.0 = Release|Win32
-		{977C6EFE-27B5-4629-AA2D-739211AC34FA}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
