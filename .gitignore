@@ -217,3 +217,5 @@ rom/
 Test/
 TestResults/*
 TestROMs/*
+
+*.diagsession
