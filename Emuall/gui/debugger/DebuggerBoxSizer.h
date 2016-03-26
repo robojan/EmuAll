@@ -25,10 +25,10 @@ namespace Debugger
 			DebuggerElement *element;
 			int proportion;
 		};
-		Emulator *mEmu;
-		wxPanel *mWidget;
-		int mOrient;
-		std::vector<Item> mItems;
+		Emulator *_emu;
+		wxPanel *_widget;
+		int _orient;
+		std::vector<Item> _items;
 	};
 }
 

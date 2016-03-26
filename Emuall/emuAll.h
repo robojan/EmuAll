@@ -10,7 +10,7 @@ public:
 	virtual bool OnInit();
 	virtual int OnExit();
 private:
-	MainFrame *mMainFrame;
+	MainFrame *_mainFrame;
 };
 
 #endif

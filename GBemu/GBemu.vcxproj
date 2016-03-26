@@ -246,7 +246,6 @@
     <ClInclude Include="gb\sound\GbChannel4.h" />
     <ClInclude Include="gb\sound\GbSound.h" />
     <ClInclude Include="resources\resources.h" />
-    <ClInclude Include="types\general.h" />
     <ClInclude Include="types\tree.h" />
     <ClInclude Include="util\Endian.h" />
     <ClInclude Include="util\exceptions.h" />
@@ -282,6 +281,9 @@
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">gb.frag; gb.vert; gbemu.xml</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">gb.frag; gb.vert; gbemu.xml</AdditionalInputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">false</LinkObjects>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">false</LinkObjects>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

@@ -6,10 +6,10 @@
 #include <AL/al.h>
 
 GbSound::GbSound(Gameboy *master) : 
-	m_channel1(master, false), 
-	m_channel2(master, true),
-	m_channel3(master),
-	m_channel4(master)
+	_channel1(master, false), 
+	_channel2(master, true),
+	_channel3(master),
+	_channel4(master)
 {
 	m_gb = master;
 
@@ -31,10 +31,10 @@ GbSound::~GbSound()
 
 void GbSound::registerEvents(void)
 {
-	m_channel1.RegisterEvents();
-	m_channel2.RegisterEvents();
-	m_channel3.RegisterEvents();
-	m_channel4.RegisterEvents();
+	_channel1.RegisterEvents();
+	_channel2.RegisterEvents();
+	_channel3.RegisterEvents();
+	_channel4.RegisterEvents();
 }
 
 void GbSound::MemEvent(address_t address, gbByte val)
@@ -44,35 +44,35 @@ void GbSound::MemEvent(address_t address, gbByte val)
 
 void GbSound::SlowTick()
 {
-	m_channel1.SlowTick();
-	m_channel2.SlowTick();
-	m_channel3.SlowTick();
-	m_channel4.SlowTick();
+	_channel1.SlowTick();
+	_channel2.SlowTick();
+	_channel3.SlowTick();
+	_channel4.SlowTick();
 }
 
 void GbSound::BeginTick()
 {
-	m_channel1.CleanSoundOutput();
-	m_channel2.CleanSoundOutput();
-	m_channel3.CleanSoundOutput();
-	m_channel4.CleanSoundOutput();
+	_channel1.CleanSoundOutput();
+	_channel2.CleanSoundOutput();
+	_channel3.CleanSoundOutput();
+	_channel4.CleanSoundOutput();
 }
 
 void GbSound::EnableAudio(bool enable)
 {
-	m_channel1.EnableAudio(enable);
-	m_channel2.EnableAudio(enable);
-	m_channel3.EnableAudio(enable);
-	m_channel4.EnableAudio(enable);
+	_channel1.EnableAudio(enable);
+	_channel2.EnableAudio(enable);
+	_channel3.EnableAudio(enable);
+	_channel4.EnableAudio(enable);
 }
 
 uint_fast8_t GbSound::GetEnabledFlags()
 {
 	uint_fast8_t ret = 0;
-	ret = m_channel1._enabled ? 0x1 : 0x0;
-	ret |= m_channel2._enabled ? 0x2 : 0x0;
-	ret |= m_channel3._enabled ? 0x4 : 0x0;
-	ret |= m_channel4._enabled ? 0x8 : 0x0;
+	ret = _channel1._enabled ? 0x1 : 0x0;
+	ret |= _channel2._enabled ? 0x2 : 0x0;
+	ret |= _channel3._enabled ? 0x4 : 0x0;
+	ret |= _channel4._enabled ? 0x8 : 0x0;
 	return ret;
 }
 
@@ -96,10 +96,10 @@ bool GbSound::LoadState(const SaveData_t *data)
 			ptr += 8;
 			len -= 8;
 			int dataLen = len;
-			ptr = m_channel1.LoadState(ptr, dataLen);
-			ptr = m_channel2.LoadState(ptr, dataLen);
-			ptr = m_channel3.LoadState(ptr, dataLen);
-			ptr = m_channel4.LoadState(ptr, dataLen);
+			ptr = _channel1.LoadState(ptr, dataLen);
+			ptr = _channel2.LoadState(ptr, dataLen);
+			ptr = _channel3.LoadState(ptr, dataLen);
+			ptr = _channel4.LoadState(ptr, dataLen);
 			return true;
 		}
 		ptr += len;
@@ -116,10 +116,10 @@ bool GbSound::SaveState(std::vector<uint8_t> &data)
 	data.resize(data.size() + dataLen);
 	uint8_t *ptr = data.data() + data.size() - dataLen;
 	*(uint32_t *)(ptr + 0) = conv->convu32(StateSNDid);
-	m_channel1.SaveState(data);
-	m_channel2.SaveState(data);
-	m_channel3.SaveState(data);
-	m_channel4.SaveState(data);
+	_channel1.SaveState(data);
+	_channel2.SaveState(data);
+	_channel3.SaveState(data);
+	_channel4.SaveState(data);
 
 	dataLen = data.size() - size;
 	*(uint32_t *)(ptr + 4) = conv->convu32(dataLen);

@@ -21,9 +21,9 @@ namespace Debugger
 
 	private:
 
-		Emulator *mEmu;
-		wxPanel *mWidget;
-		int mID;
+		Emulator *_emu;
+		wxPanel *_widgets;
+		int _id;
 	};
 
 }

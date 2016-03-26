@@ -28,31 +28,31 @@ public:
 
 private:
 	// wxWidgets members
-	wxMenuBar	*mBar;
-	wxMenu		*mMenFile;
-	wxMenu		*mMenOptions;
-	wxMenu		*mMenDebug;
-	wxMenu		*mMenDebugLevel;
-	wxMenu		*mMenSaveState;
-	wxMenu		*mMenLoadState;
-	GLPane		*mDisplay;
-	wxLogWindow *mLogger;
-	wxTimer		*mTimer;
-	LogWx		mLogDst;
-	InputOptionsFrame *mInputOptionsFrame;
-	CPUDebugger *mCpuDebugger;
-	MemDebugger *mMemDebugger;
-	GPUDebugger *mGpuDebugger;
+	wxMenuBar	*_bar;
+	wxMenu		*_menFile;
+	wxMenu		*_menOptions;
+	wxMenu		*_menDebug;
+	wxMenu		*_menDebugLevel;
+	wxMenu		*_menSaveState;
+	wxMenu		*_menLoadState;
+	GLPane		*_display;
+	wxLogWindow *_logger;
+	wxTimer		*_timer;
+	LogWx		_logDst;
+	InputOptionsFrame *_inputOptionsFrame;
+	CPUDebugger *_cpuDebugger;
+	MemDebugger *_memDebugger;
+	GPUDebugger *_gpuDebugger;
 
 	// other members
-	Emulator	mEmulator;
-	EmulatorList *mEmulators;
-	std::string	mFilePath;
-	std::string mSaveFilePath;
-	std::string mSaveStateFilePath;
-	Audio		*mAudio;
-	Options		mOptions;
-	InputMaster mInputHandler;
+	Emulator	_emulator;
+	EmulatorList *_emulators;
+	std::string	_filePath;
+	std::string _saveFilePath;
+	std::string _saveStateFilePath;
+	Audio		*_audio;
+	Options		_options;
+	InputMaster _inputHandler;
 
 	// private functions
 	void CreateLayout();

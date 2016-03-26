@@ -11,10 +11,10 @@
 #include "GbInterrupt.h"
 
 GbCpu::GbCpu(Gameboy *gb) : 
-	gb(gb), stopped(false), halted(false), ime(false), 
-	regAF(0), regBC(0), regDE(0), regHL(0), regSP(0), regPC(0),
-	m_tim_enabled(false), dividerClocks(FCPU / FDIV), 
-	timerClocks(TIMER_CLK0_CLKS * 2), runningMode(GbCpuRunningMode::Normal)
+	_gb(gb), _stopped(false), _halted(false), _ime(false), 
+	_regAF(0), _regBC(0), _regDE(0), _regHL(0), _regSP(0), _regPC(0),
+	_tim_enabled(false), _dividerClocks(FCPU / FDIV), 
+	_timerClocks(TIMER_CLK0_CLKS * 2), _runningMode(GbCpuRunningMode::Normal)
 {
 	
 }
@@ -27,53 +27,53 @@ GbCpu::~GbCpu()
 bool GbCpu::Tick()
 {
 	bool executed = false;
-	m_div_counter++;
-	if (doubleSpeed)
+	_div_counter++;
+	if (_doubleSpeed)
 	{
-		m_tim_counter += 1; // double speed
+		_tim_counter += 1; // double speed
 	}
 	else {
-		m_tim_counter += 2; // single speed
+		_tim_counter += 2; // single speed
 	}
-	if (cycles == 0 || halted || stopped)
+	if (_cycles == 0 || _halted || _stopped)
 	{
-		if (!(halted || stopped))
+		if (!(_halted || _stopped))
 		{
 			handleInstruction();
 			executed = true;
 		}
 		this->interrupt();
 	}
-	if (!(halted || stopped))
+	if (!(_halted || _stopped))
 	{
-		cycles--;
+		_cycles--;
 	}
-	if ((m_div_counter >= dividerClocks))
+	if ((_div_counter >= _dividerClocks))
 	{
-		this->gb->_mem->write(DIV, this->gb->_mem->read(DIV) + 1, false);
-		m_div_counter = 0;
+		this->_gb->_mem->write(DIV, this->_gb->_mem->read(DIV) + 1, false);
+		_div_counter = 0;
 	}
-	if ((m_tim_counter >= timerClocks) && (m_tim_enabled))
+	if ((_tim_counter >= _timerClocks) && (_tim_enabled))
 	{
-		m_tim_counter = 0;
-		gbByte tima = this->gb->_mem->read(TIMA);
+		_tim_counter = 0;
+		gbByte tima = this->_gb->_mem->read(TIMA);
 		tima++;
-		this->gb->_mem->write(TIMA, tima, false);
+		this->_gb->_mem->write(TIMA, tima, false);
 		if (tima == 0x00) // overflow
 		{
-			this->gb->_mem->write(IF, this->gb->_mem->read(IF) | INT_TIMER);
-			this->gb->_mem->write(TIMA, this->gb->_mem->read(TMA));
+			this->_gb->_mem->write(IF, this->_gb->_mem->read(IF) | INT_TIMER);
+			this->_gb->_mem->write(TIMA, this->_gb->_mem->read(TMA));
 		}
 	}
-	if (runningMode == GbCpuRunningMode::Step && cycles == 1)
-		throw  BreakPointException(regPC);
+	if (_runningMode == GbCpuRunningMode::Step && _cycles == 1)
+		throw  BreakPointException(_regPC);
 	return executed;
 }
 
 void GbCpu::registerEvents(void)
 {
-	this->gb->_mem->registerEvent(DIV, this);
-	this->gb->_mem->registerEvent(TAC, this);
+	this->_gb->_mem->registerEvent(DIV, this);
+	this->_gb->_mem->registerEvent(TAC, this);
 }
 
 void GbCpu::MemEvent(address_t address, gbByte val)
@@ -81,25 +81,25 @@ void GbCpu::MemEvent(address_t address, gbByte val)
 	switch(address)
 	{
 	case DIV:
-		this->gb->_mem->write(address, 0, false);
+		this->_gb->_mem->write(address, 0, false);
 		break;
 	case TAC: // Timer frequency clks times 2 for double speed
 		switch(val & TAC_CLK)
 		{
 		case 0:
-			timerClocks = TIMER_CLK0_CLKS*2; 
+			_timerClocks = TIMER_CLK0_CLKS*2; 
 			break;
 		case 1:
-			timerClocks = TIMER_CLK1_CLKS*2;
+			_timerClocks = TIMER_CLK1_CLKS*2;
 			break;
 		case 2:
-			timerClocks = TIMER_CLK2_CLKS*2;
+			_timerClocks = TIMER_CLK2_CLKS*2;
 			break;
 		case 3:
-			timerClocks = TIMER_CLK3_CLKS*2;
+			_timerClocks = TIMER_CLK3_CLKS*2;
 			break;
 		}
-		m_tim_enabled = (val & TAC_EN) != 0;
+		_tim_enabled = (val & TAC_EN) != 0;
 		break;
 	default:
 		return;
@@ -109,82 +109,82 @@ void GbCpu::MemEvent(address_t address, gbByte val)
 void GbCpu::reset(address_t address)
 {
 	// reset all the registers
-	regAF = 0;
-	regBC = 0;
-	regDE = 0;
-	regHL = 0;
+	_regAF = 0;
+	_regBC = 0;
+	_regDE = 0;
+	_regHL = 0;
 
-	halted = false;
-	ime = false;
-	doubleSpeed = false;
-	regSP=0;
-	m_div_counter = 0;
-	m_tim_counter = 0;
-	cycles = 0;
+	_halted = false;
+	_ime = false;
+	_doubleSpeed = false;
+	_regSP=0;
+	_div_counter = 0;
+	_tim_counter = 0;
+	_cycles = 0;
 	// set the Program counter to the reset address
-	regPC=address;
+	_regPC=address;
 }
 
 void GbCpu::bootup(void)
 {
 	// Setup the stack
-	if(this->gb->_mem->read(CGB) & 0x80)
+	if(this->_gb->_mem->read(CGB) & 0x80)
 	{
-		regSP = 0xFFFE;
-		regA = 0x11;
-		regF = 0x80;
-		regB = 0x00;
-		regC = 0x00;
-		regD = 0xFF;
-		regE = 0x56;
-		regH = 0x00;
-		regL = 0x0D;
+		_regSP = 0xFFFE;
+		_regA = 0x11;
+		_regF = 0x80;
+		_regB = 0x00;
+		_regC = 0x00;
+		_regD = 0xFF;
+		_regE = 0x56;
+		_regH = 0x00;
+		_regL = 0x0D;
 	} else {
-		regA = 0x01;
-		regF = 0xB0;
-		regB = 0x00;
-		regC = 0x13;
-		regD = 0x00;
-		regE = 0xd8;
-		regH = 0x01;
-		regL = 0x4d;
+		_regA = 0x01;
+		_regF = 0xB0;
+		_regB = 0x00;
+		_regC = 0x13;
+		_regD = 0x00;
+		_regE = 0xd8;
+		_regH = 0x01;
+		_regL = 0x4d;
 	}
-	this->gb->_mem->write(0xFF05, 0x00);
-	this->gb->_mem->write(0xFF06, 0x00);
-	this->gb->_mem->write(0xFF07, 0x00);
-	this->gb->_mem->write(0xFF10, 0x80);
-	this->gb->_mem->write(0xFF11, 0xBF);
-	this->gb->_mem->write(0xFF12, 0xF3);
-	this->gb->_mem->write(0xFF14, 0xBF);
-	this->gb->_mem->write(0xFF16, 0x3F);
-	this->gb->_mem->write(0xFF17, 0x00);
-	this->gb->_mem->write(0xFF19, 0xBF);
-	this->gb->_mem->write(0xFF1A, 0x7F);
-	this->gb->_mem->write(0xFF1B, 0xFF);
-	this->gb->_mem->write(0xFF1C, 0x9F);
-	this->gb->_mem->write(0xFF1E, 0xBF);
-	this->gb->_mem->write(0xFF20, 0xFF);
-	this->gb->_mem->write(0xFF21, 0x00);
-	this->gb->_mem->write(0xFF22, 0x00);
-	this->gb->_mem->write(0xFF23, 0xBF);
-	this->gb->_mem->write(0xFF24, 0x77);
-	this->gb->_mem->write(0xFF25, 0xF3);
-	this->gb->_mem->write(0xFF26, 0xF0);
-	this->gb->_mem->write(0xFF40, 0x91);
-	this->gb->_mem->write(0xFF42, 0x00);
-	this->gb->_mem->write(0xFF43, 0x00);
-	this->gb->_mem->write(0xFF45, 0x00);
-	this->gb->_mem->write(0xFF47, 0xFC);
-	this->gb->_mem->write(0xFF48, 0xFF);
-	this->gb->_mem->write(0xFF49, 0xFF);
-	this->gb->_mem->write(0xFF4A, 0x00);
-	this->gb->_mem->write(0xFF4B, 0x00);
-	this->gb->_mem->write(0xFF51, 0xFF);
-	this->gb->_mem->write(0xFF52, 0xFF);
-	this->gb->_mem->write(0xFF53, 0xFF);
-	this->gb->_mem->write(0xFF54, 0xFF);
-	this->gb->_mem->write(0xFF55, 0xFF);
-	this->gb->_mem->write(0xFFFF, 0x00);
+	this->_gb->_mem->write(0xFF05, 0x00);
+	this->_gb->_mem->write(0xFF06, 0x00);
+	this->_gb->_mem->write(0xFF07, 0x00);
+	this->_gb->_mem->write(0xFF10, 0x80);
+	this->_gb->_mem->write(0xFF11, 0xBF);
+	this->_gb->_mem->write(0xFF12, 0xF3);
+	this->_gb->_mem->write(0xFF14, 0xBF);
+	this->_gb->_mem->write(0xFF16, 0x3F);
+	this->_gb->_mem->write(0xFF17, 0x00);
+	this->_gb->_mem->write(0xFF19, 0xBF);
+	this->_gb->_mem->write(0xFF1A, 0x7F);
+	this->_gb->_mem->write(0xFF1B, 0xFF);
+	this->_gb->_mem->write(0xFF1C, 0x9F);
+	this->_gb->_mem->write(0xFF1E, 0xBF);
+	this->_gb->_mem->write(0xFF20, 0xFF);
+	this->_gb->_mem->write(0xFF21, 0x00);
+	this->_gb->_mem->write(0xFF22, 0x00);
+	this->_gb->_mem->write(0xFF23, 0xBF);
+	this->_gb->_mem->write(0xFF24, 0x77);
+	this->_gb->_mem->write(0xFF25, 0xF3);
+	this->_gb->_mem->write(0xFF26, 0xF0);
+	this->_gb->_mem->write(0xFF40, 0x91);
+	this->_gb->_mem->write(0xFF42, 0x00);
+	this->_gb->_mem->write(0xFF43, 0x00);
+	this->_gb->_mem->write(0xFF45, 0x00);
+	this->_gb->_mem->write(0xFF47, 0xFC);
+	this->_gb->_mem->write(0xFF48, 0xFF);
+	this->_gb->_mem->write(0xFF49, 0xFF);
+	this->_gb->_mem->write(0xFF4A, 0x00);
+	this->_gb->_mem->write(0xFF4B, 0x00);
+	this->_gb->_mem->write(0xFF51, 0xFF);
+	this->_gb->_mem->write(0xFF52, 0xFF);
+	this->_gb->_mem->write(0xFF53, 0xFF);
+	this->_gb->_mem->write(0xFF54, 0xFF);
+	this->_gb->_mem->write(0xFF55, 0xFF);
+	this->_gb->_mem->write(0xFFFF, 0x00);
 	// Clear the this->gb->memory 0x8000 to 0x9FFF
 	// Setup audio
 	// Setup BG palette
@@ -212,14 +212,14 @@ uint8_t GbCpu::GetRegister(int id) const
 {
 	switch (id)
 	{
-	case REG_B: return regB;
-	case REG_C: return regC;
-	case REG_D: return regD;
-	case REG_E: return regE;
-	case REG_H: return regH;
-	case REG_L: return regL;
-	case REG_F: return regF;
-	case REG_A: return regA;
+	case REG_B: return _regB;
+	case REG_C: return _regC;
+	case REG_D: return _regD;
+	case REG_E: return _regE;
+	case REG_H: return _regH;
+	case REG_L: return _regL;
+	case REG_F: return _regF;
+	case REG_A: return _regA;
 	}
 	return 0;
 }
@@ -228,11 +228,11 @@ uint16_t GbCpu::GetRegisterPair(int id) const
 {
 	switch (id)
 	{
-	case REG_BC: return regBC;
-	case REG_DE: return regDE;
-	case REG_HL: return regHL;
-	case REG_SP: return regSP;
-	case REG_PC: return regPC;
+	case REG_BC: return _regBC;
+	case REG_DE: return _regDE;
+	case REG_HL: return _regHL;
+	case REG_SP: return _regSP;
+	case REG_PC: return _regPC;
 	}
 	return 0;
 }
@@ -266,23 +266,23 @@ bool GbCpu::LoadState(const SaveData_t *data)
 		uint32_t id = conv->convu32(*(uint32_t *)(ptr + 0));
 		uint32_t len = conv->convu32(*(uint32_t *)(ptr + 4));
 		if (id == StateCPUid && len >= 42) {
-			regAF = conv->convu16(*(uint16_t *)(ptr + 8));
-			regBC = conv->convu16(*(uint16_t *)(ptr + 10));
-			regDE = conv->convu16(*(uint16_t *)(ptr + 12));
-			regHL = conv->convu16(*(uint16_t *)(ptr + 14));
-			regSP = conv->convu16(*(uint16_t *)(ptr + 16));
-			regPC = conv->convu16(*(uint16_t *)(ptr + 18));
-			runningMode = (GbCpuRunningMode)ptr[20];
-			m_tim_enabled = (ptr[21] & 0x01) != 0;
-			doubleSpeed = (ptr[21] & 0x02) != 0;
-			halted = (ptr[21] & 0x04) != 0;
-			stopped = (ptr[21] & 0x08) != 0;
-			ime = (ptr[21] & 0x10) != 0;
-			cycles = conv->convi32(*(int32_t *)(ptr + 22));
-			m_div_counter = conv->convi32(*(int32_t *)(ptr + 26));
-			m_tim_counter = conv->convi32(*(int32_t *)(ptr + 30));
-			timerClocks = conv->convi32(*(int32_t *)(ptr + 34));
-			dividerClocks = conv->convi32(*(int32_t *)(ptr + 38));
+			_regAF = conv->convu16(*(uint16_t *)(ptr + 8));
+			_regBC = conv->convu16(*(uint16_t *)(ptr + 10));
+			_regDE = conv->convu16(*(uint16_t *)(ptr + 12));
+			_regHL = conv->convu16(*(uint16_t *)(ptr + 14));
+			_regSP = conv->convu16(*(uint16_t *)(ptr + 16));
+			_regPC = conv->convu16(*(uint16_t *)(ptr + 18));
+			_runningMode = (GbCpuRunningMode)ptr[20];
+			_tim_enabled = (ptr[21] & 0x01) != 0;
+			_doubleSpeed = (ptr[21] & 0x02) != 0;
+			_halted = (ptr[21] & 0x04) != 0;
+			_stopped = (ptr[21] & 0x08) != 0;
+			_ime = (ptr[21] & 0x10) != 0;
+			_cycles = conv->convi32(*(int32_t *)(ptr + 22));
+			_div_counter = conv->convi32(*(int32_t *)(ptr + 26));
+			_tim_counter = conv->convi32(*(int32_t *)(ptr + 30));
+			_timerClocks = conv->convi32(*(int32_t *)(ptr + 34));
+			_dividerClocks = conv->convi32(*(int32_t *)(ptr + 38));
 			return true;
 		}
 		ptr += len;
@@ -299,24 +299,24 @@ bool GbCpu::SaveState(std::vector<uint8_t> &data)
 	uint8_t *ptr = data.data() + data.size() - dataLen;
 	*(uint32_t *)(ptr + 0) = conv->convu32(StateCPUid);
 	*(uint32_t *)(ptr + 4) = conv->convu32(dataLen);
-	*(uint16_t *)(ptr + 8) = conv->convu16(regAF);
-	*(uint16_t *)(ptr + 10) = conv->convu16(regBC);
-	*(uint16_t *)(ptr + 12) = conv->convu16(regDE);
-	*(uint16_t *)(ptr + 14) = conv->convu16(regHL);
-	*(uint16_t *)(ptr + 16) = conv->convu16(regSP);
-	*(uint16_t *)(ptr + 18) = conv->convu16(regPC);
-	ptr[20] = (uint8_t)runningMode;
+	*(uint16_t *)(ptr + 8) = conv->convu16(_regAF);
+	*(uint16_t *)(ptr + 10) = conv->convu16(_regBC);
+	*(uint16_t *)(ptr + 12) = conv->convu16(_regDE);
+	*(uint16_t *)(ptr + 14) = conv->convu16(_regHL);
+	*(uint16_t *)(ptr + 16) = conv->convu16(_regSP);
+	*(uint16_t *)(ptr + 18) = conv->convu16(_regPC);
+	ptr[20] = (uint8_t)_runningMode;
 	ptr[21] =
-		(m_tim_enabled ? 0x01 : 0x00) |
-		(doubleSpeed ? 0x02 : 0x00) |
-		(halted ? 0x04 : 0x00) |
-		(stopped ? 0x08 : 0x00) |
-		(ime ? 0x10 : 0x00);
-	*(int32_t *)(ptr + 22) = conv->convi32(cycles);
-	*(int32_t *)(ptr + 26) = conv->convi32(m_div_counter);
-	*(int32_t *)(ptr + 30) = conv->convi32(m_tim_counter);
-	*(int32_t *)(ptr + 34) = conv->convi32(timerClocks);
-	*(int32_t *)(ptr + 38) = conv->convi32(dividerClocks);
+		(_tim_enabled ? 0x01 : 0x00) |
+		(_doubleSpeed ? 0x02 : 0x00) |
+		(_halted ? 0x04 : 0x00) |
+		(_stopped ? 0x08 : 0x00) |
+		(_ime ? 0x10 : 0x00);
+	*(int32_t *)(ptr + 22) = conv->convi32(_cycles);
+	*(int32_t *)(ptr + 26) = conv->convi32(_div_counter);
+	*(int32_t *)(ptr + 30) = conv->convi32(_tim_counter);
+	*(int32_t *)(ptr + 34) = conv->convi32(_timerClocks);
+	*(int32_t *)(ptr + 38) = conv->convi32(_dividerClocks);
 	return true;
 }
 

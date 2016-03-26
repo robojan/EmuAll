@@ -94,17 +94,17 @@ public:
 	void DestroyGL(int user);
 	void Reshape(int width, int height, bool keepAspect);
 
-	bool IsEnabled() const { return m_enabled; }
+	bool IsEnabled() const { return _enabled; }
 
 	bool LoadState(const SaveData_t *data);
 	bool SaveState(std::vector<uint8_t> &data);
 
 	// Debugging
-	BackgroundDebuggerData *GetBackgroundDebugInfo() { return &mBGDebug; }
+	BackgroundDebuggerData *GetBackgroundDebugInfo() { return &_BGDebug; }
 	void UpdateBackgroundDebug();
-	TilesDebuggerData *GetTilesDebugInfo() { return &mTiDebug; }
+	TilesDebuggerData *GetTilesDebugInfo() { return &_TiDebug; }
 	void UpdateTilesDebug();
-	OAMDebuggerData *GetOAMDebugInfo() { return &mOAMDebug; }
+	OAMDebuggerData *GetOAMDebugInfo() { return &_OAMDebug; }
 	void UpdateOAMDebug();
 	unsigned int GetPalette(int index);
 
@@ -125,100 +125,100 @@ private:
 	void DrawDebugTiles();
 	void DrawDebugOAM();
 
-	Gameboy		*m_gb;
-	bool		m_enabled;
-	int			m_clocks;
-	int			m_lineCounter;
-	gbByte		m_mode;
-	int			m_lineSprites[40];
-	int			m_ly;
-	gbPallete	m_bgPaletteData[PALETTE_SIZE];
-	gbPallete	m_oPaletteData[PALETTE_SIZE];
+	Gameboy		*_gb;
+	bool		_enabled;
+	int			_clocks;
+	int			_lineCounter;
+	gbByte		_mode;
+	int			_lineSprites[40];
+	int			_ly;
+	gbPallete	_bgPaletteData[PALETTE_SIZE];
+	gbPallete	_oPaletteData[PALETTE_SIZE];
 
 	// Main screen
-	unsigned int m_texture;
-	unsigned int m_surfaceVBO;
-	unsigned int m_surfaceUVBO;
-	unsigned int m_vao;
-	unsigned int m_shaderProgram;
-	gbColor		*m_screen;
-	gbColor		*m_screen_buffer1;
-	gbColor		*m_screen_buffer2;
-	gbColor		*mDebugDrawBuffer;
+	unsigned int _texture;
+	unsigned int _surfaceVBO;
+	unsigned int _surfaceUVBO;
+	unsigned int _vao;
+	unsigned int _shaderProgram;
+	gbColor		*_screen;
+	gbColor		*_screen_buffer1;
+	gbColor		*_screen_buffer2;
+	gbColor		*_debugDrawBuffer;
 	
 	// Background
-	BackgroundDebuggerData mBGDebug;
-	unsigned int mBGTexture;
-	unsigned int mBGVBO;
-	unsigned int mBGUVBO;
-	unsigned int mBGVAO;
-	unsigned int mBGShaderProgram;
+	BackgroundDebuggerData _BGDebug;
+	unsigned int _BGTexture;
+	unsigned int _BGVBO;
+	unsigned int _BGUVBO;
+	unsigned int _BGVAO;
+	unsigned int _BGShaderProgram;
 
 	// Tiles
-	TilesDebuggerData mTiDebug;
-	unsigned int mTiTexture;
-	unsigned int mTiVBO;
-	unsigned int mTiUVBO;
-	unsigned int mTiVAO;
-	unsigned int mTiShaderProgram;
+	TilesDebuggerData _TiDebug;
+	unsigned int _TiTexture;
+	unsigned int _TiVBO;
+	unsigned int _TiUVBO;
+	unsigned int _TiVAO;
+	unsigned int _TiShaderProgram;
 
 	// OAM
-	OAMDebuggerData mOAMDebug;
-	unsigned int mOAMTexture;
-	unsigned int mOAMVBO;
-	unsigned int mOAMUVBO;
-	unsigned int mOAMVAO;
-	unsigned int mOAMShaderProgram;
+	OAMDebuggerData _OAMDebug;
+	unsigned int _OAMTexture;
+	unsigned int _OAMVBO;
+	unsigned int _OAMUVBO;
+	unsigned int _OAMVAO;
+	unsigned int _OAMShaderProgram;
 
 
 };
 
 inline void GbGpu::tick(void)
 { 
-	if (m_gb == NULL || m_gb->_mem == NULL || m_enabled == false)
+	if (_gb == NULL || _gb->_mem == NULL || _enabled == false)
 	{
 		return;
 	}
-	m_clocks++;
-	m_lineCounter--;
-	if(m_clocks == REFRESH_CLKS)
+	_clocks++;
+	_lineCounter--;
+	if(_clocks == REFRESH_CLKS)
 	{
-		m_clocks = 0; // Update in which clock we are
+		_clocks = 0; // Update in which clock we are
 	}
-	if (m_lineCounter == 0)
+	if (_lineCounter == 0)
 	{
-		m_lineCounter = LINE_CLKS;
-		m_ly = (m_clocks) / LINE_CLKS;
-		m_gb->_mem->write(LY, (gbByte) m_ly, false);
+		_lineCounter = LINE_CLKS;
+		_ly = (_clocks) / LINE_CLKS;
+		_gb->_mem->write(LY, (gbByte) _ly, false);
 	}
-	if(m_clocks < (REFRESH_CLKS - VBLANK_CLKS))  // The GPU is in active mode
+	if(_clocks < (REFRESH_CLKS - VBLANK_CLKS))  // The GPU is in active mode
 	{
-		if (LINE_CLKS - m_lineCounter < OAM_CLKS) // OAM acces mode Mode 2
+		if (LINE_CLKS - _lineCounter < OAM_CLKS) // OAM acces mode Mode 2
 		{
-			if(m_mode != LCDS_M_S)	//First time entering this mode
+			if(_mode != LCDS_M_S)	//First time entering this mode
 			{
-				m_mode = LCDS_M_S;
-				oam(m_ly);
+				_mode = LCDS_M_S;
+				oam(_ly);
 			}
 		}
-		else if (LINE_CLKS - m_lineCounter < OAM_CLKS + VRAM_CLKS) { // GPU draw mode Mode 3
+		else if (LINE_CLKS - _lineCounter < OAM_CLKS + VRAM_CLKS) { // GPU draw mode Mode 3
 			// Draw the line
-			if(m_mode != LCDS_M_T)
+			if(_mode != LCDS_M_T)
 			{
-				m_mode = LCDS_M_T;
-				drawing(m_ly);
+				_mode = LCDS_M_T;
+				drawing(_ly);
 			}			
 		} else { // Hblank period Mode 0
-			if(m_mode != LCDS_M_H)
+			if(_mode != LCDS_M_H)
 			{
-				m_mode = LCDS_M_H;
-				hblank(m_ly);
+				_mode = LCDS_M_H;
+				hblank(_ly);
 			}
 		}
 	} else {					// The GPU is in VBLANK
-		if(m_mode != LCDS_M_V)	// First time entering this mode
+		if(_mode != LCDS_M_V)	// First time entering this mode
 		{
-			m_mode = LCDS_M_V;
+			_mode = LCDS_M_V;
 			vblank();
 		}
 	}
@@ -230,17 +230,17 @@ inline gbBgMap GbGpu::getTileData(bool bgd, bool bgm, int map) const
 	gbBgMap r;
 	if(bgm) // (0=9800-9BFF, 1=9C00-9FFF)
 	{
-		tileNr = m_gb->_mem->vram[0][BGMAP_VRAM_OFFSET1 + map];
-		r.attributes = m_gb->_mem->vram[1][BGMAP_VRAM_OFFSET1 + map];
+		tileNr = _gb->_mem->_vram[0][BGMAP_VRAM_OFFSET1 + map];
+		r.attributes = _gb->_mem->_vram[1][BGMAP_VRAM_OFFSET1 + map];
 	} else {
-		tileNr = m_gb->_mem->vram[0][BGMAP_VRAM_OFFSET0 + map];
-		r.attributes = m_gb->_mem->vram[1][BGMAP_VRAM_OFFSET0 + map];
+		tileNr = _gb->_mem->_vram[0][BGMAP_VRAM_OFFSET0 + map];
+		r.attributes = _gb->_mem->_vram[1][BGMAP_VRAM_OFFSET0 + map];
 	}
 	if(bgd) // (0=8800-97FF, 1=8000-8FFF)
 	{
-		r.tile = m_gb->_mem->vram[(r.attributes & BGMAP_ATTR_BANK) ? 1 : 0] + BGDATA_VRAM_OFFSET1 + tileNr*TILE_SIZE;
+		r.tile = _gb->_mem->_vram[(r.attributes & BGMAP_ATTR_BANK) ? 1 : 0] + BGDATA_VRAM_OFFSET1 + tileNr*TILE_SIZE;
 	} else {
-		r.tile = m_gb->_mem->vram[(r.attributes & BGMAP_ATTR_BANK) ? 1 : 0] + BGDATA_VRAM_OFFSET0 + ((int8_t) tileNr)*TILE_SIZE;
+		r.tile = _gb->_mem->_vram[(r.attributes & BGMAP_ATTR_BANK) ? 1 : 0] + BGDATA_VRAM_OFFSET0 + ((int8_t) tileNr)*TILE_SIZE;
 	}
 	return r;
 }

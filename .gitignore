@@ -29,6 +29,9 @@ bld/
 [Oo]bj/
 /tools/
 
+# Include debugger directory
+!/GBemu/gb/debug/
+
 # Visual Studio 2015 cache/options directory
 .vs/
 
@@ -227,7 +230,6 @@ TestROMs/*
 
 #generated files
 GBemu/resources/resources.h
-
 
 
 *.diagsession

@@ -5,16 +5,16 @@
 using namespace Debugger;
 
 DebuggerGrid::DebuggerGrid(Emulator *emu, const pugi::xml_node &node) :
-	mEmu(emu), mWidget(NULL), mRows(-1), mColumns(-1)
+	_emu(emu), _widget(NULL), _rows(-1), _colums(-1)
 {
 	wxASSERT(strcmp(node.name(), "grid") == 0);
 	wxASSERT(emu != NULL);
 
-	mRows = node.child("rows").text().as_int(-1);
-	mColumns = node.child("columns").text().as_int(-1);
-	mName = node.attribute("name").as_string("");
+	_rows = node.child("rows").text().as_int(-1);
+	_colums = node.child("columns").text().as_int(-1);
+	_name = node.attribute("name").as_string("");
 
-	if (mColumns < 0)
+	if (_colums < 0)
 	{
 		Log(Warn, "Grid colums size is invalid");
 		return;
@@ -32,68 +32,68 @@ DebuggerGrid::DebuggerGrid(Emulator *emu, const pugi::xml_node &node) :
 		item.proportion = iChild->attribute("prop").as_int(0);
 		if (item.element != NULL)
 		{
-			mItems.push_back(item);
+			_items.push_back(item);
 		}
 	}
 }
 
 DebuggerGrid::~DebuggerGrid()
 {
-	for (std::vector<Item>::iterator iElement = mItems.begin();
-		iElement != mItems.end(); ++iElement)
+	for (std::vector<Item>::iterator iElement = _items.begin();
+		iElement != _items.end(); ++iElement)
 	{
 		delete iElement->element;
 	}
-	mItems.clear();
+	_items.clear();
 }
 
 wxWindow *DebuggerGrid::GetWidget(wxWindow *parent, wxWindowID id)
 {
-	if (mWidget != NULL)
+	if (_widget != NULL)
 	{
-		return mWidget; // Widget already created
+		return _widget; // Widget already created
 	}
 
 	wxBoxSizer *bsizer = new wxBoxSizer(wxVERTICAL);
-	if (!mName.IsEmpty())
+	if (!_name.IsEmpty())
 	{
 
-		mWidget = new wxStaticBox(parent, id, mName);
+		_widget = new wxStaticBox(parent, id, _name);
 		bsizer->AddSpacer(15);
 	}
 	else {
-		mWidget = new wxPanel(parent, id);
+		_widget = new wxPanel(parent, id);
 	}
 
 	wxFlexGridSizer *sizer;
-	if(mRows > 0) {
-		sizer = new wxFlexGridSizer(mRows,mColumns,5,5);
+	if(_rows > 0) {
+		sizer = new wxFlexGridSizer(_rows,_colums,5,5);
 	}
 	else {
-		sizer = new wxFlexGridSizer(mColumns, 5, 5);
+		sizer = new wxFlexGridSizer(_colums, 5, 5);
 	}
-	for (std::vector<Item>::iterator iItem = mItems.begin();
-		iItem != mItems.end(); ++iItem)
+	for (std::vector<Item>::iterator iItem = _items.begin();
+		iItem != _items.end(); ++iItem)
 	{
-		sizer->Add(iItem->element->GetWidget(mWidget, wxID_ANY), iItem->proportion, wxEXPAND | wxALL, 5);
+		sizer->Add(iItem->element->GetWidget(_widget, wxID_ANY), iItem->proportion, wxEXPAND | wxALL, 5);
 	}
 	bsizer->Add(sizer);
-	mWidget->SetSizerAndFit(bsizer);
+	_widget->SetSizerAndFit(bsizer);
 
 	UpdateInfo();
-	return mWidget;
+	return _widget;
 }
 
 void DebuggerGrid::UpdateInfo()
 {
-	if (mEmu->emu == NULL || mWidget == NULL)
+	if (_emu->emu == NULL || _widget == NULL)
 	{
 		return; // Nothing to do
 	}
 
 
-	for (std::vector<Item>::iterator iItem = mItems.begin();
-		iItem != mItems.end(); ++iItem)
+	for (std::vector<Item>::iterator iItem = _items.begin();
+		iItem != _items.end(); ++iItem)
 	{
 		iItem->element->UpdateInfo();
 	}

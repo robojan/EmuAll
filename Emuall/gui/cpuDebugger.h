@@ -23,17 +23,17 @@ private:
 	void OnRun(wxCommandEvent &evt);
 	void OnStep(wxCommandEvent &evt);
 
-	Emulator mEmu;
-	DisView *mCodeView;
-	wxListCtrl *mRegisterView;
-	std::vector<wxCheckBox *> mStatusWidgets;
-	std::map<int, EmulatorRegister_t> mRegisters;
-	std::map<wxCheckBox *, EmulatorRegister_t> mFlags;
-	wxGridSizer* mStatusSizer;
-	wxButton *mRunButton;
-	wxButton *mStepButton;
-	wxButton *mStepOverButton;
-	wxButton *mStepOutButton;
+	Emulator _emu;
+	DisView *_codeView;
+	wxListCtrl *_registerView;
+	std::vector<wxCheckBox *> _statusWidget;
+	std::map<int, EmulatorRegister_t> _registers;
+	std::map<wxCheckBox *, EmulatorRegister_t> _flags;
+	wxGridSizer* _statusSizer;
+	wxButton *_runButton;
+	wxButton *_stepButton;
+	wxButton *_stepOverButton;
+	wxButton *_stepOutButton;
 };
 
 #endif

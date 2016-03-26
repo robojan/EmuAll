@@ -31,13 +31,13 @@ public:
 	inline void handleInstruction(void);
 	void registerEvents(void);
 	void MemEvent(address_t address, gbByte val);
-	inline bool InterruptsEnabled() const { return ime; }
-	inline bool IsHalted() const { return halted; }
-	inline bool IsStopped() const { return stopped; }
+	inline bool InterruptsEnabled() const { return _ime; }
+	inline bool IsHalted() const { return _halted; }
+	inline bool IsStopped() const { return _stopped; }
 	uint8_t GetRegister(int id) const;
 	uint16_t GetRegisterPair(int id) const;
-	GbCpuRunningMode GetRunningMode() const { return runningMode; }
-	void SetRunningMode(GbCpuRunningMode mode) { runningMode = mode; }
+	GbCpuRunningMode GetRunningMode() const { return _runningMode; }
+	void SetRunningMode(GbCpuRunningMode mode) { _runningMode = mode; }
 
 	bool LoadState(const SaveData_t *data);
 	bool SaveState(std::vector<uint8_t> &data);
@@ -45,62 +45,62 @@ public:
 private:
 
 	inline uint8_t GetOP() { 
-		uint8_t ret = gb->_mem->read(regPC); 
-		regPC+=1; 
+		uint8_t ret = _gb->_mem->read(_regPC); 
+		_regPC+=1; 
 		return ret;
 	}
 
 	inline uint16_t GetNN() {
-		uint16_t ret = gb->_mem->read(regPC) | gb->_mem->read(regPC + 1) << 8;
-		regPC += 2;
+		uint16_t ret = _gb->_mem->read(_regPC) | _gb->_mem->read(_regPC + 1) << 8;
+		_regPC += 2;
 		return ret;
 	}
 
 	
 	union{
 		struct {
-			uint8_t regF;
-			uint8_t regA;
+			uint8_t _regF;
+			uint8_t _regA;
 		};
-		uint16_t regAF;
+		uint16_t _regAF;
 	};
 	union{
 		struct {
-			uint8_t regC;
-			uint8_t regB;
+			uint8_t _regC;
+			uint8_t _regB;
 		};
-		uint16_t regBC;
+		uint16_t _regBC;
 	};
 	union{
 		struct {
-			uint8_t regE;
-			uint8_t regD;
+			uint8_t _regE;
+			uint8_t _regD;
 		};
-		uint16_t regDE;
+		uint16_t _regDE;
 	};
 	union{
 		struct {
-			uint8_t regL;
-			uint8_t regH;
+			uint8_t _regL;
+			uint8_t _regH;
 		};
-		uint16_t regHL;
+		uint16_t _regHL;
 	};
-	uint16_t regSP;
-	uint16_t regPC;
+	uint16_t _regSP;
+	uint16_t _regPC;
 
-	GbCpuRunningMode runningMode;
-	Gameboy		*gb;
-	int			cycles;
-	bool		ime;
-	bool		stopped;
-	bool		halted;
-	bool		doubleSpeed;
-	bool		m_tim_enabled;
-	int			m_div_counter;
-	int			m_tim_counter;
+	GbCpuRunningMode _runningMode;
+	Gameboy		*_gb;
+	int			_cycles;
+	bool		_ime;
+	bool		_stopped;
+	bool		_halted;
+	bool		_doubleSpeed;
+	bool		_tim_enabled;
+	int			_div_counter;
+	int			_tim_counter;
 	
-	int			timerClocks;
-	int			dividerClocks;
+	int			_timerClocks;
+	int			_dividerClocks;
 };
 
 //#include "GbOpcodes.h"

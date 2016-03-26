@@ -28,7 +28,7 @@ Gameboy::~Gameboy()
 
 void Gameboy::Step(void)
 {
-	uint32_t unbankedAddress = _mem->GetUnbankedAddress(_cpu->regPC);
+	uint32_t unbankedAddress = _mem->GetUnbankedAddress(_cpu->_regPC);
 	if (IsBreakpoint(unbankedAddress))
 	{
 		// Add skip
@@ -119,14 +119,14 @@ bool Gameboy::Tick(uint32_t time)
 	{
 		_sound->BeginTick();
 		int execute = ((uint64_t)time * FCPU + 500000)/1000000;
-		if (_cpu->doubleSpeed) // CPU in double speed mode?
+		if (_cpu->_doubleSpeed) // CPU in double speed mode?
 		{
 			execute = execute * 2;
 		}
 		int slowTickCounter = execute/4;
 		for (int i = execute; i != 0; --i)
 		{
-			if (_cpu->stopped)
+			if (_cpu->_stopped)
 			{
 				gbByte key1 = _mem->read(KEY1);
 				if (key1 & KEY1_PREP) // if the cpu is stopped and the switch to double frequency is set
@@ -135,20 +135,20 @@ bool Gameboy::Tick(uint32_t time)
 					{
 						i = i / 2; // half the execution speed;
 						_mem->write(KEY1, (gbByte) 0x00);
-						_cpu->doubleSpeed = false;
+						_cpu->_doubleSpeed = false;
 					}
 					else {
 						i = i * 2; // double the execution speed;
 						_mem->write(KEY1, (gbByte) KEY1_CURSPEED);
-						_cpu->doubleSpeed = true;
+						_cpu->_doubleSpeed = true;
 					}
 					// And continue the cpu
-					_cpu->stopped = false;
+					_cpu->_stopped = false;
 				}
 			}
 			_cpu->Tick();
 			// TODO: add serial port
-			if ((_cpu->doubleSpeed && (i & 1)) || !_cpu->doubleSpeed)
+			if ((_cpu->_doubleSpeed && (i & 1)) || !_cpu->_doubleSpeed)
 			{
 				// In double speed this is stil normal
 				_gpu->tick();
@@ -297,7 +297,7 @@ void Gameboy::AddBreakpoint(address_t address)
 	address_t realAddress = address;
 	if (realAddress >= 0xE000 && realAddress < 0xFEA0) // copy of memory
 		realAddress -= 0x2000;
-	bp.ptr = &_mem->mem[realAddress / 0x1000][realAddress % 0x1000];
+	bp.ptr = &_mem->_mem[realAddress / 0x1000][realAddress % 0x1000];
 	// Insert breakpoint
 	bp.org = *bp.ptr;
 	*bp.ptr = 0xFD; // Insert breakpoint

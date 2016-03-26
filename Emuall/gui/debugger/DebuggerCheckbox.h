@@ -29,9 +29,9 @@ namespace Debugger
 			bool write;
 		};
 
-		Emulator *mEmu;
-		wxCheckBox *mWidget;
-		Item mCheckbox;
+		Emulator *_emu;
+		wxCheckBox *_widgets;
+		Item _checkbox;
 	};
 
 }

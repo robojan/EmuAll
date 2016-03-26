@@ -21,14 +21,14 @@ protected:
 	void OnDClick(wxMouseEvent &evt);
 	wxSize DoGetBestClientSize() const;
 private:
-	int mEmuCurLineId;
-	unsigned int mNumberOfLines;
-	unsigned int mStartingLine;
-	unsigned int mEndingLine;
-	unsigned int mCurrentLine;
-	int mStartingY;
-	int mLineHeight;
-	Emulator *mEmu;
+	int _emuCurLineId;
+	unsigned int _numberOfLines;
+	unsigned int _startingLine;
+	unsigned int _endingLine;
+	unsigned int _currentLine;
+	int _startingY;
+	int _lineHeight;
+	Emulator *_emu;
 };
 
 #endif

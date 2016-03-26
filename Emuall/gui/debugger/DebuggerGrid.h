@@ -25,12 +25,12 @@ namespace Debugger
 			DebuggerElement *element;
 			int proportion;
 		};
-		Emulator *mEmu;
-		wxWindow *mWidget;
-		wxString mName;
-		int mRows;
-		int mColumns;
-		std::vector<Item> mItems;
+		Emulator *_emu;
+		wxWindow *_widget;
+		wxString _name;
+		int _rows;
+		int _colums;
+		std::vector<Item> _items;
 	};
 }
 

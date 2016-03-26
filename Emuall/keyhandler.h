@@ -26,8 +26,8 @@ public:
 private:
 	bool SendKey(std::string name, int key, int pressed);
 
-	std::map<std::string, std::list<Emulator>> mClients;
-	Options *mOptions;
+	std::map<std::string, std::list<Emulator>> _clients;
+	Options *_options;
 };
 
 #endif

@@ -27,10 +27,10 @@ private:
 
 	void RestoreBinding();
 
-	std::map<std::string, std::map<int, KeyBindBox *>> mBindingBoxes;
-	Options *mOptions;
-	wxNotebook *mNotebook;
-	KeyBindBox *mActiveRebind;
+	std::map<std::string, std::map<int, KeyBindBox *>> _bindingBoxes;
+	Options *_options;
+	wxNotebook *_notebook;
+	KeyBindBox *_activeRebind;
 };
 
 #endif

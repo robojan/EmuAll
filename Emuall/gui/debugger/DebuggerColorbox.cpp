@@ -3,11 +3,11 @@
 using namespace Debugger;
 
 DebuggerColorbox::DebuggerColorbox(Emulator *emu, const pugi::xml_node &node) :
-mEmu(emu), mWidget(NULL)
+_emu(emu), _widgets(NULL)
 {
 	wxASSERT(strcmp(node.name(), "colorbox") == 0);
 	wxASSERT(emu != NULL);
-	mID = node.attribute("id").as_int(-1);
+	_id = node.attribute("id").as_int(-1);
 }
 
 DebuggerColorbox::~DebuggerColorbox()
@@ -17,28 +17,28 @@ DebuggerColorbox::~DebuggerColorbox()
 
 wxPanel *DebuggerColorbox::GetWidget(wxWindow *parent, wxWindowID id)
 {
-	if (mWidget != NULL)
+	if (_widgets != NULL)
 	{
-		return mWidget; // Widget already created
+		return _widgets; // Widget already created
 	}
 
-	mWidget = new wxPanel(parent, id, wxDefaultPosition, wxSize(20, 20), wxBORDER_SUNKEN);
-	mWidget->SetMinSize(wxSize(20, 20));
-	mWidget->SetBackgroundColour(wxColour((unsigned long)0x000000)); // black
+	_widgets = new wxPanel(parent, id, wxDefaultPosition, wxSize(20, 20), wxBORDER_SUNKEN);
+	_widgets->SetMinSize(wxSize(20, 20));
+	_widgets->SetBackgroundColour(wxColour((unsigned long)0x000000)); // black
 	UpdateInfo();
-	return mWidget;
+	return _widgets;
 }
 
 void DebuggerColorbox::UpdateInfo()
 {
-	if (mEmu->emu == NULL || mWidget == NULL)
+	if (_emu->emu == NULL || _widgets == NULL)
 	{
 		return; // Nothing to do
 	}
 
-	if (mWidget->IsShownOnScreen())
+	if (_widgets->IsShownOnScreen())
 	{
-		mWidget->SetBackgroundColour(wxColour((unsigned long)mEmu->emu->GetValU(mEmu->handle, mID)));
-		mWidget->Refresh();
+		_widgets->SetBackgroundColour(wxColour((unsigned long)_emu->emu->GetValU(_emu->handle, _id)));
+		_widgets->Refresh();
 	}
 }

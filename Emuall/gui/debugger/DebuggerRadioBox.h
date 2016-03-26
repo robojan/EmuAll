@@ -27,9 +27,9 @@ namespace Debugger {
 			std::map<std::string, int> options;
 		};
 
-		Emulator *mEmu;
-		wxRadioBox *mWidget;
-		Item mItem;
+		Emulator *_emu;
+		wxRadioBox *_widget;
+		Item _item;
 	};
 }
 

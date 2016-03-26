@@ -67,7 +67,7 @@ void Options::SaveOptions()
 	mFileConfig.Write("RecentFiles/file4", wxString(recentFiles[4]));
 
 	// Key bindings
-	for (auto &emu : mKeyBindings) {
+	for (auto &emu : _keyBindings) {
 		wxString groupBase = wxString::Format(_("KeyBindings.%s"), emu.first);
 		for (auto &keybindings : emu.second) {
 			wxString group = groupBase;
@@ -97,37 +97,37 @@ void Options::AddKeyBinding(std::string name, const EmulatorInput_t &keyInfo)
 		wxCONFIG_USE_SUBDIR | wxCONFIG_USE_LOCAL_FILE);
 	wxString entry = wxString::Format("KeyBindings.%s/%s", name, keyInfo.name);
 	int key = mFileConfig.ReadLong(entry, keyInfo.defaultKey);
-	mKeyBindings[name][key] = keyInfo;
+	_keyBindings[name][key] = keyInfo;
 }
 
 void Options::RebindKey(std::string name, int emuKey, int inputKey)
 {
-	assert(mKeyBindings.find(name) != mKeyBindings.end());
+	assert(_keyBindings.find(name) != _keyBindings.end());
 	std::map<int, EmulatorInput_t>::iterator it;
 	EmulatorInput_t reboundEmuInput;
 	int oldKey = 0;
 	// Search for the keybinding
-	for (it = mKeyBindings[name].begin(); it != mKeyBindings[name].end(); ++it)
+	for (it = _keyBindings[name].begin(); it != _keyBindings[name].end(); ++it)
 	{
 		if (it->second.key == emuKey)
 		{
 			reboundEmuInput = it->second;
 			oldKey = it->first;
 			// Remove binding from the list
-			mKeyBindings[name].erase(it);
+			_keyBindings[name].erase(it);
 			break;
 		}
 	}
 
-	if ((it = mKeyBindings[name].find(inputKey)) != mKeyBindings[name].end())
+	if ((it = _keyBindings[name].find(inputKey)) != _keyBindings[name].end())
 	{
 		// Key already exists in rebindings
 		EmulatorInput_t overWriteInput = it->second;
 		it->second = reboundEmuInput;
-		mKeyBindings[name][oldKey] = overWriteInput;
+		_keyBindings[name][oldKey] = overWriteInput;
 	}
 	else {
-		mKeyBindings[name][inputKey] = reboundEmuInput;
+		_keyBindings[name][inputKey] = reboundEmuInput;
 	}
 }
 
@@ -151,21 +151,21 @@ void Options::SaveRecentFile(std::string file)
 
 int Options::GetKeyBinding(std::string name, int key, int defaultKey)
 {
-	if (mKeyBindings.find(name) == mKeyBindings.end() || mKeyBindings[name].find(key) == mKeyBindings[name].end())
+	if (_keyBindings.find(name) == _keyBindings.end() || _keyBindings[name].find(key) == _keyBindings[name].end())
 	{
 		return defaultKey;
 	}
-	return mKeyBindings[name][key].key;
+	return _keyBindings[name][key].key;
 }
 
 int Options::GetInputKeyBinding(std::string name, int key, int defaultKey)
 {
-	if (mKeyBindings.find(name) == mKeyBindings.end())
+	if (_keyBindings.find(name) == _keyBindings.end())
 		return defaultKey;
 
 	std::map<int, EmulatorInput_t>::iterator it;
 	// Search for the keybinding
-	for (it = mKeyBindings[name].begin(); it != mKeyBindings[name].end(); ++it)
+	for (it = _keyBindings[name].begin(); it != _keyBindings[name].end(); ++it)
 	{
 		if (it->second.key == key)
 		{
@@ -177,9 +177,9 @@ int Options::GetInputKeyBinding(std::string name, int key, int defaultKey)
 
 const EmulatorInput_t *Options::GetKeyBindingInfo(std::string name, int key)
 {
-	if (mKeyBindings.find(name) == mKeyBindings.end() || mKeyBindings[name].find(key) == mKeyBindings[name].end())
+	if (_keyBindings.find(name) == _keyBindings.end() || _keyBindings[name].find(key) == _keyBindings[name].end())
 	{
 		return NULL;
 	}
-	return &mKeyBindings[name][key];
+	return &_keyBindings[name][key];
 }

@@ -21,8 +21,8 @@ public:
 		const wxSize &size, long style, const wxGLAttributes &attr, const wxGLContextAttrs &ctxAttr);
 	~GLPane();
 
-	void SetUserData(int user) { mUser = user; }
-	int GetUserData() const { return mUser; }
+	void SetUserData(int user) { _user = user; }
+	int GetUserData() const { return _user; }
 
 	void DestroyGL();
 
@@ -32,14 +32,14 @@ public:
 
 private:
 	void Render(wxPaintEvent &evt);
-	wxGLContext	*mContext;
-	GLPaneI		*mCallback;
-	int			mUser;
-	bool		mInitialized;
-	float		mClearR, mClearG, mClearB, mClearA;
-	bool		mClearColourChanged;
-	wxGLAttributes mGLAttr;
-	wxGLContextAttrs mCtxAttr;
+	wxGLContext	*_context;
+	GLPaneI		*_callback;
+	int			_user;
+	bool		_initialized;
+	float		_clearR, _clearG, _clearB, _clearA;
+	bool		_clearColourChanged;
+	wxGLAttributes _GLAttr;
+	wxGLContextAttrs _CtxAttr;
 };
 
 #endif

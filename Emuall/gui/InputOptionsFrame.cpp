@@ -16,10 +16,10 @@ END_EVENT_TABLE()
 InputOptionsFrame::InputOptionsFrame(wxFrame *parent, Options *options) :
 	wxFrame(parent, wxID_ANY, _("Input options"))
 {
-	mOptions = options;
+	_options = options;
 
-	mNotebook = new wxNotebook(this, wxID_ANY);
-	mActiveRebind = NULL;
+	_notebook = new wxNotebook(this, wxID_ANY);
+	_activeRebind = NULL;
 }
 
 InputOptionsFrame::~InputOptionsFrame()
@@ -168,29 +168,29 @@ void InputOptionsFrame::OnShow(wxShowEvent &evt)
 {
 	if (!evt.IsShown())
 		return;
-	if (mNotebook->GetPageCount() >0 && mNotebook->GetPageText(0) == _("No emulators"))
-		mNotebook->DeletePage(0);
-	if (mOptions->mKeyBindings.size() == 0)
+	if (_notebook->GetPageCount() >0 && _notebook->GetPageText(0) == _("No emulators"))
+		_notebook->DeletePage(0);
+	if (_options->_keyBindings.size() == 0)
 	{
 		// Add empty page
-		wxPanel *emptyPage = new wxPanel(mNotebook);
+		wxPanel *emptyPage = new wxPanel(_notebook);
 		wxBoxSizer *sizer1 = new wxBoxSizer(wxVERTICAL);
 		sizer1->AddStretchSpacer();
 		wxStaticText *label1 = new wxStaticText(emptyPage, wxID_ANY, _("There are no emulators loaded!"));
 		sizer1->Add(label1, 1, wxEXPAND|wxALIGN_CENTER,0);
 		sizer1->AddStretchSpacer();
 		emptyPage->SetSizerAndFit(sizer1);
-		mNotebook->InsertPage(0, emptyPage,_("No emulators"), true);
+		_notebook->InsertPage(0, emptyPage,_("No emulators"), true);
 	}
 	else {
 		// Add a new page for each emulator
 		std::map<std::string, std::map<int, EmulatorInput_t >>::iterator it;
-		for (it = mOptions->mKeyBindings.begin(); it != mOptions->mKeyBindings.end(); ++it)
+		for (it = _options->_keyBindings.begin(); it != _options->_keyBindings.end(); ++it)
 		{
 			bool pageExists = false;
-			for (size_t i = 0; i < mNotebook->GetPageCount(); i++)
+			for (size_t i = 0; i < _notebook->GetPageCount(); i++)
 			{
-				if (mNotebook->GetPageText(i) == wxString(it->first))
+				if (_notebook->GetPageText(i) == wxString(it->first))
 				{
 					pageExists = true;
 					break;
@@ -200,7 +200,7 @@ void InputOptionsFrame::OnShow(wxShowEvent &evt)
 			if (pageExists)
 				continue;
 			// Add page
-			wxPanel *emuPage = new wxPanel(mNotebook);
+			wxPanel *emuPage = new wxPanel(_notebook);
 			wxBoxSizer *sizerV1 = new wxBoxSizer(wxVERTICAL);
 			wxStaticText *labelTitle = new wxStaticText(emuPage, wxID_ANY, wxString(it->first).Append(" Input options"));
 			wxFlexGridSizer *fgsizer1 = new  wxFlexGridSizer(4,5,10);
@@ -210,37 +210,37 @@ void InputOptionsFrame::OnShow(wxShowEvent &evt)
 			{
 				wxStaticText *labelKey = new wxStaticText(emuPage, wxID_ANY, wxString(it2->second.name));
 				KeyBindBox *textBoxKey = new KeyBindBox(it->first, it2->second.key, emuPage, wxID_ANY, wxDefaultPosition, wxDefaultSize);
-				textBoxKey->SetLabelText(KeyToString(mOptions->GetInputKeyBinding(it->first, it2->second.key, 0)));
+				textBoxKey->SetLabelText(KeyToString(_options->GetInputKeyBinding(it->first, it2->second.key, 0)));
 				textBoxKey->Bind(wxEVT_LEFT_UP, &InputOptionsFrame::OnBindingClick, this, wxID_ANY, wxID_ANY, NULL);
-				mBindingBoxes[it->first][it2->second.key] = textBoxKey;
+				_bindingBoxes[it->first][it2->second.key] = textBoxKey;
 				fgsizer1->Add(labelKey);
 				fgsizer1->Add(textBoxKey);
 			}
 			sizerV1->Add(labelTitle, 0, wxALIGN_CENTER_HORIZONTAL, 20);
 			sizerV1->Add(fgsizer1, 0, wxALIGN_CENTER_HORIZONTAL, 0);
 			emuPage->SetSizerAndFit(sizerV1);
-			mNotebook->InsertPage(0, emuPage, wxString(it->first),true);
+			_notebook->InsertPage(0, emuPage, wxString(it->first),true);
 		}
 	}
 }
 
 void InputOptionsFrame::RestoreBinding()
 {
-	mActiveRebind->SetLabelText(KeyToString(mOptions->GetInputKeyBinding(mActiveRebind->GetName(), mActiveRebind->GetKey(), 0)));
-	mActiveRebind = NULL;
+	_activeRebind->SetLabelText(KeyToString(_options->GetInputKeyBinding(_activeRebind->GetName(), _activeRebind->GetKey(), 0)));
+	_activeRebind = NULL;
 }
 
 void InputOptionsFrame::OnBindingClick(wxMouseEvent &evt)
 {
-	if (mActiveRebind != NULL)
+	if (_activeRebind != NULL)
 	{
 		RestoreBinding();
 	}
 
-	mActiveRebind = (KeyBindBox *) evt.GetEventObject();
+	_activeRebind = (KeyBindBox *) evt.GetEventObject();
 
-	mActiveRebind->SetLabelText(_("-Press any key-"));
-	mActiveRebind->Bind(wxEVT_KEY_UP, &InputOptionsFrame::OnKeyboardInput, this, wxID_ANY, wxID_ANY, NULL);
+	_activeRebind->SetLabelText(_("-Press any key-"));
+	_activeRebind->Bind(wxEVT_KEY_UP, &InputOptionsFrame::OnKeyboardInput, this, wxID_ANY, wxID_ANY, NULL);
 
 	evt.Skip();
 }
@@ -248,30 +248,30 @@ void InputOptionsFrame::OnBindingClick(wxMouseEvent &evt)
 void InputOptionsFrame::OnKeyboardInput(wxKeyEvent &evt)
 {
 	int keyCode = evt.GetKeyCode();
-	if (mActiveRebind == NULL || keyCode == 0)
+	if (_activeRebind == NULL || keyCode == 0)
 		return; // How the hell did we come here?
 
-	mOptions->RebindKey(mActiveRebind->GetName(), mActiveRebind->GetKey(), evt.GetKeyCode());
-	mActiveRebind->Unbind(wxEVT_KEY_UP, &InputOptionsFrame::OnKeyboardInput,this, wxID_ANY, wxID_ANY, NULL);
+	_options->RebindKey(_activeRebind->GetName(), _activeRebind->GetKey(), evt.GetKeyCode());
+	_activeRebind->Unbind(wxEVT_KEY_UP, &InputOptionsFrame::OnKeyboardInput,this, wxID_ANY, wxID_ANY, NULL);
 	// Update all boxes
 	std::map<int, KeyBindBox *>::iterator it;
-	for (it = mBindingBoxes[mActiveRebind->GetName()].begin(); it != mBindingBoxes[mActiveRebind->GetName()].end(); ++it)
+	for (it = _bindingBoxes[_activeRebind->GetName()].begin(); it != _bindingBoxes[_activeRebind->GetName()].end(); ++it)
 	{
-		it->second->SetLabelText(KeyToString(mOptions->GetInputKeyBinding(it->second->GetName(), it->second->GetKey(), 0)));
+		it->second->SetLabelText(KeyToString(_options->GetInputKeyBinding(it->second->GetName(), it->second->GetKey(), 0)));
 	}
-	mActiveRebind = NULL;
+	_activeRebind = NULL;
 }
 
 void InputOptionsFrame::OnPageChanging(wxNotebookEvent &evt)
 {
-	if (mActiveRebind != NULL)
+	if (_activeRebind != NULL)
 	{
-		mActiveRebind = NULL;
+		_activeRebind = NULL;
 		// Update all boxes
 		std::map<int, KeyBindBox *>::iterator it;
-		for (it = mBindingBoxes[mActiveRebind->GetName()].begin(); it != mBindingBoxes[mActiveRebind->GetName()].end(); ++it)
+		for (it = _bindingBoxes[_activeRebind->GetName()].begin(); it != _bindingBoxes[_activeRebind->GetName()].end(); ++it)
 		{
-			it->second->SetLabelText(KeyToString(mOptions->GetInputKeyBinding(it->second->GetName(), it->second->GetKey(), 0)));
+			it->second->SetLabelText(KeyToString(_options->GetInputKeyBinding(it->second->GetName(), it->second->GetKey(), 0)));
 		}
 	}
 }

@@ -19,15 +19,15 @@ public:
 	bool LoadState(const SaveData_t *data);
 	bool SaveState(std::vector<uint8_t> &data);
 private:
-	Gameboy			*m_gb;
-	bool			m_u;
-	bool			m_d;
-	bool			m_l;
-	bool			m_r;
-	bool			m_a;
-	bool			m_b;
-	bool			m_se;
-	bool			m_st;
+	Gameboy			*_gb;
+	bool			_u;
+	bool			_d;
+	bool			_l;
+	bool			_r;
+	bool			_a;
+	bool			_b;
+	bool			_se;
+	bool			_st;
 };
 
 #endif

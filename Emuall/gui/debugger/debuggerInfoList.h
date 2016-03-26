@@ -35,9 +35,9 @@ namespace Debugger {
 			Mode mode;
 		};
 
-		Emulator *mEmu;
-		wxListCtrl *mWidget;
-		std::map<int, Item> mItems;
+		Emulator *_emu;
+		wxListCtrl *_widget;
+		std::map<int, Item> _items;
 
 	};
 }

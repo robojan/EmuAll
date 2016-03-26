@@ -25,13 +25,13 @@ private:
 	void OnSetValue(int address, wxByte val);
 
 
-	Emulator mEmu;
-	HexView *mHexView;
-	wxChoice *mPicker;
-	std::map<int, EmulatorMemory_t> mMemories;
-	std::map<int, EmulatorValue_t> mInfos;
-	bool mReadOnly;
-	wxListCtrl *mMemInfo;
+	Emulator _emu;
+	HexView *_hexView;
+	wxChoice *_picker;
+	std::map<int, EmulatorMemory_t> _memories;
+	std::map<int, EmulatorValue_t> _infos;
+	bool _readOnly;
+	wxListCtrl *_memInfo;
 
 };
 

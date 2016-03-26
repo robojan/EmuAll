@@ -26,13 +26,13 @@ public:
 	void SetValue(int , int , const wxString& );
 	bool IsEmptyCell(int, int);
 	void SetSize(wxUint32 size);
-	wxUint32 GetSize(void) { return mSize; }
+	wxUint32 GetSize(void) { return _size; }
 	void SetOffset(wxUint32 offset);
-	wxUint32 GetOffset(void) { return mOffset; }
+	wxUint32 GetOffset(void) { return _offset; }
 private:
-	HexViewI		*mHandler;
-	wxUint32		mSize;
-	wxUint32		mOffset;
+	HexViewI		*_handler;
+	wxUint32		_size;
+	wxUint32		_offset;
 };
 
 #endif

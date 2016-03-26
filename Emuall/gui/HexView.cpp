@@ -13,9 +13,9 @@ wxChar ToPrintable(uint8_t c)
 
 HexView::HexView(HexViewI *handler, wxUint32 size) : wxGridTableBase()
 {
-	mHandler = handler;
-	mSize = size;
-	mOffset = 0;
+	_handler = handler;
+	_size = size;
+	_offset = 0;
 }
 
 HexView::~HexView()
@@ -28,7 +28,7 @@ HexView::~HexView()
 
 int HexView::GetNumberRows()
 {
-	return (mSize+0xf)/0x10;
+	return (_size+0xf)/0x10;
 }
 
 int HexView::GetNumberCols()
@@ -48,12 +48,12 @@ wxString HexView::GetColLabelValue(int col)
 
 wxString HexView::GetRowLabelValue(int row)
 {
-	return wxString::Format("0x%X0", row+mOffset);
+	return wxString::Format("0x%X0", row+_offset);
 }
 
 wxString HexView::GetValue( int row, int col)
 {
-	if(mHandler == NULL)
+	if(_handler == NULL)
 	{
 		return _("-");
 	}
@@ -65,30 +65,30 @@ wxString HexView::GetValue( int row, int col)
 		{
 			if (i == 8)
 				ascii.Append(' ');
-			if ((((unsigned int)row << 4) + i) >= mSize)
+			if ((((unsigned int)row << 4) + i) >= _size)
 			{
 				ascii.Append(' ');
 				continue;
 			}
-			ascii.Append(ToPrintable(mHandler->OnGetValue((row << 4) + i)));
+			ascii.Append(ToPrintable(_handler->OnGetValue((row << 4) + i)));
 
 		}
 		return ascii;
 	}
-	if ((((unsigned int) row << 4) + col) >= mSize)
+	if ((((unsigned int) row << 4) + col) >= _size)
 		return wxEmptyString;
-	return wxString::Format("%02X", mHandler->OnGetValue((row << 4) + col));
+	return wxString::Format("%02X", _handler->OnGetValue((row << 4) + col));
 }
 
 void HexView::SetValue(int row, int col, const wxString &data)
 {
-	if(mHandler == NULL || col == 0x10)
+	if(_handler == NULL || col == 0x10)
 	{
 		return;
 	}
 	long val;
 	data.ToLong(&val, 16);
-	mHandler->OnSetValue(mOffset*0x10 + row*0x10+col, (wxByte)(val&0xFF));
+	_handler->OnSetValue(_offset*0x10 + row*0x10+col, (wxByte)(val&0xFF));
 }
 
 bool HexView::IsEmptyCell(int, int)
@@ -98,7 +98,7 @@ bool HexView::IsEmptyCell(int, int)
 
 void HexView::SetSize(wxUint32 size)
 {
-	mSize = size;
+	_size = size;
 	if (GetView())
 	{
 		wxGrid *grid = GetView();
@@ -122,5 +122,5 @@ void HexView::SetSize(wxUint32 size)
 
 void HexView::SetOffset(wxUint32 offset)
 {
-	mOffset = offset;
+	_offset = offset;
 }

@@ -19,9 +19,9 @@ private:
 	void OnClose(wxCloseEvent &evt);
 	void OnTimer(wxTimerEvent &evt);
 
-	Emulator mEmu;
-	Debugger::DebuggerRoot *mRoot;
-	wxTimer *mTimer;
+	Emulator _emu;
+	Debugger::DebuggerRoot *_root;
+	wxTimer *_timer;
 };
 
 #endif

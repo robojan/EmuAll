@@ -50,11 +50,11 @@ public:
 	uint8_t GetERAMData(unsigned int address) const;
 	uint8_t GetVRAMData(unsigned int address) const;
 	uint8_t GetWRAMData(unsigned int address) const;
-	inline int GetROMBank() const { return romBank; }
-	inline int GetERAMBank() const { return eramBank; }
-	inline int GetVRAMBank() const { return vramBank; }
-	inline int GetWRAMBank() const { return wramBank; }
-	bank_t GetRegisterPointer() const { return mem[0xF];}
+	inline int GetROMBank() const { return _romBank; }
+	inline int GetERAMBank() const { return _eramBank; }
+	inline int GetVRAMBank() const { return _vramBank; }
+	inline int GetWRAMBank() const { return _wramBank; }
+	bank_t GetRegisterPointer() const { return _mem[0xF];}
 
 	inline void write(address_t address, gbByte val, bool event = true);
 	inline gbByte read(address_t address) const;
@@ -63,28 +63,28 @@ public:
 	bool SaveState(rom_t *rom, rom_t *ram, std::vector<uint8_t> &data);
 private:
 	// Memory data
-	rom_t *rom;
-	bank_t mem[0x10];
-	bank_t vram[VRAM_BANKS];
-	bank_t wram[WRAM_BANKS];
-	bank_t *eram;
-	bank_t regs;
+	rom_t *_rom;
+	bank_t _mem[0x10];
+	bank_t _vram[VRAM_BANKS];
+	bank_t _wram[WRAM_BANKS];
+	bank_t *_eram;
+	bank_t _regs;
 	// Memory information
-	int				eramSize;
-	unsigned int	romBank;
-	unsigned int	vramBank;
-	unsigned int	wramBank;
-	unsigned int	eramBank;
-	bool			vramAccess;
-	bool			oamAccess;
-	bool			m_rtc;
-	bool			m_rtcActive;
-	gbByte			m_rtcRegister;
-	gbByte			m_lastLatch;
-	gbTime			m_timeStamp;
+	int				_eramSize;
+	unsigned int	_romBank;
+	unsigned int	_vramBank;
+	unsigned int	_wramBank;
+	unsigned int	_eramBank;
+	bool			_vramAccess;
+	bool			_oamAccess;
+	bool			_rtc;
+	bool			_rtcActive;
+	gbByte			_rtcRegister;
+	gbByte			_lastLatch;
+	gbTime			_timeStamp;
 	
 	// Events
-	tree			eventTable;
+	tree			_eventTable;
 
 	void CalculateRTC(gbTime *time);
 };
@@ -97,8 +97,8 @@ inline void GbMem::write(address_t address, gbByte val, bool event)
 	// TODO: review code
 	unsigned int t = (address>>12)&0xf;
 	
-	if(!vramAccess && (address >= 0x8000 && address < 0xA000) ||
-		!oamAccess && (address >= 0xFE00 && address < 0xFEA0))
+	if(!_vramAccess && (address >= 0x8000 && address < 0xA000) ||
+		!_oamAccess && (address >= 0xFE00 && address < 0xFEA0))
 	{
 		//wxLogWarning("Tried to write gpu memory when not available");
 		return;
@@ -122,14 +122,14 @@ inline void GbMem::write(address_t address, gbByte val, bool event)
 			} else if(address>=0x2000 && address <= 0x3FFF) // ROM bank select
 			{
 				if(val ==0) val = 1;
-				switchBank(((unsigned char)val&0x1F) | (romBank & 0xE0));
+				switchBank(((unsigned char)val&0x1F) | (_romBank & 0xE0));
 			} else if(address>=0x4000 && address <= 0x5FFF) // RAM bank select
 			{
 				if(mode)
 				{
 					switchEramBank((unsigned char)val&0x3);
 				} else {
-					switchBank((romBank & 0x1F) | (((unsigned char)val&0x3)<<5));
+					switchBank((_romBank & 0x1F) | (((unsigned char)val&0x3)<<5));
 				}
 			} else if(address>=0x6000)
 			{
@@ -165,22 +165,22 @@ inline void GbMem::write(address_t address, gbByte val, bool event)
 				if(val & 0x08)
 				{
 					// rtc access
-					m_rtc = true;
-					m_rtcRegister = val;
+					_rtc = true;
+					_rtcRegister = val;
 				} else {
-					m_rtc = false;
+					_rtc = false;
 					switchEramBank((unsigned char)val&0x3);
 				}
 			} else if(address>=0x6000 && address <= 0x7FFF) // latch clock data
 			{
-				if(m_lastLatch == 0x00 && val == 0x01)
+				if(_lastLatch == 0x00 && val == 0x01)
 				{
-					if(m_rtcActive)
+					if(_rtcActive)
 					{
-						CalculateRTC(&m_timeStamp);
+						CalculateRTC(&_timeStamp);
 					}
 				}
-				m_lastLatch = val;
+				_lastLatch = val;
 			} 
 			break;
 		case MBC4:
@@ -202,11 +202,11 @@ inline void GbMem::write(address_t address, gbByte val, bool event)
 			} else if(address>=0x2000 && address <= 0x2FFF) // ROM bank select
 			{
 				// 8 most significant bits
-				switchBank((this->romBank&0x100)|((unsigned char)val));
+				switchBank((this->_romBank&0x100)|((unsigned char)val));
 			} else if(address>=0x3000 && address <= 0x3FFF) // ROM bank select
 			{
 				// least significant bit
-				switchBank((this->romBank&0xFF)|(((unsigned char)val&1)<<8));
+				switchBank((this->_romBank&0xFF)|(((unsigned char)val&1)<<8));
 			} else if(address>=0x4000 && address <= 0x5FFF) // RAM bank select
 			{
 				switchEramBank((unsigned char)val&0xF);
@@ -218,44 +218,44 @@ inline void GbMem::write(address_t address, gbByte val, bool event)
 		}
 		return;
 	}
-	if(m_rtc && address >= 0xA000 && address < 0xC000)
+	if(_rtc && address >= 0xA000 && address < 0xC000)
 	{
-		switch(m_rtcRegister)
+		switch(_rtcRegister)
 		{
 		case 0x08:
-			m_timeStamp.seconds = val;
+			_timeStamp.seconds = val;
 			break;
 		case 0x09:
-			m_timeStamp.minutes = val;
+			_timeStamp.minutes = val;
 			break;
 		case 0x0A:
-			m_timeStamp.hours = val;
+			_timeStamp.hours = val;
 			break;
 		case 0x0B:
-			m_timeStamp.day = (m_timeStamp.day & ~0xFF)|val;
+			_timeStamp.day = (_timeStamp.day & ~0xFF)|val;
 			break;
 		case 0x0C:
-			m_timeStamp.day = (m_timeStamp.day & ~0x300)|((val&0x01)<<8)|((val&0x80)<<2);
-			m_rtcActive = (val & 0x40) == 0;
-			if(m_rtcActive)
+			_timeStamp.day = (_timeStamp.day & ~0x300)|((val&0x01)<<8)|((val&0x80)<<2);
+			_rtcActive = (val & 0x40) == 0;
+			if(_rtcActive)
 			{
-				m_timeStamp.systemTime = time(NULL);
+				_timeStamp.systemTime = time(NULL);
 			}
 			break;
 		}
 	} else {
 		if(address >= 0xE000 && address < 0xFEA0) address -= 0x2000; // copy of memory
-		if(this->mem[t] == NULL)
+		if(this->_mem[t] == NULL)
 		{
 			//wxLogWarning("memory %04X does not exist", address);
 			return;
 		}
 	
-		this->mem[t][address&0xFFF] = val;
+		this->_mem[t][address&0xFFF] = val;
 	}
 	if(event)
 	{
-		node *evt = eventTable.search(address);
+		node *evt = _eventTable.search(address);
 		while(evt != NULL)
 		{
 			if(((GbMemEvent *)evt->ptr) == NULL)
@@ -276,39 +276,39 @@ inline gbByte GbMem::read(address_t address) const
 		address -= 0x2000; // copy of memory
 	unsigned int t = (address>>12) & 0xf;
 	
-	if(!vramAccess && (address >= 0x8000 && address < 0xA000) ||
-		!oamAccess && (address >= 0xFE00 && address < 0xFEA0))
+	if(!_vramAccess && (address >= 0x8000 && address < 0xA000) ||
+		!_oamAccess && (address >= 0xFE00 && address < 0xFEA0))
 	{
 		//wxLogWarning("Tried to read gpu memory when not available");
 		return 0xFF;
 	}
 	
-	if(m_rtc && address >= 0xA000 && address < 0xC000)
+	if(_rtc && address >= 0xA000 && address < 0xC000)
 	{
-		switch(m_rtcRegister)
+		switch(_rtcRegister)
 		{
 		case 0x08:
-			return m_timeStamp.seconds;
+			return _timeStamp.seconds;
 			break;
 		case 0x09:
-			return m_timeStamp.minutes;
+			return _timeStamp.minutes;
 			break;
 		case 0x0A:
-			return m_timeStamp.hours;
+			return _timeStamp.hours;
 			break;
 		case 0x0B:
-			return (gbByte)(m_timeStamp.day&0xFF);
+			return (gbByte)(_timeStamp.day&0xFF);
 			break;
 		case 0x0C:
-			return (gbByte)(((m_timeStamp.day&0x100)>>8)| 
-				(m_rtcActive?0x00:0x40) | 
-				((m_timeStamp.day&0x200)? 0x80:0x00));
+			return (gbByte)(((_timeStamp.day&0x100)>>8)| 
+				(_rtcActive?0x00:0x40) | 
+				((_timeStamp.day&0x200)? 0x80:0x00));
 			break;
 		}
 	}
-	if (this->mem[t] == NULL)
+	if (this->_mem[t] == NULL)
 		return 0xFF;
-	return this->mem[t][address&0xFFF];
+	return this->_mem[t][address&0xFFF];
 }
 
 #endif

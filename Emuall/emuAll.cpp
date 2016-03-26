@@ -9,9 +9,9 @@ IMPLEMENT_APP(EmuAll);
 bool EmuAll::OnInit()
 {
 	// Start the program
-	mMainFrame = new MainFrame(_("EmuAll"), wxDefaultPosition, wxSize(400,300));
-	mMainFrame->Show(true);
-	SetTopWindow(mMainFrame);
+	_mainFrame = new MainFrame(_("EmuAll"), wxDefaultPosition, wxSize(400,300));
+	_mainFrame->Show(true);
+	SetTopWindow(_mainFrame);
 	SetAppDisplayName(_("EmuAll"));
 	return true;
 }

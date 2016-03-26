@@ -30,19 +30,19 @@ public:
 private:
 	Gameboy			*m_gb;
 
-	GbChannel12		m_channel1;
-	GbChannel12		m_channel2;
-	GbChannel3		m_channel3;
-	GbChannel4		m_channel4;
+	GbChannel12		_channel1;
+	GbChannel12		_channel2;
+	GbChannel3		_channel3;
+	GbChannel4		_channel4;
 };
 
 
 inline void GbSound::Tick()
 {
-	m_channel1.Tick();
-	m_channel2.Tick();
-	m_channel3.Tick();
-	m_channel4.Tick();
+	_channel1.Tick();
+	_channel2.Tick();
+	_channel3.Tick();
+	_channel4.Tick();
 
 }
 

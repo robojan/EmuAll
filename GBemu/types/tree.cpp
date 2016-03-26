@@ -4,7 +4,7 @@
 #include "tree.h"
 tree::tree()
 {
-	root = NULL;
+	_root = NULL;
 }
 
 tree::~tree()
@@ -85,26 +85,26 @@ node *tree::search(int key, node *leaf)
 
 void tree::insert(int key, void *ptr)
 {
-	if(root != NULL)
+	if(_root != NULL)
 	{
-		insert(key, ptr, root);
+		insert(key, ptr, _root);
 	} else {
-		root = new node;
-		root->key = key;
-		root->ptr = ptr;
-		root->left = NULL;
-		root->middle = NULL;
-		root->right = NULL;
+		_root = new node;
+		_root->key = key;
+		_root->ptr = ptr;
+		_root->left = NULL;
+		_root->middle = NULL;
+		_root->right = NULL;
 	}
 }
 
 node *tree::search(int key)
 {
-	return search(key, root);
+	return search(key, _root);
 }
 
 void tree::destroy_tree()
 {
-	destroy_tree(root);
-	root = NULL;
+	destroy_tree(_root);
+	_root = NULL;
 }

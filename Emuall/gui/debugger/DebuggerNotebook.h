@@ -26,9 +26,9 @@ namespace Debugger
 			std::vector<DebuggerElement *> elements;
 		};
 
-		Emulator *mEmu;
-		wxNotebook *mWidget;
-		std::vector<Item> mItems;
+		Emulator *_emu;
+		wxNotebook *_widget;
+		std::vector<Item> _items;
 	};
 }
 

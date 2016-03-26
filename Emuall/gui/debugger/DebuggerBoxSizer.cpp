@@ -5,7 +5,7 @@
 using namespace Debugger;
 
 DebuggerBoxSizer::DebuggerBoxSizer(Emulator *emu, const pugi::xml_node &node, int orient) :
-mEmu(emu), mWidget(NULL), mOrient(orient)
+_emu(emu), _widget(NULL), _orient(orient)
 {
 	wxASSERT(strcmp(node.name(), "hor") == 0 || strcmp(node.name(), "ver") == 0);
 	wxASSERT(emu != NULL);
@@ -18,51 +18,51 @@ mEmu(emu), mWidget(NULL), mOrient(orient)
 		item.proportion = iChild->attribute("prop").as_int(0);
 		if (item.element != NULL)
 		{
-			mItems.push_back(item);
+			_items.push_back(item);
 		}
 	}
 }
 
 DebuggerBoxSizer::~DebuggerBoxSizer()
 {
-	for (std::vector<Item>::iterator iElement = mItems.begin();
-		iElement != mItems.end(); ++iElement)
+	for (std::vector<Item>::iterator iElement = _items.begin();
+		iElement != _items.end(); ++iElement)
 	{
 		delete iElement->element;
 	}
-	mItems.clear();
+	_items.clear();
 }
 
 wxPanel *DebuggerBoxSizer::GetWidget(wxWindow *parent, wxWindowID id)
 {
-	if (mWidget != NULL)
+	if (_widget != NULL)
 	{
-		return mWidget; // Widget already created
+		return _widget; // Widget already created
 	}
 
-	mWidget = new wxPanel(parent, id);
-	wxBoxSizer *sizer = new wxBoxSizer(mOrient);
-	for (std::vector<Item>::iterator iItem = mItems.begin();
-		iItem != mItems.end(); ++iItem)
+	_widget = new wxPanel(parent, id);
+	wxBoxSizer *sizer = new wxBoxSizer(_orient);
+	for (std::vector<Item>::iterator iItem = _items.begin();
+		iItem != _items.end(); ++iItem)
 	{
-		sizer->Add(iItem->element->GetWidget(mWidget, wxID_ANY), iItem->proportion, wxEXPAND | wxALL, 5);
+		sizer->Add(iItem->element->GetWidget(_widget, wxID_ANY), iItem->proportion, wxEXPAND | wxALL, 5);
 	}
-	mWidget->SetSizerAndFit(sizer);
+	_widget->SetSizerAndFit(sizer);
 		
 	UpdateInfo();
-	return mWidget;
+	return _widget;
 }
 
 void DebuggerBoxSizer::UpdateInfo()
 {
-	if (mEmu->emu == NULL || mWidget == NULL)
+	if (_emu->emu == NULL || _widget == NULL)
 	{
 		return; // Nothing to do
 	}
 
 
-	for (std::vector<Item>::iterator iItem = mItems.begin();
-		iItem != mItems.end(); ++iItem)
+	for (std::vector<Item>::iterator iItem = _items.begin();
+		iItem != _items.end(); ++iItem)
 	{
 		iItem->element->UpdateInfo();
 	}

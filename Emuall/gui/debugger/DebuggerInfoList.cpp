@@ -5,7 +5,7 @@
 using namespace Debugger;
 
 DebuggerInfoList::DebuggerInfoList(Emulator *emu, const pugi::xml_node &node) :
-	mEmu(emu), mWidget(NULL)
+	_emu(emu), _widget(NULL)
 {
 	// Create an internal representation of the data
 	wxASSERT(strcmp(node.name(), "infolist") == 0);
@@ -49,7 +49,7 @@ DebuggerInfoList::DebuggerInfoList(Emulator *emu, const pugi::xml_node &node) :
 				Log(Warn, "Unknown info type \"%s\" found", mode.c_str().AsChar());
 				continue;
 			}
-			mItems[i++] = item;
+			_items[i++] = item;
 		}
 		else if (strcmp(iChild->name(), "flag") == 0)
 		{
@@ -59,7 +59,7 @@ DebuggerInfoList::DebuggerInfoList(Emulator *emu, const pugi::xml_node &node) :
 			item.readOnly = iChild->child("readonly").text().as_bool(true);
 			item.mode = Item::flag;
 			item.format = _("%d");
-			mItems[i++] = item;
+			_items[i++] = item;
 		}
 		else {
 			Log(Warn, "Unknown element \"%s\" in InfoList", iChild->name());
@@ -74,69 +74,69 @@ DebuggerInfoList::~DebuggerInfoList()
 
 wxListCtrl *DebuggerInfoList::GetWidget(wxWindow *parent, wxWindowID id)
 {
-	if (mWidget != NULL)
-		return mWidget;
+	if (_widget != NULL)
+		return _widget;
 
 	// Create the widget
 	std::map<int, Item> newMap;
-	mWidget = new wxListCtrl(parent, id, wxDefaultPosition, wxDefaultSize, wxLC_HRULES | wxLC_NO_SORT_HEADER | wxLC_REPORT | wxLC_SINGLE_SEL | wxHSCROLL);
-	mWidget->AppendColumn("Name");
-	mWidget->AppendColumn("Value", wxLIST_FORMAT_LEFT);
+	_widget = new wxListCtrl(parent, id, wxDefaultPosition, wxDefaultSize, wxLC_HRULES | wxLC_NO_SORT_HEADER | wxLC_REPORT | wxLC_SINGLE_SEL | wxHSCROLL);
+	_widget->AppendColumn("Name");
+	_widget->AppendColumn("Value", wxLIST_FORMAT_LEFT);
 
 	std::map<int, Item>::iterator iItem;
-	for (iItem = mItems.begin(); iItem != mItems.end(); ++iItem)
+	for (iItem = _items.begin(); iItem != _items.end(); ++iItem)
 	{
-		long pos = mWidget->InsertItem(mWidget->GetItemCount(), iItem->second.name);
+		long pos = _widget->InsertItem(_widget->GetItemCount(), iItem->second.name);
 		newMap[pos] = iItem->second;
 
 		if (iItem->second.mode == Item::string)
 		{
-			mWidget->SetItem(pos, 1, wxString::Format(iItem->second.format, ""));
+			_widget->SetItem(pos, 1, wxString::Format(iItem->second.format, ""));
 		}
 		else {
-			mWidget->SetItem(pos, 1, wxString::Format(iItem->second.format, 0));
+			_widget->SetItem(pos, 1, wxString::Format(iItem->second.format, 0));
 		}
 	}
 
 	// Replace the map
-	mItems = newMap;
+	_items = newMap;
 	// Update the widget with the correct values
 	UpdateInfo();
-	return mWidget;
+	return _widget;
 }
 
 void DebuggerInfoList::UpdateInfo()
 {
-	if (mWidget == NULL)
+	if (_widget == NULL)
 		return; // Nothing to update
 
-	if (mWidget->IsShownOnScreen())
+	if (_widget->IsShownOnScreen())
 	{
-		if (mEmu->emu != NULL)
+		if (_emu->emu != NULL)
 		{
-			for (std::map<int, Item>::iterator iItem = mItems.begin(); iItem != mItems.end(); ++iItem)
+			for (std::map<int, Item>::iterator iItem = _items.begin(); iItem != _items.end(); ++iItem)
 			{
 				wxASSERT_MSG(!iItem->second.format.IsEmpty(), "Format is empty for item in a infolist");
 				if (iItem->second.mode == Item::string)
 				{
-					mWidget->SetItem(iItem->first, 1, wxString::Format(iItem->second.format, mEmu->emu->GetString(mEmu->handle, iItem->second.id)));
+					_widget->SetItem(iItem->first, 1, wxString::Format(iItem->second.format, _emu->emu->GetString(_emu->handle, iItem->second.id)));
 				}
 				else {
-					mWidget->SetItem(iItem->first, 1, wxString::Format(iItem->second.format, mEmu->emu->GetValI(mEmu->handle, iItem->second.id)));
+					_widget->SetItem(iItem->first, 1, wxString::Format(iItem->second.format, _emu->emu->GetValI(_emu->handle, iItem->second.id)));
 				}
 			}
 		}
 		else {
-			for (std::map<int, Item>::iterator iItem = mItems.begin(); iItem != mItems.end(); ++iItem)
+			for (std::map<int, Item>::iterator iItem = _items.begin(); iItem != _items.end(); ++iItem)
 			{
 				wxASSERT_MSG(!iItem->second.format.IsEmpty(), "Format is empty for item in a infolist");
 				if (iItem->second.mode == Item::string)
 				{
 					wxASSERT_MSG(false, "Not implemented");
-					mWidget->SetItem(iItem->first, 1, wxString::Format(iItem->second.format, ""));
+					_widget->SetItem(iItem->first, 1, wxString::Format(iItem->second.format, ""));
 				}
 				else {
-					mWidget->SetItem(iItem->first, 1, wxString::Format(iItem->second.format, 0));
+					_widget->SetItem(iItem->first, 1, wxString::Format(iItem->second.format, 0));
 				}
 			}
 		}

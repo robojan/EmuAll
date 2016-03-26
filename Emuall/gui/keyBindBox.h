@@ -14,8 +14,8 @@ public:
 	int GetKey();
 
 private:
-	int mKey;
-	std::string mEmuname;
+	int _key;
+	std::string _emuname;
 };
 
 #endif

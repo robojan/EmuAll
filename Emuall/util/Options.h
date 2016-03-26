@@ -42,7 +42,7 @@ public:
 	OptionsVid_t videoOptions;
 	OptionsAud_t audioOptions;
 private:
-	std::map<std::string, std::map<int, EmulatorInput_t>> mKeyBindings;
+	std::map<std::string, std::map<int, EmulatorInput_t>> _keyBindings;
 };
 
 #endif

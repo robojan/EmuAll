@@ -11,23 +11,23 @@ END_EVENT_TABLE()
 
 GLPane::GLPane(wxWindow *parent, GLPaneI *callback, int user, wxWindowID id, const wxPoint &pos, 
 	const wxSize &size, long style, const wxGLAttributes &attr, const wxGLContextAttrs &ctxAttr) :
-wxGLCanvas(parent, attr, id, pos, size, style), mUser(user), mClearR(0.0), mClearG(0.0), 
-mClearB(0.0), mClearA(1.0), mInitialized(false), mGLAttr(attr), mCtxAttr(ctxAttr)
+wxGLCanvas(parent, attr, id, pos, size, style), _user(user), _clearR(0.0), _clearG(0.0), 
+_clearB(0.0), _clearA(1.0), _initialized(false), _GLAttr(attr), _CtxAttr(ctxAttr)
 {
 	wxASSERT(callback != NULL);
-	mContext = new wxGLContext(this, NULL, &mCtxAttr);
-	if (!mContext->IsOK()) {
+	_context = new wxGLContext(this, NULL, &_CtxAttr);
+	if (!_context->IsOK()) {
 		Log(Error, "Could not create openGL context");
 	}
 	
-	mCallback = callback;
+	_callback = callback;
 
 }
 
 GLPane::~GLPane()
 {
 	DestroyGL();
-	delete mContext;
+	delete _context;
 }
 
 void GLPane::SetClearColour(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
@@ -42,40 +42,40 @@ void GLPane::SetClearColour(wxColour colour)
 
 void GLPane::SetClearColour(float r, float g, float b, float a)
 {
-	mClearR = r; mClearG = g; mClearB = b; mClearA = a; // set colour
-	mClearColourChanged=true;
+	_clearR = r; _clearG = g; _clearB = b; _clearA = a; // set colour
+	_clearColourChanged=true;
 }
 
 void GLPane::DestroyGL()
 {
 	if (IsShownOnScreen())
 	{
-		SetCurrent(*mContext);
+		SetCurrent(*_context);
 	}
-	mCallback->DestroyGL(mUser);
-	mInitialized = false;
+	_callback->DestroyGL(_user);
+	_initialized = false;
 }
 
 void GLPane::Render( wxPaintEvent &evt)
 {
 	if (!IsShownOnScreen())
 		return;
-	SetCurrent(*mContext);
+	SetCurrent(*_context);
 	wxPaintDC(this);
 
-	if (mClearColourChanged)
+	if (_clearColourChanged)
 	{
-		glClearColor(mClearR, mClearG, mClearB, mClearA);
-		mClearColourChanged = false;
+		glClearColor(_clearR, _clearG, _clearB, _clearA);
+		_clearColourChanged = false;
 	}
 
-	if (!mInitialized)
+	if (!_initialized)
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
-		mInitialized = mCallback->InitGL(mUser);
+		_initialized = _callback->InitGL(_user);
 	}
 	else {
-		mCallback->DrawGL(mUser);
+		_callback->DrawGL(_user);
 	}
 
 	SwapBuffers();

@@ -6,7 +6,7 @@
 using namespace Debugger;
 
 DebuggerRoot::DebuggerRoot(Emulator *emu, const pugi::xml_node &node) :
-mEmu(emu), mWidget(NULL)
+_emu(emu), _widget(NULL)
 {
 	wxASSERT(emu != NULL);
 
@@ -19,52 +19,52 @@ mEmu(emu), mWidget(NULL)
 		item.proportion = iChild->attribute("prop").as_int(0);
 		if (item.element != NULL)
 		{
-			mItems.push_back(item);
+			_items.push_back(item);
 		}
 	}
 }
 
 DebuggerRoot::~DebuggerRoot()
 {
-	for (std::vector<Item>::iterator iItem = mItems.begin();
-		iItem != mItems.end(); ++iItem)
+	for (std::vector<Item>::iterator iItem = _items.begin();
+		iItem != _items.end(); ++iItem)
 	{
 		delete iItem->element;
 	}
-	mItems.clear();
+	_items.clear();
 }
 
 wxPanel *DebuggerRoot::GetWidget(wxWindow *parent, wxWindowID id)
 {
-	if (mWidget != NULL)
+	if (_widget != NULL)
 	{
-		return mWidget; // Widget already created
+		return _widget; // Widget already created
 	}
 
-	mWidget = new wxPanel(parent, id);
+	_widget = new wxPanel(parent, id);
 	wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
-	for (std::vector<Item>::iterator iItem = mItems.begin();
-		iItem != mItems.end(); ++iItem)
+	for (std::vector<Item>::iterator iItem = _items.begin();
+		iItem != _items.end(); ++iItem)
 	{
-		sizer->Add(iItem->element->GetWidget(mWidget, wxID_ANY), iItem->proportion, wxEXPAND | wxALL, 5);
+		sizer->Add(iItem->element->GetWidget(_widget, wxID_ANY), iItem->proportion, wxEXPAND | wxALL, 5);
 	}
-	mWidget->SetSizerAndFit(sizer);
+	_widget->SetSizerAndFit(sizer);
 
 	UpdateInfo();
-	return mWidget;
+	return _widget;
 }
 
 void DebuggerRoot::UpdateInfo()
 {
-	if (mEmu->emu == NULL || mWidget == NULL)
+	if (_emu->emu == NULL || _widget == NULL)
 	{
 		return; // Nothing to do
 	}
 
-	if (mWidget->IsShownOnScreen())
+	if (_widget->IsShownOnScreen())
 	{
-		for (std::vector<Item>::iterator iItem = mItems.begin();
-			iItem != mItems.end(); ++iItem)
+		for (std::vector<Item>::iterator iItem = _items.begin();
+			iItem != _items.end(); ++iItem)
 		{
 			iItem->element->UpdateInfo();
 		}

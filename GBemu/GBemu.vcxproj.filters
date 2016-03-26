@@ -173,9 +173,6 @@
     <ClInclude Include="types\tree.h">
       <Filter>Header Files\types</Filter>
     </ClInclude>
-    <ClInclude Include="types\general.h">
-      <Filter>Header Files\types</Filter>
-    </ClInclude>
     <ClInclude Include="util\Endian.h">
       <Filter>Header Files\util</Filter>
     </ClInclude>

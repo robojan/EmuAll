@@ -10,24 +10,24 @@ BEGIN_EVENT_TABLE(GPUDebugger, wxFrame)
 END_EVENT_TABLE()
 
 GPUDebugger::GPUDebugger(wxWindow *parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) :
-	wxFrame(parent, id, title, pos, size, style), mRoot(NULL)
+	wxFrame(parent, id, title, pos, size, style), _root(NULL)
 {
-	mEmu.emu = NULL;
-	mEmu.handle = NULL;
-	SetEmulator(mEmu);
-	mTimer = new wxTimer(this, ID_Debug_Gpu_timer);
-	mTimer->Start(200); // 5 Hz update rate
+	_emu.emu = NULL;
+	_emu.handle = NULL;
+	SetEmulator(_emu);
+	_timer = new wxTimer(this, ID_Debug_Gpu_timer);
+	_timer->Start(200); // 5 Hz update rate
 }
 
 GPUDebugger::~GPUDebugger()
 {
-	mEmu.emu = NULL;
-	mEmu.handle = NULL;
-	mTimer->Stop();
-	if (mRoot != NULL)
+	_emu.emu = NULL;
+	_emu.handle = NULL;
+	_timer->Stop();
+	if (_root != NULL)
 	{
-		delete mRoot;
-		mRoot = NULL;
+		delete _root;
+		_root = NULL;
 	}
 }
 
@@ -37,12 +37,12 @@ void GPUDebugger::SetEmulator(const Emulator &emu)
 	if (emu.emu == NULL)
 	{
 		DestroyChildren();
-		if (mRoot != NULL)
+		if (_root != NULL)
 		{
-			delete mRoot;
-			mRoot = NULL;
+			delete _root;
+			_root = NULL;
 		}
-		mEmu = emu;
+		_emu = emu;
 		// Create empty page
 		wxPanel *emptyPage = new wxPanel(this);
 		wxBoxSizer *hbSizer1 = new wxBoxSizer(wxHORIZONTAL);
@@ -55,15 +55,15 @@ void GPUDebugger::SetEmulator(const Emulator &emu)
 	}
 	else {
 		DestroyChildren();
-		if (mRoot != NULL)
+		if (_root != NULL)
 		{
-			delete mRoot;
-			mRoot = NULL;
+			delete _root;
+			_root = NULL;
 		}
-		mEmu = emu;
-		mRoot = mEmu.emu->GetGpuDebuggerInfo(&mEmu);
+		_emu = emu;
+		_root = _emu.emu->GetGpuDebuggerInfo(&_emu);
 
-		wxPanel *panel = mRoot->GetWidget(this, wxID_ANY);
+		wxPanel *panel = _root->GetWidget(this, wxID_ANY);
 		vbSizer1->Add(panel, 1, wxEXPAND | wxALL, 0);
 	}
 
@@ -76,9 +76,9 @@ void GPUDebugger::SetEmulator(const Emulator &emu)
 
 void GPUDebugger::Update()
 {
-	if (mRoot != NULL)
+	if (_root != NULL)
 	{
-		mRoot->UpdateInfo();
+		_root->UpdateInfo();
 	}
 }
 

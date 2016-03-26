@@ -5,7 +5,7 @@
 using namespace Debugger;
 
 DebuggerNotebook::DebuggerNotebook(Emulator *emu, const pugi::xml_node &node) :
-mEmu(emu), mWidget(NULL)
+_emu(emu), _widget(NULL)
 {
 	wxASSERT(strcmp(node.name(), "notebook") == 0);
 	wxASSERT(emu != NULL);
@@ -27,7 +27,7 @@ mEmu(emu), mWidget(NULL)
 					item.elements.push_back(element);
 				}
 			}
-			mItems.push_back(item); // Position not final, can change when creating widget
+			_items.push_back(item); // Position not final, can change when creating widget
 		}
 		else {
 			Log(Warn, "Unknown notebook element '%s'", iChild->name());
@@ -38,7 +38,7 @@ mEmu(emu), mWidget(NULL)
 DebuggerNotebook::~DebuggerNotebook()
 {
 	std::vector<Item>::iterator iItem;
-	for (iItem = mItems.begin(); iItem != mItems.end(); ++iItem)
+	for (iItem = _items.begin(); iItem != _items.end(); ++iItem)
 	{
 		for (std::vector<DebuggerElement *>::iterator iElement = iItem->elements.begin();
 			iElement != iItem->elements.end(); ++iElement)
@@ -51,17 +51,17 @@ DebuggerNotebook::~DebuggerNotebook()
 
 wxNotebook *DebuggerNotebook::GetWidget(wxWindow *parent, wxWindowID id)
 {
-	if (mWidget != NULL)
+	if (_widget != NULL)
 	{
-		return mWidget; // Widget already created
+		return _widget; // Widget already created
 	}
 
-	mWidget = new wxNotebook(parent, id);
+	_widget = new wxNotebook(parent, id);
 
 	std::vector<Item>::iterator iItem;
-	for (iItem = mItems.begin(); iItem != mItems.end(); ++iItem)
+	for (iItem = _items.begin(); iItem != _items.end(); ++iItem)
 	{
-		wxPanel *page = new wxPanel(mWidget);
+		wxPanel *page = new wxPanel(_widget);
 		wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
 		for (std::vector<DebuggerElement *>::iterator iElement = iItem->elements.begin();
 			iElement != iItem->elements.end(); ++iElement)
@@ -69,24 +69,24 @@ wxNotebook *DebuggerNotebook::GetWidget(wxWindow *parent, wxWindowID id)
 			sizer->Add((*iElement)->GetWidget(page, wxID_ANY), 1, wxEXPAND|wxALL, 5);
 		}
 		page->SetSizerAndFit(sizer);
-		mWidget->AddPage(page, iItem->name);
+		_widget->AddPage(page, iItem->name);
 	}
 
 	UpdateInfo();
-	return mWidget;
+	return _widget;
 }
 
 void DebuggerNotebook::UpdateInfo()
 {
-	if (mEmu->emu == NULL || mWidget == NULL)
+	if (_emu->emu == NULL || _widget == NULL)
 	{
 		return; // Nothing to do
 	}
 
-	if (mWidget->IsShownOnScreen())
+	if (_widget->IsShownOnScreen())
 	{
 		std::vector<Item>::iterator iItem;
-		for (iItem = mItems.begin(); iItem != mItems.end(); ++iItem)
+		for (iItem = _items.begin(); iItem != _items.end(); ++iItem)
 		{
 			for (std::vector<DebuggerElement *>::iterator iElement = iItem->elements.begin();
 				iElement != iItem->elements.end(); ++iElement)

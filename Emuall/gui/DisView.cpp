@@ -13,13 +13,13 @@ END_EVENT_TABLE()
 DisView::DisView(Emulator *emu, wxWindow *parent, int windowId, const wxPoint &pos, const wxSize &size, long style, const wxString &name) :
 	wxWindow(parent, windowId, pos, size, style)
 {
-	mEmu = emu;
-	mNumberOfLines = 0;
-	mStartingLine = 0;
-	mCurrentLine = 0;
-	mEndingLine = 0;
-	mStartingY = 0;
-	mLineHeight = 0;
+	_emu = emu;
+	_numberOfLines = 0;
+	_startingLine = 0;
+	_currentLine = 0;
+	_endingLine = 0;
+	_startingY = 0;
+	_lineHeight = 0;
 	this->SetScrollbar(wxVERTICAL, 50, 1, 100);
 }
 
@@ -30,30 +30,30 @@ DisView::~DisView()
 
 void DisView::Update(unsigned int size, int emuCurLineId)
 {
-	if (mEmu->emu != NULL)
+	if (_emu->emu != NULL)
 	{
-		mNumberOfLines = size;
-		mEmuCurLineId = emuCurLineId;
-		mCurrentLine = mEmu->emu->GetValU(mEmu->handle, mEmuCurLineId);
+		_numberOfLines = size;
+		_emuCurLineId = emuCurLineId;
+		_currentLine = _emu->emu->GetValU(_emu->handle, _emuCurLineId);
 	}
 	else {
-		mEmuCurLineId = 0;
-		mNumberOfLines = 0;
-		mStartingLine = 0;
-		mCurrentLine = 0;
-		mEndingLine = 0;
+		_emuCurLineId = 0;
+		_numberOfLines = 0;
+		_startingLine = 0;
+		_currentLine = 0;
+		_endingLine = 0;
 	}
 }
 
 void DisView::FollowCurrentLine()
 {
-	if (mEmu->emu == NULL || mEmuCurLineId <= 0)
+	if (_emu->emu == NULL || _emuCurLineId <= 0)
 		return;
-	mCurrentLine = mEmu->emu->GetValU(mEmu->handle, mEmuCurLineId);
-	if (mCurrentLine < mStartingLine || mCurrentLine >= mEndingLine)
+	_currentLine = _emu->emu->GetValU(_emu->handle, _emuCurLineId);
+	if (_currentLine < _startingLine || _currentLine >= _endingLine)
 	{
 		// Current line is outside view
-		mStartingLine = mCurrentLine;
+		_startingLine = _currentLine;
 	}
 }
 
@@ -94,11 +94,11 @@ void DisView::OnPaint(wxPaintEvent &evt)
 	rawRect.Offset(0, rawRect.GetHeight());
 	instrRect.Offset(0, instrRect.GetHeight());
 	dc.SetFont(codeFont);
-	mStartingY = infoCorner.y;
-	mLineHeight = dc.GetCharHeight();
-	addressRect.SetHeight(mLineHeight);
-	rawRect.SetHeight(mLineHeight);
-	instrRect.SetHeight(mLineHeight);
+	_startingY = infoCorner.y;
+	_lineHeight = dc.GetCharHeight();
+	addressRect.SetHeight(_lineHeight);
+	rawRect.SetHeight(_lineHeight);
+	instrRect.SetHeight(_lineHeight);
 
 	// Clear background
 	//ClearBackground();
@@ -118,35 +118,35 @@ void DisView::OnPaint(wxPaintEvent &evt)
 	// Paint code section
 	dc.SetFont(codeFont);
 	dc.SetPen(codeTextPen);
-	if (mEmu->emu != NULL)
+	if (_emu->emu != NULL)
 	{
 
-		unsigned int address = mStartingLine;
+		unsigned int address = _startingLine;
 		while (addressRect.GetBottom() < codeRect.GetBottom())
 		{
 			// Draw a line
 			const char *raw;
 			const char *instr;
-			char size = mEmu->emu->Disassemble(mEmu->handle, address, &raw, &instr);
+			char size = _emu->emu->Disassemble(_emu->handle, address, &raw, &instr);
 
-			if (address == mCurrentLine) // Draw currentLine icon
+			if (address == _currentLine) // Draw currentLine icon
 			{
 				dc.SetBrush(arrowBrush);
 				dc.SetPen(transparentPen);
 				wxPoint arrowPoint(0, addressRect.GetTop()+2);
-				dc.DrawRoundedRectangle(arrowPoint, wxSize(infoCorner.x, mLineHeight-4), 3);
+				dc.DrawRoundedRectangle(arrowPoint, wxSize(infoCorner.x, _lineHeight-4), 3);
 				dc.DrawRectangle(addressRect);
 				dc.DrawRectangle(rawRect);
 				dc.DrawRectangle(instrRect);
 				dc.SetPen(codeTextPen);
 			}
-			if (mEmu->emu->IsBreakpoint(mEmu->handle, address))
+			if (_emu->emu->IsBreakpoint(_emu->handle, address))
 			{
 				// Breakpoint
-				wxPoint breakPoint(infoCorner.x / 2, addressRect.GetTop() + mLineHeight / 2);
+				wxPoint breakPoint(infoCorner.x / 2, addressRect.GetTop() + _lineHeight / 2);
 				dc.SetBrush(breakBrush);
 				dc.SetPen(transparentPen);
-				dc.DrawCircle(breakPoint, mLineHeight / 2);
+				dc.DrawCircle(breakPoint, _lineHeight / 2);
 				dc.SetPen(codeTextPen);
 			}
 
@@ -155,12 +155,12 @@ void DisView::OnPaint(wxPaintEvent &evt)
 			dc.DrawText(instr, instrRect.GetLeftTop());
 
 			address += size;
-			address %= mNumberOfLines;
+			address %= _numberOfLines;
 			addressRect.Offset(0, addressRect.GetHeight());
 			rawRect.Offset(0, rawRect.GetHeight());
 			instrRect.Offset(0, instrRect.GetHeight());
 		}
-		mEndingLine = address;
+		_endingLine = address;
 	}
 	else {
 		// Draw no emulator loaded text
@@ -172,7 +172,7 @@ void DisView::OnPaint(wxPaintEvent &evt)
 
 void DisView::OnScroll(wxScrollWinEvent &evt)
 {
-	if(evt.GetOrientation() != wxSB_VERTICAL || mEmu->emu == NULL)
+	if(evt.GetOrientation() != wxSB_VERTICAL || _emu->emu == NULL)
 		return;
 	static long lockedLine = 0;
 	static bool scrolling = false;
@@ -181,64 +181,64 @@ void DisView::OnScroll(wxScrollWinEvent &evt)
 	{
 		if (!scrolling)
 		{
-			lockedLine = mStartingLine;
+			lockedLine = _startingLine;
 			scrolling = true;
 		}
 		int pos = evt.GetPosition()-50;
-		int scrollAmount = pos*(mNumberOfLines/50);
+		int scrollAmount = pos*(_numberOfLines/50);
 		// if the result would wrap around
 		if (lockedLine < -scrollAmount)
-			mStartingLine = lockedLine + scrollAmount + mNumberOfLines;
+			_startingLine = lockedLine + scrollAmount + _numberOfLines;
 		else
-			mStartingLine = (lockedLine + scrollAmount);		
-		mStartingLine %= mNumberOfLines;
+			_startingLine = (lockedLine + scrollAmount);		
+		_startingLine %= _numberOfLines;
 	} else if (type == wxEVT_SCROLLWIN_THUMBRELEASE) {
 		scrolling = false;
 		lockedLine = 0;
 	} else if (type == wxEVT_SCROLLWIN_LINEUP)
 	{
-		if (mStartingLine == 0)
-			mStartingLine = mNumberOfLines;
-		mStartingLine -= 1;
+		if (_startingLine == 0)
+			_startingLine = _numberOfLines;
+		_startingLine -= 1;
 	} else if (type == wxEVT_SCROLLWIN_LINEDOWN)
 	{
-		mStartingLine += mEmu->emu->Disassemble(mEmu->handle, mStartingLine, NULL, NULL);
-		mStartingLine %= mNumberOfLines;
+		_startingLine += _emu->emu->Disassemble(_emu->handle, _startingLine, NULL, NULL);
+		_startingLine %= _numberOfLines;
 	} else if (type == wxEVT_SCROLLWIN_PAGEUP)
 	{
-		if (mStartingLine < 50)
-			mStartingLine += mNumberOfLines;
-		mStartingLine -= 50;
+		if (_startingLine < 50)
+			_startingLine += _numberOfLines;
+		_startingLine -= 50;
 	} else if (type == wxEVT_SCROLLWIN_PAGEDOWN)
 	{
-		mStartingLine += 50;
-		mStartingLine %= mNumberOfLines;
+		_startingLine += 50;
+		_startingLine %= _numberOfLines;
 	}
 	Refresh();
 }
 
 void DisView::OnDClick(wxMouseEvent &evt)
 {
-	if (mEmu->emu == NULL || mLineHeight == 0)
+	if (_emu->emu == NULL || _lineHeight == 0)
 		return;
 	long x, y;
 	int lineNr;
-	unsigned int line = mStartingLine;
+	unsigned int line = _startingLine;
 	// Get line
 	evt.GetPosition(&x, &y);
-	for (lineNr = (y - mStartingY) / mLineHeight; lineNr; --lineNr)
+	for (lineNr = (y - _startingY) / _lineHeight; lineNr; --lineNr)
 	{
-		line += mEmu->emu->Disassemble(mEmu->handle, line, NULL, NULL);
+		line += _emu->emu->Disassemble(_emu->handle, line, NULL, NULL);
 	}
 	// Check if breakpoint already exists
-	if (mEmu->emu->IsBreakpoint(mEmu->handle, line))
+	if (_emu->emu->IsBreakpoint(_emu->handle, line))
 	{
 		// remove breakpoint
-		mEmu->emu->RemoveBreakpoint(mEmu->handle, line);
+		_emu->emu->RemoveBreakpoint(_emu->handle, line);
 	}
 	else {
 		// Add breakpoint
-		mEmu->emu->AddBreakpoint(mEmu->handle, line);
+		_emu->emu->AddBreakpoint(_emu->handle, line);
 	}
 	Refresh();
 }

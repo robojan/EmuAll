@@ -24,7 +24,7 @@ private:
 	void insert(int key, void *ptr, node *leaf);
 	node *search(int key, node *leaf);
 
-	node *root;
+	node *_root;
 };
 
 #endif _TREE_H

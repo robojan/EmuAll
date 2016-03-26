@@ -55,81 +55,81 @@ bool GbGpu::InitGL(int user)
 		case 0: // main screen
 			// Generate texture for drawing
 			glEnable(GL_TEXTURE_2D);
-			glGenTextures(1, &m_texture);
-			glBindTexture(GL_TEXTURE_2D, m_texture);
+			glGenTextures(1, &_texture);
+			glBindTexture(GL_TEXTURE_2D, _texture);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 256, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 			
-			glGenVertexArrays(1, &m_vao);
-			glBindVertexArray(m_vao);
+			glGenVertexArrays(1, &_vao);
+			glBindVertexArray(_vao);
 
 			// Generate vertex buffer
-			glGenBuffers(1, &m_surfaceVBO);
-			glBindBuffer(GL_ARRAY_BUFFER, m_surfaceVBO);
+			glGenBuffers(1, &_surfaceVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, _surfaceVBO);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(square), square, GL_STATIC_DRAW);
 
 			// Generate UV buffer
-			glGenBuffers(1, &m_surfaceUVBO);
-			glBindBuffer(GL_ARRAY_BUFFER, m_surfaceUVBO);
+			glGenBuffers(1, &_surfaceUVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, _surfaceUVBO);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(screenUVData), screenUVData, GL_STATIC_DRAW);
 
 			// Initialize viewport
 			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 			// Load shaders
-			m_shaderProgram = Shaders::LoadShaderMem((const char *) resource_gb_vert, sizeof(resource_gb_vert), (const char *) resource_gb_frag, sizeof(resource_gb_frag));
+			_shaderProgram = Shaders::LoadShaderMem((const char *) resource_gb_vert, sizeof(resource_gb_vert), (const char *) resource_gb_frag, sizeof(resource_gb_frag));
 			break;
 		case 1: // Background screen
-			glGenTextures(1, &mBGTexture);
-			glBindTexture(GL_TEXTURE_2D, mBGTexture);
+			glGenTextures(1, &_BGTexture);
+			glBindTexture(GL_TEXTURE_2D, _BGTexture);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 256, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glGenVertexArrays(1, &mBGVAO);
-			glBindVertexArray(mBGVAO);
-			glGenBuffers(1, &mBGVBO);
-			glBindBuffer(GL_ARRAY_BUFFER, mBGVBO);
+			glGenVertexArrays(1, &_BGVAO);
+			glBindVertexArray(_BGVAO);
+			glGenBuffers(1, &_BGVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, _BGVBO);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(square), square, GL_STATIC_DRAW);
-			glGenBuffers(1, &mBGUVBO);
-			glBindBuffer(GL_ARRAY_BUFFER, mBGUVBO);
+			glGenBuffers(1, &_BGUVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, _BGUVBO);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(totalUVData), totalUVData, GL_STATIC_DRAW);
-			mBGShaderProgram = Shaders::LoadShaderMem((const char *) resource_gb_vert, sizeof(resource_gb_vert), (const char *) resource_gb_frag, sizeof(resource_gb_frag));
+			_BGShaderProgram = Shaders::LoadShaderMem((const char *) resource_gb_vert, sizeof(resource_gb_vert), (const char *) resource_gb_frag, sizeof(resource_gb_frag));
 			break;
 		case 2: // Tiles screen
-			glGenTextures(1, &mTiTexture);
-			glBindTexture(GL_TEXTURE_2D, mTiTexture);
+			glGenTextures(1, &_TiTexture);
+			glBindTexture(GL_TEXTURE_2D, _TiTexture);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 512, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glGenVertexArrays(1, &mTiVAO);
-			glBindVertexArray(mTiVAO);
-			glGenBuffers(1, &mTiVBO);
-			glBindBuffer(GL_ARRAY_BUFFER, mTiVBO);
+			glGenVertexArrays(1, &_TiVAO);
+			glBindVertexArray(_TiVAO);
+			glGenBuffers(1, &_TiVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, _TiVBO);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(square), square, GL_STATIC_DRAW);
-			glGenBuffers(1, &mTiUVBO);
-			glBindBuffer(GL_ARRAY_BUFFER, mTiUVBO);
+			glGenBuffers(1, &_TiUVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, _TiUVBO);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(tilesUVData), tilesUVData, GL_STATIC_DRAW);
-			mTiShaderProgram = Shaders::LoadShaderMem((const char *) resource_gb_vert, sizeof(resource_gb_vert), (const char *) resource_gb_frag, sizeof(resource_gb_frag));
+			_TiShaderProgram = Shaders::LoadShaderMem((const char *) resource_gb_vert, sizeof(resource_gb_vert), (const char *) resource_gb_frag, sizeof(resource_gb_frag));
 			glClearColor(0.0f,0.0f,0.0f,1.0f);
 			break;
 		case 3: // OAM screen
-			glGenTextures(1, &mOAMTexture);
-			glBindTexture(GL_TEXTURE_2D, mOAMTexture);
+			glGenTextures(1, &_OAMTexture);
+			glBindTexture(GL_TEXTURE_2D, _OAMTexture);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 128, 128, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glGenVertexArrays(1, &mOAMVAO);
-			glBindVertexArray(mOAMVAO);
-			glGenBuffers(1, &mOAMVBO);
-			glBindBuffer(GL_ARRAY_BUFFER, mOAMVBO);
+			glGenVertexArrays(1, &_OAMVAO);
+			glBindVertexArray(_OAMVAO);
+			glGenBuffers(1, &_OAMVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, _OAMVBO);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(square), square, GL_STATIC_DRAW);
-			glGenBuffers(1, &mOAMUVBO);
-			glBindBuffer(GL_ARRAY_BUFFER, mOAMUVBO);
+			glGenBuffers(1, &_OAMUVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, _OAMUVBO);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(oamUVData), oamUVData, GL_STATIC_DRAW);
-			mOAMShaderProgram = Shaders::LoadShaderMem((const char *) resource_gb_vert, sizeof(resource_gb_vert), (const char *) resource_gb_frag, sizeof(resource_gb_frag));
+			_OAMShaderProgram = Shaders::LoadShaderMem((const char *) resource_gb_vert, sizeof(resource_gb_vert), (const char *) resource_gb_frag, sizeof(resource_gb_frag));
 			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			break;
 		default:
@@ -145,32 +145,32 @@ void GbGpu::DestroyGL(int user)
 	switch (user)
 	{
 	case 0: // main screen
-		glDeleteTextures(1, &m_texture);
-		glDeleteVertexArrays(1, &m_vao);
-		glDeleteBuffers(1, &m_surfaceVBO);
-		glDeleteBuffers(1, &m_surfaceUVBO);
-		glDeleteProgram(m_shaderProgram);
+		glDeleteTextures(1, &_texture);
+		glDeleteVertexArrays(1, &_vao);
+		glDeleteBuffers(1, &_surfaceVBO);
+		glDeleteBuffers(1, &_surfaceUVBO);
+		glDeleteProgram(_shaderProgram);
 		break;
 	case 1: // BG screen
-		glDeleteTextures(1, &mBGTexture);
-		glDeleteVertexArrays(1, &mBGVAO);
-		glDeleteBuffers(1, &mBGVBO);
-		glDeleteBuffers(1, &mBGUVBO);
-		glDeleteProgram(mBGShaderProgram);
+		glDeleteTextures(1, &_BGTexture);
+		glDeleteVertexArrays(1, &_BGVAO);
+		glDeleteBuffers(1, &_BGVBO);
+		glDeleteBuffers(1, &_BGUVBO);
+		glDeleteProgram(_BGShaderProgram);
 		break;
 	case 2: // Tiles screen
-		glDeleteTextures(1, &mTiTexture);
-		glDeleteVertexArrays(1, &mTiVAO);
-		glDeleteBuffers(1, &mTiVBO);
-		glDeleteBuffers(1, &mTiUVBO);
-		glDeleteProgram(mTiShaderProgram);
+		glDeleteTextures(1, &_TiTexture);
+		glDeleteVertexArrays(1, &_TiVAO);
+		glDeleteBuffers(1, &_TiVBO);
+		glDeleteBuffers(1, &_TiUVBO);
+		glDeleteProgram(_TiShaderProgram);
 		break;
 	case 3: // OAM screen
-		glDeleteTextures(1, &mOAMTexture);
-		glDeleteVertexArrays(1, &mOAMVAO);
-		glDeleteBuffers(1, &mOAMVBO);
-		glDeleteBuffers(1, &mOAMUVBO);
-		glDeleteProgram(mOAMShaderProgram);
+		glDeleteTextures(1, &_OAMTexture);
+		glDeleteVertexArrays(1, &_OAMVAO);
+		glDeleteBuffers(1, &_OAMVBO);
+		glDeleteBuffers(1, &_OAMUVBO);
+		glDeleteProgram(_OAMShaderProgram);
 		break;
 	}
 }
@@ -185,26 +185,26 @@ void GbGpu::drawGL(int user)
 	case 0: // main screen
 
 		
-		glBindTexture(GL_TEXTURE_2D, m_texture);
-		if (m_screen == m_screen_buffer1)
+		glBindTexture(GL_TEXTURE_2D, _texture);
+		if (_screen == _screen_buffer1)
 		{
-			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, m_screen_buffer2);
+			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, _screen_buffer2);
 		}
 		else {
-			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, m_screen_buffer1);
+			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, _screen_buffer1);
 		}
 		
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		// Enable shader and load buffers
-		glUseProgram(m_shaderProgram);
+		glUseProgram(_shaderProgram);
 		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, m_surfaceVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, _surfaceVBO);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0);
 		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, m_surfaceUVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, _surfaceUVBO);
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0);
-		glBindTexture(GL_TEXTURE_2D, m_texture);
+		glBindTexture(GL_TEXTURE_2D, _texture);
 
 		// Draw the screen
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -229,10 +229,10 @@ void GbGpu::drawGL(int user)
 
 void GbGpu::DrawDebugBackground()
 {
-	bool bgd = mBGDebug.dataMode == 2 ? (m_gb->_mem->read(LCDC) & LCDC_BS) != 0 : mBGDebug.dataMode == 1;
-	bool bgm = mBGDebug.mapMode == 2 ? (m_gb->_mem->read(LCDC) & LCDC_BTS) != 0 : mBGDebug.mapMode == 1;
-	bool gbc = m_gb->IsGBC();
-	bool grid = mBGDebug.grid;
+	bool bgd = _BGDebug.dataMode == 2 ? (_gb->_mem->read(LCDC) & LCDC_BS) != 0 : _BGDebug.dataMode == 1;
+	bool bgm = _BGDebug.mapMode == 2 ? (_gb->_mem->read(LCDC) & LCDC_BTS) != 0 : _BGDebug.mapMode == 1;
+	bool gbc = _gb->IsGBC();
+	bool grid = _BGDebug.grid;
 	for (int ty = 0; ty < 32; ty++)
 	{
 		for (int tx = 0; tx < 32; tx++)
@@ -249,45 +249,45 @@ void GbGpu::DrawDebugBackground()
 					gbColor col;
 					if (gbc)
 					{
-						col = convertPaletteData(pixel, tile.attributes & BGMAP_PALETTE, m_bgPaletteData);
+						col = convertPaletteData(pixel, tile.attributes & BGMAP_PALETTE, _bgPaletteData);
 					}
 					else {
-						col = convertPaletteData(pixel, m_gb->_mem->read(BGP));
+						col = convertPaletteData(pixel, _gb->_mem->read(BGP));
 					}
 					if (grid && (x == 0 || y == 0))
 					{
 						col.color = ~col.color;
 					}
 					col.p = 255;
-					mDebugDrawBuffer[(tx * 8 + x + (ty * 8 + y) * 256)] = col;
+					_debugDrawBuffer[(tx * 8 + x + (ty * 8 + y) * 256)] = col;
 				}
 			}
 		}
 	}
-	gbByte scx = m_gb->_mem->read(SCX);
-	gbByte scy = m_gb->_mem->read(SCY);
+	gbByte scx = _gb->_mem->read(SCX);
+	gbByte scy = _gb->_mem->read(SCY);
 	for (int x = scx; x < scx + SCREEN_WIDTH; x++)
 	{
-		mDebugDrawBuffer[((x % 256) + scy * 256)].g ^= 0xFF;
-		mDebugDrawBuffer[((x % 256) + ((scy + SCREEN_HEIGHT) % 256) * 256)].g ^= 0xFF;
+		_debugDrawBuffer[((x % 256) + scy * 256)].g ^= 0xFF;
+		_debugDrawBuffer[((x % 256) + ((scy + SCREEN_HEIGHT) % 256) * 256)].g ^= 0xFF;
 	}
 	for (int y = scy; y < scy + SCREEN_HEIGHT; y++)
 	{
-		mDebugDrawBuffer[(scx + (y % 256) * 256)].g ^= 0xFF;
-		mDebugDrawBuffer[(((scx + SCREEN_WIDTH) % 256) + (y % 256) * 256)].g ^= 0xFF;
+		_debugDrawBuffer[(scx + (y % 256) * 256)].g ^= 0xFF;
+		_debugDrawBuffer[(((scx + SCREEN_WIDTH) % 256) + (y % 256) * 256)].g ^= 0xFF;
 	}
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glBindTexture(GL_TEXTURE_2D, mBGTexture);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_BYTE, mDebugDrawBuffer);
+	glBindTexture(GL_TEXTURE_2D, _BGTexture);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_BYTE, _debugDrawBuffer);
 
 	// Enable shader and load buffers
-	glUseProgram(mBGShaderProgram);
+	glUseProgram(_BGShaderProgram);
 	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, mBGVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, _BGVBO);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0);
 	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, mBGUVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, _BGUVBO);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0);
 
 	// Draw the screen
@@ -311,39 +311,39 @@ void GbGpu::DrawDebugTiles()
 			int tx = (x - 1) / 9;
 			if (xi == 8 || yi == 8 || y == 0 || x == 0)
 			{
-				mDebugDrawBuffer[(y * 289 + x)].color = 0xFF000000;
+				_debugDrawBuffer[(y * 289 + x)].color = 0xFF000000;
 				continue;
 			}
 					
-			gbByte pixel = getTilePixel(m_gb->_mem->vram[tx / 16] + (ty * 16 * 8 * 2 + (tx % 16) * 8 * 2), xi, yi);
+			gbByte pixel = getTilePixel(_gb->_mem->_vram[tx / 16] + (ty * 16 * 8 * 2 + (tx % 16) * 8 * 2), xi, yi);
 			switch (pixel)
 			{
 			case 0:
-				mDebugDrawBuffer[(y * 289 + x)].color = 0xFFFFFFFF;
+				_debugDrawBuffer[(y * 289 + x)].color = 0xFFFFFFFF;
 				break;
 			case 1:
-				mDebugDrawBuffer[(y * 289 + x)].color = 0xFFD3D3D3;
+				_debugDrawBuffer[(y * 289 + x)].color = 0xFFD3D3D3;
 				break;
 			case 2:
-				mDebugDrawBuffer[(y * 289 + x)].color = 0xFFA9A9A9;
+				_debugDrawBuffer[(y * 289 + x)].color = 0xFFA9A9A9;
 				break;
 			case 3:
-				mDebugDrawBuffer[(y * 289 + x)].color = 0xFF000000;
+				_debugDrawBuffer[(y * 289 + x)].color = 0xFF000000;
 				break;
 			}
 		}
 	}
 
-	glBindTexture(GL_TEXTURE_2D, mTiTexture);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 289, 217, GL_RGBA, GL_UNSIGNED_BYTE, mDebugDrawBuffer);
+	glBindTexture(GL_TEXTURE_2D, _TiTexture);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 289, 217, GL_RGBA, GL_UNSIGNED_BYTE, _debugDrawBuffer);
 
 	// Enable shader and load buffers
-	glUseProgram(mTiShaderProgram);
+	glUseProgram(_TiShaderProgram);
 	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, mTiVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, _TiVBO);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0);
 	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, mTiUVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, _TiUVBO);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0);
 
 	// Draw the screen
@@ -357,18 +357,18 @@ void GbGpu::DrawDebugTiles()
 
 void GbGpu::DrawDebugOAM()
 {
-	memset(mDebugDrawBuffer, 0, 73 * 86 * sizeof(gbColor));
-	bool large = (m_gb->_mem->read(LCDC) & LCDC_OS) != 0;
-	bool gbc = (m_gb->_mem->read(CGB) & 0x80) != 0;
+	memset(_debugDrawBuffer, 0, 73 * 86 * sizeof(gbColor));
+	bool large = (_gb->_mem->read(LCDC) & LCDC_OS) != 0;
+	bool gbc = (_gb->_mem->read(CGB) & 0x80) != 0;
 	for (int i = 0; i < 40; i++)
 	{
 		int ox = (i % 8) * 9 + 1;
 		int oy = (i / 8) * 17 + 1;
 		gbSprite sprite;
-		sprite.y = m_gb->_mem->mem[0xF][OAM_OFFSET + i * 4 + 0];
-		sprite.x = m_gb->_mem->mem[0xF][OAM_OFFSET + i * 4 + 1];
-		sprite.loc = m_gb->_mem->mem[0xF][OAM_OFFSET + i * 4 + 2];
-		sprite.attr = m_gb->_mem->mem[0xF][OAM_OFFSET + i * 4 + 3];
+		sprite.y = _gb->_mem->_mem[0xF][OAM_OFFSET + i * 4 + 0];
+		sprite.x = _gb->_mem->_mem[0xF][OAM_OFFSET + i * 4 + 1];
+		sprite.loc = _gb->_mem->_mem[0xF][OAM_OFFSET + i * 4 + 2];
+		sprite.attr = _gb->_mem->_mem[0xF][OAM_OFFSET + i * 4 + 3];
 		for (int y = 0; y < 16; y++)
 		{
 			gbByte yindex;
@@ -393,40 +393,40 @@ void GbGpu::DrawDebugOAM()
 					col.color = 0xFFFFFFFF;
 					for (int x = 0; x < 8; x++)
 					{
-						mDebugDrawBuffer[(oy + y) * 73 + (ox + x)] = col;
+						_debugDrawBuffer[(oy + y) * 73 + (ox + x)] = col;
 					}
 					continue;
 				}
 			}
 
-			gbByte *ptr = m_gb->_mem->vram[(sprite.attr & OAM_VRAM) ? 1 : 0] + SPRITE_OFFSET + sprite.loc * 2 * 8;
+			gbByte *ptr = _gb->_mem->_vram[(sprite.attr & OAM_VRAM) ? 1 : 0] + SPRITE_OFFSET + sprite.loc * 2 * 8;
 			for (int x = 0; x < 8; x++)
 			{
 				gbByte xindex = (sprite.attr & OAM_XFLIP) ? 7 - x : x;
-				gbByte pixel = m_gb->_gpu->getTilePixel(ptr, xindex, yindex);
+				gbByte pixel = _gb->_gpu->getTilePixel(ptr, xindex, yindex);
 				gbColor col;
 				if (gbc)
 				{
-					col = m_gb->_gpu->convertPaletteData(pixel, sprite.attr & OAM_PALETTE, m_oPaletteData);
+					col = _gb->_gpu->convertPaletteData(pixel, sprite.attr & OAM_PALETTE, _oPaletteData);
 				}
 				else {
-					col = m_gb->_gpu->convertPaletteData(pixel, m_gb->_mem->read((sprite.attr & OAM_PALETTENR) ? OBP1 : OBP0));
+					col = _gb->_gpu->convertPaletteData(pixel, _gb->_mem->read((sprite.attr & OAM_PALETTENR) ? OBP1 : OBP0));
 				}
 				col.p = 255;
-				mDebugDrawBuffer[(oy + y)*73 + (ox + x)] = col;
+				_debugDrawBuffer[(oy + y)*73 + (ox + x)] = col;
 			}
 		}
 	}
-	glBindTexture(GL_TEXTURE_2D, mOAMTexture);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 73, 86, GL_RGBA, GL_UNSIGNED_BYTE, mDebugDrawBuffer);
+	glBindTexture(GL_TEXTURE_2D, _OAMTexture);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 73, 86, GL_RGBA, GL_UNSIGNED_BYTE, _debugDrawBuffer);
 
 	// Enable shader and load buffers
-	glUseProgram(mOAMShaderProgram);
+	glUseProgram(_OAMShaderProgram);
 	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, mOAMVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, _OAMVBO);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0);
 	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, mOAMUVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, _OAMUVBO);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0);
 
 	// Draw the screen
@@ -460,25 +460,25 @@ void GbGpu::Reshape(int width, int height, bool keepAspect)
 
 void GbGpu::drawing(gbByte ly)
 {
-	m_gb->_mem->setAccessable(false, false);
-	gbByte lcds = m_gb->_mem->read(LCDS);
-	gbByte lcdc = m_gb->_mem->read(LCDC);
+	_gb->_mem->setAccessable(false, false);
+	gbByte lcds = _gb->_mem->read(LCDS);
+	gbByte lcdc = _gb->_mem->read(LCDC);
 
-	m_gb->_mem->write(LCDS, (lcds & ~LCDS_M_M) | LCDS_M_T);
+	_gb->_mem->write(LCDS, (lcds & ~LCDS_M_M) | LCDS_M_T);
 
 	// get modes
 	bool be = (lcdc & LCDC_BD) != 0; //Background enabled
 	bool we = (lcdc & LCDC_WE) != 0; // Window enabled
 	bool oe = (lcdc & LCDC_OE) != 0; // Sprite(OBJ) enabled
-	bool gbc = (m_gb->_mem->read(CGB) & 0x80) != 0; // gameboy color mode
+	bool gbc = (_gb->_mem->read(CGB) & 0x80) != 0; // gameboy color mode
 	bool bgd = (lcdc & LCDC_BS) != 0; // Background data location
 	bool bgm = (lcdc & LCDC_BTS) != 0; // Background map location
 	bool wtm = (lcdc & LCDC_TS) != 0; // Window tile map location
-	bool large = (m_gb->_mem->read(LCDC) & LCDC_OS) != 0; // 8 by 16 sprites
-	gbByte scx = m_gb->_mem->read(SCX); // Background scroll x
-	gbByte scy = m_gb->_mem->read(SCY); // Background scroll y
-	gbByte wx = m_gb->_mem->read(WX); // window start x
-	gbByte wy = m_gb->_mem->read(WY); // window start y
+	bool large = (_gb->_mem->read(LCDC) & LCDC_OS) != 0; // 8 by 16 sprites
+	gbByte scx = _gb->_mem->read(SCX); // Background scroll x
+	gbByte scy = _gb->_mem->read(SCY); // Background scroll y
+	gbByte wx = _gb->_mem->read(WX); // window start x
+	gbByte wy = _gb->_mem->read(WY); // window start y
 
 	// Draw the background
 	gbByte bg_y = (ly + scy) % 256;
@@ -492,26 +492,26 @@ void GbGpu::drawing(gbByte ly)
 		gbByte pixel = getTilePixel(tile.tile, xindex, yindex); // Get the pixel data
 		if (gbc)
 		{
-			gbColor col = convertPaletteData(pixel, tile.attributes & BGMAP_PALETTE, m_bgPaletteData);
-			m_screen[ly * SCREEN_WIDTH + x - scx].r = col.r;
-			m_screen[ly * SCREEN_WIDTH + x - scx].g = col.g;
-			m_screen[ly * SCREEN_WIDTH + x - scx].b = col.b;
-			m_screen[ly * SCREEN_WIDTH + x - scx].p = pixel | (tile.attributes & PRIO_BG);
+			gbColor col = convertPaletteData(pixel, tile.attributes & BGMAP_PALETTE, _bgPaletteData);
+			_screen[ly * SCREEN_WIDTH + x - scx].r = col.r;
+			_screen[ly * SCREEN_WIDTH + x - scx].g = col.g;
+			_screen[ly * SCREEN_WIDTH + x - scx].b = col.b;
+			_screen[ly * SCREEN_WIDTH + x - scx].p = pixel | (tile.attributes & PRIO_BG);
 		}
 		else {
 			if (be)
 			{
-				gbColor col = convertPaletteData(pixel, m_gb->_mem->read(BGP));
-				m_screen[ly * SCREEN_WIDTH + x - scx].r = col.r;
-				m_screen[ly * SCREEN_WIDTH + x - scx].g = col.g;
-				m_screen[ly * SCREEN_WIDTH + x - scx].b = col.b;
-				m_screen[ly * SCREEN_WIDTH + x - scx].p = pixel | (tile.attributes & PRIO_BG);
+				gbColor col = convertPaletteData(pixel, _gb->_mem->read(BGP));
+				_screen[ly * SCREEN_WIDTH + x - scx].r = col.r;
+				_screen[ly * SCREEN_WIDTH + x - scx].g = col.g;
+				_screen[ly * SCREEN_WIDTH + x - scx].b = col.b;
+				_screen[ly * SCREEN_WIDTH + x - scx].p = pixel | (tile.attributes & PRIO_BG);
 			}
 			else {
-				m_screen[ly * SCREEN_WIDTH + x - scx].r = 0xFF;
-				m_screen[ly * SCREEN_WIDTH + x - scx].g = 0xFF;
-				m_screen[ly * SCREEN_WIDTH + x - scx].b = 0xFF;
-				m_screen[ly * SCREEN_WIDTH + x - scx].p = 0x00;
+				_screen[ly * SCREEN_WIDTH + x - scx].r = 0xFF;
+				_screen[ly * SCREEN_WIDTH + x - scx].g = 0xFF;
+				_screen[ly * SCREEN_WIDTH + x - scx].b = 0xFF;
+				_screen[ly * SCREEN_WIDTH + x - scx].p = 0x00;
 			}
 		}
 	}
@@ -533,32 +533,32 @@ void GbGpu::drawing(gbByte ly)
 			gbColor col;
 			if (gbc)
 			{
-				col = convertPaletteData(pixel, tile.attributes & BGMAP_PALETTE, m_bgPaletteData);
+				col = convertPaletteData(pixel, tile.attributes & BGMAP_PALETTE, _bgPaletteData);
 			}
 			else {
-				col = convertPaletteData(pixel, m_gb->_mem->read(BGP));
+				col = convertPaletteData(pixel, _gb->_mem->read(BGP));
 			}
-			m_screen[ly * SCREEN_WIDTH + x].r = col.r;
-			m_screen[ly * SCREEN_WIDTH + x].g = col.g;
-			m_screen[ly * SCREEN_WIDTH + x].b = col.b;
-			m_screen[ly * SCREEN_WIDTH + x].p &= ~0x3;
-			m_screen[ly * SCREEN_WIDTH + x].p |= PRIO_WI | pixel | ((tile.attributes & BGMAP_ATTR_PRIO) ? PRIO_BG : 0x00);
+			_screen[ly * SCREEN_WIDTH + x].r = col.r;
+			_screen[ly * SCREEN_WIDTH + x].g = col.g;
+			_screen[ly * SCREEN_WIDTH + x].b = col.b;
+			_screen[ly * SCREEN_WIDTH + x].p &= ~0x3;
+			_screen[ly * SCREEN_WIDTH + x].p |= PRIO_WI | pixel | ((tile.attributes & BGMAP_ATTR_PRIO) ? PRIO_BG : 0x00);
 		}
 	}
 	// Draw the prebuffered sprites
 	if (oe)
 	{
-		gbByte *ptr = m_gb->_mem->mem[0xF] + OAM_OFFSET;
+		gbByte *ptr = _gb->_mem->_mem[0xF] + OAM_OFFSET;
 
 		for (int i = 39; i >= 0; i--)
 		{
-			if (m_lineSprites[i] == -1)
+			if (_lineSprites[i] == -1)
 				continue;
 			gbSprite sprite;
-			sprite.y = ptr[m_lineSprites[i] * 4];
-			sprite.x = ptr[m_lineSprites[i] * 4 + 1];
-			sprite.nr = ptr[m_lineSprites[i] * 4 + 2];
-			sprite.attr = ptr[m_lineSprites[i] * 4 + 3];
+			sprite.y = ptr[_lineSprites[i] * 4];
+			sprite.x = ptr[_lineSprites[i] * 4 + 1];
+			sprite.nr = ptr[_lineSprites[i] * 4 + 2];
+			sprite.attr = ptr[_lineSprites[i] * 4 + 3];
 			gbByte iny = ly - (sprite.y - 16);
 			gbByte tileNr = sprite.nr;
 			gbByte yindex;
@@ -582,12 +582,12 @@ void GbGpu::drawing(gbByte ly)
 					continue;
 				}
 			}
-			gbByte *ptr = m_gb->_mem->vram[(sprite.attr & OAM_VRAM) ? 1 : 0] + SPRITE_OFFSET + tileNr * 2 * 8;
+			gbByte *ptr = _gb->_mem->_vram[(sprite.attr & OAM_VRAM) ? 1 : 0] + SPRITE_OFFSET + tileNr * 2 * 8;
 			for (int x = 0; x < 8; x++)
 			{
 				gbByte screenx = (sprite.x - 8 + x);
 				if (screenx < 0 || screenx >= SCREEN_WIDTH ||
-					((m_screen[ly * SCREEN_WIDTH + screenx].p & PRIO_BG) != 0))
+					((_screen[ly * SCREEN_WIDTH + screenx].p & PRIO_BG) != 0))
 				{
 					// when the sprite is offscreen, dont draw it
 					// or the background has priority
@@ -603,26 +603,26 @@ void GbGpu::drawing(gbByte ly)
 				gbColor col;
 				if (gbc)
 				{
-					col = convertPaletteData(pixel, sprite.attr & OAM_PALETTE, m_oPaletteData);
+					col = convertPaletteData(pixel, sprite.attr & OAM_PALETTE, _oPaletteData);
 				}
 				else {
-					col = convertPaletteData(pixel, m_gb->_mem->read((sprite.attr & OAM_PALETTENR) ? OBP1 : OBP0));
+					col = convertPaletteData(pixel, _gb->_mem->read((sprite.attr & OAM_PALETTENR) ? OBP1 : OBP0));
 				}
 				if (sprite.attr & OAM_PRIO)
 				{
 					// OBJ behind bg color 1-3
-					if ((m_screen[ly * SCREEN_WIDTH + screenx].p & 0x3) == 0)
+					if ((_screen[ly * SCREEN_WIDTH + screenx].p & 0x3) == 0)
 					{
-						m_screen[ly * SCREEN_WIDTH + screenx].r = col.r;
-						m_screen[ly * SCREEN_WIDTH + screenx].g = col.g;
-						m_screen[ly * SCREEN_WIDTH + screenx].b = col.b;
+						_screen[ly * SCREEN_WIDTH + screenx].r = col.r;
+						_screen[ly * SCREEN_WIDTH + screenx].g = col.g;
+						_screen[ly * SCREEN_WIDTH + screenx].b = col.b;
 					}
 				}
 				else {
 					// OBJ above bg
-					m_screen[ly * SCREEN_WIDTH + screenx].r = col.r;
-					m_screen[ly * SCREEN_WIDTH + screenx].g = col.g;
-					m_screen[ly * SCREEN_WIDTH + screenx].b = col.b;
+					_screen[ly * SCREEN_WIDTH + screenx].r = col.r;
+					_screen[ly * SCREEN_WIDTH + screenx].g = col.g;
+					_screen[ly * SCREEN_WIDTH + screenx].b = col.b;
 				}
 			}
 		}

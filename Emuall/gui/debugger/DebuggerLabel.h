@@ -21,9 +21,9 @@ namespace Debugger
 
 	private:
 
-		Emulator *mEmu;
-		wxStaticText *mWidget;
-		wxString mLabel;
+		Emulator *_emu;
+		wxStaticText *_widget;
+		wxString _label;
 	};
 
 }

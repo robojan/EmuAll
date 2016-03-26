@@ -15,8 +15,8 @@ END_EVENT_TABLE()
 CPUDebugger::CPUDebugger(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) :
 	wxFrame(parent, id, title, pos, size, style)
 {
-	mEmu.emu = NULL;
-	mEmu.handle = NULL;
+	_emu.emu = NULL;
+	_emu.handle = NULL;
 
 	// Initialize the window
 	this->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
@@ -25,24 +25,24 @@ CPUDebugger::CPUDebugger(wxWindow* parent, wxWindowID id, const wxString& title,
 	bSizer1 = new wxBoxSizer(wxHORIZONTAL);
 
 	// Code section
-	mCodeView = new DisView(&mEmu, this);
-	bSizer1->Add(mCodeView, 7, wxEXPAND, 5);
+	_codeView = new DisView(&_emu, this);
+	bSizer1->Add(_codeView, 7, wxEXPAND, 5);
 
 	wxBoxSizer* bSizer2;
 	bSizer2 = new wxBoxSizer(wxVERTICAL);
 
 	// Register view
-	mRegisterView = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_HRULES | wxLC_NO_SORT_HEADER | wxLC_REPORT | wxLC_SINGLE_SEL | wxHSCROLL);
-	mRegisterView->AppendColumn("Register");
-	mRegisterView->AppendColumn("Value", wxLIST_FORMAT_LEFT);
-	bSizer2->Add(mRegisterView, 2, wxEXPAND, 5);
+	_registerView = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_HRULES | wxLC_NO_SORT_HEADER | wxLC_REPORT | wxLC_SINGLE_SEL | wxHSCROLL);
+	_registerView->AppendColumn("Register");
+	_registerView->AppendColumn("Value", wxLIST_FORMAT_LEFT);
+	bSizer2->Add(_registerView, 2, wxEXPAND, 5);
 
 	// Status view
 	wxStaticBoxSizer* sbSizer1;
 	sbSizer1 = new wxStaticBoxSizer(new wxStaticBox(this, wxID_ANY, wxT("Status")), wxVERTICAL);
 	
-	mStatusSizer = new wxGridSizer(0, 2, 0, 0);
-	sbSizer1->Add(mStatusSizer, 1, wxEXPAND, 5);
+	_statusSizer = new wxGridSizer(0, 2, 0, 0);
+	sbSizer1->Add(_statusSizer, 1, wxEXPAND, 5);
 	this->SetAutoLayout(true);
 	bSizer2->Add(sbSizer1, 1, wxEXPAND | wxLEFT | wxRIGHT, 5);
 	
@@ -50,14 +50,14 @@ CPUDebugger::CPUDebugger(wxWindow* parent, wxWindowID id, const wxString& title,
 	// Add buttons
 	wxGridSizer* gSizer4;
 	gSizer4 = new wxGridSizer(0, 2, 0, 0);
-	mRunButton = new wxButton(this, ID_Debug_Cpu_run, _("Run"));
-	gSizer4->Add(mRunButton, 1, wxALIGN_CENTER, 5);
-	mStepButton = new wxButton(this, ID_Debug_Cpu_step, _("Step"));
-	gSizer4->Add(mStepButton, 1, wxALIGN_CENTER, 5);
-	mStepOverButton = new wxButton(this, ID_Debug_Cpu_stepOver, _("Step over"));
-	gSizer4->Add(mStepOverButton, 1, wxALIGN_CENTER, 5);
-	mStepOutButton = new wxButton(this, ID_Debug_Cpu_stepOut, _("Step out"));
-	gSizer4->Add(mStepOutButton, 1, wxALIGN_CENTER, 5);
+	_runButton = new wxButton(this, ID_Debug_Cpu_run, _("Run"));
+	gSizer4->Add(_runButton, 1, wxALIGN_CENTER, 5);
+	_stepButton = new wxButton(this, ID_Debug_Cpu_step, _("Step"));
+	gSizer4->Add(_stepButton, 1, wxALIGN_CENTER, 5);
+	_stepOverButton = new wxButton(this, ID_Debug_Cpu_stepOver, _("Step over"));
+	gSizer4->Add(_stepOverButton, 1, wxALIGN_CENTER, 5);
+	_stepOutButton = new wxButton(this, ID_Debug_Cpu_stepOut, _("Step out"));
+	gSizer4->Add(_stepOutButton, 1, wxALIGN_CENTER, 5);
 	bSizer2->Add(gSizer4, 0, wxALIGN_CENTER | wxLEFT | wxRIGHT, 5);
 
 
@@ -68,7 +68,7 @@ CPUDebugger::CPUDebugger(wxWindow* parent, wxWindowID id, const wxString& title,
 
 	this->Centre(wxBOTH);
 
-	SetEmulator(mEmu);
+	SetEmulator(_emu);
 }
 
 CPUDebugger::~CPUDebugger()
@@ -78,114 +78,114 @@ CPUDebugger::~CPUDebugger()
 
 void CPUDebugger::Update()
 {
-	if (mEmu.emu == NULL)
+	if (_emu.emu == NULL)
 		return;
-	if (mEmu.emu->IsRunning(mEmu.handle) == 1)
+	if (_emu.emu->IsRunning(_emu.handle) == 1)
 	{
 		// Emulator running
-		mRunButton->SetLabel(_("Stop"));
-		mStepButton->Disable();
-		mRegisterView->Disable();
+		_runButton->SetLabel(_("Stop"));
+		_stepButton->Disable();
+		_registerView->Disable();
 		std::vector<wxCheckBox *>::iterator it;
-		for (it = mStatusWidgets.begin(); it != mStatusWidgets.end(); ++it)
+		for (it = _statusWidget.begin(); it != _statusWidget.end(); ++it)
 		{
 			(*it)->Disable();
 		}
 
 	}
-	else if (mEmu.emu->IsRunning(mEmu.handle) == 0)
+	else if (_emu.emu->IsRunning(_emu.handle) == 0)
 	{
 		// Emulator not running
 		// Update button
-		mRunButton->SetLabel(_("Run"));
-		mStepButton->Enable();
+		_runButton->SetLabel(_("Run"));
+		_stepButton->Enable();
 		// Update registers
 		
 		std::map<int, EmulatorRegister_t>::iterator it;
-		for (it = mRegisters.begin(); it != mRegisters.end(); ++it)
+		for (it = _registers.begin(); it != _registers.end(); ++it)
 		{
-			mRegisterView->SetItem(it->first, 1, wxString::Format(wxString::Format("0x%%0%dX", (it->second.size +3)/ 4),
-				 mEmu.emu->GetValU(mEmu.handle, it->second.id)));
+			_registerView->SetItem(it->first, 1, wxString::Format(wxString::Format("0x%%0%dX", (it->second.size +3)/ 4),
+				 _emu.emu->GetValU(_emu.handle, it->second.id)));
 		}
-		mRegisterView->Enable();
+		_registerView->Enable();
 
 		std::map<wxCheckBox *, EmulatorRegister_t>::iterator it2;
-		for (it2 = mFlags.begin(); it2 != mFlags.end(); ++it2)
+		for (it2 = _flags.begin(); it2 != _flags.end(); ++it2)
 		{
-			it2->first->SetValue(mEmu.emu->GetValU(mEmu.handle, it2->second.id) != 0);
+			it2->first->SetValue(_emu.emu->GetValU(_emu.handle, it2->second.id) != 0);
 			it2->first->Enable();
 		}
 
 	}
-	mCodeView->FollowCurrentLine();
-	mCodeView->Refresh();
+	_codeView->FollowCurrentLine();
+	_codeView->Refresh();
 }
 
 void CPUDebugger::SetEmulator(const Emulator &emu)
 {
-	mEmu = emu;
-	if (mEmu.emu == NULL)
+	_emu = emu;
+	if (_emu.emu == NULL)
 	{
 		// Clear everything
-		mRegisterView->DeleteAllItems();
-		mRegisterView->Disable();
+		_registerView->DeleteAllItems();
+		_registerView->Disable();
 		std::vector<wxCheckBox *>::iterator it;
-		for (it = mStatusWidgets.begin(); it != mStatusWidgets.end(); ++it)
+		for (it = _statusWidget.begin(); it != _statusWidget.end(); ++it)
 		{
 			(*it)->Destroy();
 		}
-		mStatusWidgets.clear();
-		mRegisters.clear();
-		mFlags.clear();
-		mCodeView->Update(0, 0);
-		mRunButton->Enable(false);
-		mStepButton->Enable(false);
-		mStepOverButton->Enable(false);
-		mStepOutButton->Enable(false);
+		_statusWidget.clear();
+		_registers.clear();
+		_flags.clear();
+		_codeView->Update(0, 0);
+		_runButton->Enable(false);
+		_stepButton->Enable(false);
+		_stepOverButton->Enable(false);
+		_stepOutButton->Enable(false);
 
 	}
 	else {
 		// Load registers
-		mRegisterView->DeleteAllItems();
+		_registerView->DeleteAllItems();
 		std::vector<wxCheckBox *>::iterator it;
-		for (it = mStatusWidgets.begin(); it != mStatusWidgets.end(); ++it)
+		for (it = _statusWidget.begin(); it != _statusWidget.end(); ++it)
 		{
 			(*it)->Destroy();
 		}
-		mStatusWidgets.clear();
-		mFlags.clear();
-		mRegisters.clear();
+		_statusWidget.clear();
+		_flags.clear();
+		_registers.clear();
 
 		// Get cpu debugging information
-		CpuDebuggerInfo_t config = mEmu.emu->GetCpuDebuggerInfo();
+		CpuDebuggerInfo_t config = _emu.emu->GetCpuDebuggerInfo();
 
-		mCodeView->Update(config.disassemblerSize, config.curLineId);
+		_codeView->Update(config.disassemblerSize, config.curLineId);
 
 		std::vector<EmulatorRegister_t>::iterator it2;
 		for (it2 = config.registers.begin(); it2 != config.registers.end(); ++it2)
 		{
 			// add register
-			long pos = mRegisterView->InsertItem(mRegisterView->GetItemCount(), it2->name);
+			long pos = _registerView->InsertItem(_registerView->GetItemCount(), it2->name);
 			if (it2->size == 0)
 				it2->size = 32;
-			mRegisterView->SetItem(pos, 1, wxString::Format(wxString::Format("0x%%0%dX", (it2->size + 1) / 4), 0));
-			mRegisters[pos] = *it2;
+			_registerView->SetItem(pos, 1, wxString::Format(wxString::Format("0x%%0%dX", (it2->size + 1) / 4), 0));
+			_registers[pos] = *it2;
 		}
 		for (it2 = config.flags.begin(); it2 != config.flags.end(); ++it2)
 		{
 			// add flag
 			wxCheckBox *flag = new wxCheckBox(this, wxID_ANY, it2->name, wxDefaultPosition, wxDefaultSize, 0);
 			flag->SetValue(0);
-			mStatusSizer->Add(flag, 0, wxALL, 5);
-			mStatusWidgets.push_back(flag);
-			mFlags[flag] = *it2;
+			_statusSizer->Add(flag, 0, wxALL, 5);
+			_statusWidget.push_back(flag);
+			_flags[flag] = *it2;
 		}
-		mRegisterView->Enable();
+		_registerView->Enable();
 
-		mRunButton->Enable(true);
-		mStepButton->Enable(config.step);
-		mStepOverButton->Enable(config.stepOver);
-		mStepOutButton->Enable(config.stepOut);
+		_runButton->Enable(true);
+		_stepButton->Enable(config.step);
+		_stepOverButton->Enable(config.stepOver);
+		_stepOutButton->Enable(config.stepOut);
 	}
 	Fit();
 	Layout();
@@ -205,17 +205,17 @@ void CPUDebugger::OnClose(wxCloseEvent &evt)
 
 void CPUDebugger::OnRun(wxCommandEvent &evt)
 {
-	if (mEmu.emu == NULL)
+	if (_emu.emu == NULL)
 		return;
-	if (mEmu.emu->IsRunning(mEmu.handle) == 1)
+	if (_emu.emu->IsRunning(_emu.handle) == 1)
 	{
 		// Stop
-		mEmu.emu->Run(mEmu.handle, 0);
+		_emu.emu->Run(_emu.handle, 0);
 	}
-	else if (mEmu.emu->IsRunning(mEmu.handle) == 0)
+	else if (_emu.emu->IsRunning(_emu.handle) == 0)
 	{
 		// Run
-		mEmu.emu->Run(mEmu.handle, 1);
+		_emu.emu->Run(_emu.handle, 1);
 	}
 
 	m_parent->Update();
@@ -223,8 +223,8 @@ void CPUDebugger::OnRun(wxCommandEvent &evt)
 
 void CPUDebugger::OnStep(wxCommandEvent &evt)
 {
-	if (mEmu.emu == NULL)
+	if (_emu.emu == NULL)
 		return;
-	mEmu.emu->Step(mEmu.handle);
+	_emu.emu->Step(_emu.handle);
 	m_parent->Update();
 }

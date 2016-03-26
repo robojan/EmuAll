@@ -3,11 +3,11 @@
 using namespace Debugger;
 
 DebuggerLabel::DebuggerLabel(Emulator *emu, const pugi::xml_node &node) :
-mEmu(emu), mWidget(NULL)
+_emu(emu), _widget(NULL)
 {
 	wxASSERT(strcmp(node.name(), "label") == 0);
 	wxASSERT(emu != NULL);
-	mLabel = node.text().as_string("Error!");
+	_label = node.text().as_string("Error!");
 }
 
 DebuggerLabel::~DebuggerLabel()
@@ -17,15 +17,15 @@ DebuggerLabel::~DebuggerLabel()
 
 wxStaticText *DebuggerLabel::GetWidget(wxWindow *parent, wxWindowID id)
 {
-	if (mWidget != NULL)
+	if (_widget != NULL)
 	{
-		return mWidget; // Widget already created
+		return _widget; // Widget already created
 	}
 
-	mWidget = new wxStaticText(parent, id, mLabel);
+	_widget = new wxStaticText(parent, id, _label);
 
 	UpdateInfo();
-	return mWidget;
+	return _widget;
 }
 
 void DebuggerLabel::UpdateInfo()

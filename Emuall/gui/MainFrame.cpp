@@ -35,62 +35,62 @@ END_EVENT_TABLE()
 
 MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &size) :
 	wxFrame(NULL, ID_MainFrame, title, pos, size),
-	mInputHandler(&mOptions)
+	_inputHandler(&_options)
 {	
-	mBar = NULL;
-	mMenFile = NULL;
-	mMenOptions = NULL;
-	mMenDebug = NULL;
-	mMenDebugLevel = NULL;
-	mMenSaveState = NULL;
-	mMenLoadState = NULL;
-	mDisplay = NULL;
-	mLogger = NULL;
-	mTimer = NULL;
-	mEmulator.emu = NULL;
-	mEmulator.handle = NULL;
-	mEmulators = NULL;
-	mAudio = NULL;
-	mInputOptionsFrame = NULL;
+	_bar = NULL;
+	_menFile = NULL;
+	_menOptions = NULL;
+	_menDebug = NULL;
+	_menDebugLevel = NULL;
+	_menSaveState = NULL;
+	_menLoadState = NULL;
+	_display = NULL;
+	_logger = NULL;
+	_timer = NULL;
+	_emulator.emu = NULL;
+	_emulator.handle = NULL;
+	_emulators = NULL;
+	_audio = NULL;
+	_inputOptionsFrame = NULL;
 
 	// Constructor
-	mLogger = new wxLogWindow(this, _("Debug Log"), false, false);
-	mLogger->SetVerbose(true);
-	mLogger->SetLogLevel(wxLOG_Message);
-	InitLog(&mLogDst);
+	_logger = new wxLogWindow(this, _("Debug Log"), false, false);
+	_logger->SetVerbose(true);
+	_logger->SetLogLevel(wxLOG_Message);
+	InitLog(&_logDst);
 
 	CreateLayout();
 
 	// Load options
-	mOptions.LoadOptions();
-	mInputOptionsFrame = new InputOptionsFrame(this, &mOptions);
+	_options.LoadOptions();
+	_inputOptionsFrame = new InputOptionsFrame(this, &_options);
 	UpdateRecentFiles();
 
-	mEmulators = new EmulatorList("plugins");
+	_emulators = new EmulatorList("plugins");
 	std::list<EmulatorInterface *>::iterator it;
-	for (it = mEmulators->begin(); it != mEmulators->end(); ++it)
+	for (it = _emulators->begin(); it != _emulators->end(); ++it)
 	{
-		mInputHandler.RegisterInputs((*it)->GetEmulatorInputs(), (*it)->GetName());
+		_inputHandler.RegisterInputs((*it)->GetEmulatorInputs(), (*it)->GetName());
 	}
 
 	// Load debuggers
-	mCpuDebugger = new CPUDebugger(this, wxID_ANY, _("CPU debugger"));
-	mMemDebugger = new MemDebugger(this, wxID_ANY, _("Memory debugger"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER|wxMAXIMIZE_BOX));
-	mGpuDebugger = new GPUDebugger(this, wxID_ANY, _("GPU debugger"));
+	_cpuDebugger = new CPUDebugger(this, wxID_ANY, _("CPU debugger"));
+	_memDebugger = new MemDebugger(this, wxID_ANY, _("Memory debugger"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER|wxMAXIMIZE_BOX));
+	_gpuDebugger = new GPUDebugger(this, wxID_ANY, _("GPU debugger"));
 
-	mFilePath.clear();
-	mTimer = new wxTimer(this, ID_Timer);
-	mTimer->Start(FPS, false);
+	_filePath.clear();
+	_timer = new wxTimer(this, ID_Timer);
+	_timer->Start(FPS, false);
 	Log(Message,"EmuAll started");
-	mAudio = new Audio();
-	mAudio->Init();
+	_audio = new Audio();
+	_audio->Init();
 }
 
 MainFrame::~MainFrame()
 {
 	// Destructor
-	if (mEmulators)
-		delete mEmulators;
+	if (_emulators)
+		delete _emulators;
 	Log(Message, "EmuAll stopped");
 }
 
@@ -114,85 +114,85 @@ void MainFrame::CreateLayout()
 	//ctxAttr.OGLVersion(3, 2);
 	ctxAttr.ForwardCompatible();
 	ctxAttr.EndList();
-	mDisplay = new GLPane(this, this, 0, ID_Main_display, wxDefaultPosition,
+	_display = new GLPane(this, this, 0, ID_Main_display, wxDefaultPosition,
 		wxDefaultSize, wxFULL_REPAINT_ON_RESIZE, glAttr, ctxAttr);
 
 	//mDisplay->Connect(ID_Main_display, wxEVT_KEY_UP, wxKeyEventHandler(InputMaster::OnKeyboard), (wxObject *) NULL, &mInputHandler);
 	//mDisplay->Connect(ID_Main_display, wxEVT_KEY_DOWN, wxKeyEventHandler(InputMaster::OnKeyboard), (wxObject *) NULL, &mInputHandler);
-	mDisplay->Bind(wxEVT_KEY_UP, &InputMaster::OnKeyboard, &mInputHandler);
-	mDisplay->Bind(wxEVT_KEY_DOWN, &InputMaster::OnKeyboard, &mInputHandler);
+	_display->Bind(wxEVT_KEY_UP, &InputMaster::OnKeyboard, &_inputHandler);
+	_display->Bind(wxEVT_KEY_DOWN, &InputMaster::OnKeyboard, &_inputHandler);
 	//Bind(wxEVT_CHAR_HOOK, &InputMaster::OnKeyboard, &mInputHandler);
-	mDisplay->Connect(ID_Main_display, wxEVT_SIZE, wxSizeEventHandler(MainFrame::OnResize), (wxObject *) NULL, this);
+	_display->Connect(ID_Main_display, wxEVT_SIZE, wxSizeEventHandler(MainFrame::OnResize), (wxObject *) NULL, this);
 }
 
 void MainFrame::CreateMenuBar()
 {	
 	// Create the save state menu
-	mMenSaveState = new wxMenu;
+	_menSaveState = new wxMenu;
 
 	// Create the load state menu
-	mMenLoadState = new wxMenu;
+	_menLoadState = new wxMenu;
 
 	for (int i = 0; i < 10; i++) {
-		mMenSaveState->Append(ID_Main_File_SaveState + i, wxString::Format(_("Save State %d\tCtrl+Shift+F%d"), i + 1, i + 1));
-		mMenLoadState->Append(ID_Main_File_LoadState + i, wxString::Format(_("Load State %d\tCtrl+F%d"), i + 1, i + 1));
+		_menSaveState->Append(ID_Main_File_SaveState + i, wxString::Format(_("Save State %d\tCtrl+Shift+F%d"), i + 1, i + 1));
+		_menLoadState->Append(ID_Main_File_LoadState + i, wxString::Format(_("Load State %d\tCtrl+F%d"), i + 1, i + 1));
 	}
 	UpdateSaveStateLabels();
 	Bind(wxEVT_MENU, &MainFrame::OnSaveState, this, ID_Main_File_SaveState, ID_Main_File_SaveState + 9);
 	Bind(wxEVT_MENU, &MainFrame::OnLoadState, this, ID_Main_File_LoadState, ID_Main_File_LoadState + 9);
 
 	// Create the File menu
-	mMenFile = new wxMenu;
-	mMenFile->Append(ID_Main_File_open, _("&Open\tCtrl+O"));
-	mMenFile->Append(ID_Main_File_run, _("&Run\tCtrl+R"));
-	mMenFile->Append(ID_Main_File_reset, _("Reset"));
-	mMenFile->AppendSeparator();
-	mMenFile->AppendSubMenu(mMenSaveState, _("&Save state"));
-	mMenFile->AppendSubMenu(mMenLoadState, _("&Load state"));
-	mMenFile->AppendSeparator();
+	_menFile = new wxMenu;
+	_menFile->Append(ID_Main_File_open, _("&Open\tCtrl+O"));
+	_menFile->Append(ID_Main_File_run, _("&Run\tCtrl+R"));
+	_menFile->Append(ID_Main_File_reset, _("Reset"));
+	_menFile->AppendSeparator();
+	_menFile->AppendSubMenu(_menSaveState, _("&Save state"));
+	_menFile->AppendSubMenu(_menLoadState, _("&Load state"));
+	_menFile->AppendSeparator();
 	for (int i = 0; i < 5; i++) {
-		mMenFile->Append(ID_Main_File_RecentFile + i, wxString::Format(_("%d. ---"), i + 1));
+		_menFile->Append(ID_Main_File_RecentFile + i, wxString::Format(_("%d. ---"), i + 1));
 	}
 	Bind(wxEVT_MENU, &MainFrame::OnOpenRecentFile, this, ID_Main_File_RecentFile, ID_Main_File_RecentFile + 4);
-	mMenFile->AppendSeparator();
-	mMenFile->Append(ID_Main_File_quit, _("&Quit"));
+	_menFile->AppendSeparator();
+	_menFile->Append(ID_Main_File_quit, _("&Quit"));
 
 	// Create the options menu
-	mMenOptions = new wxMenu;
-	mMenOptions->AppendCheckItem(ID_Main_Options_KeepAspect, _("Keep aspect ratio"));
-	mMenOptions->Check(ID_Main_Options_KeepAspect, mOptions.videoOptions.keepAspect);
-	mMenOptions->Append(ID_Main_Options_input, _("&Input"));
+	_menOptions = new wxMenu;
+	_menOptions->AppendCheckItem(ID_Main_Options_KeepAspect, _("Keep aspect ratio"));
+	_menOptions->Check(ID_Main_Options_KeepAspect, _options.videoOptions.keepAspect);
+	_menOptions->Append(ID_Main_Options_input, _("&Input"));
 
 	// Create the debug level menu
-	mMenDebugLevel = new wxMenu;
-	mMenDebugLevel->AppendRadioItem(ID_Main_Debug_level_fat, _("&Fatal"));
-	mMenDebugLevel->AppendRadioItem(ID_Main_Debug_level_err, _("&Error"));
-	mMenDebugLevel->AppendRadioItem(ID_Main_Debug_level_war, _("&Warning"));
-	mMenDebugLevel->AppendRadioItem(ID_Main_Debug_level_mes, _("&Message"))->Check(true);
-	mMenDebugLevel->AppendRadioItem(ID_Main_Debug_level_deb, _("&Debug"));
+	_menDebugLevel = new wxMenu;
+	_menDebugLevel->AppendRadioItem(ID_Main_Debug_level_fat, _("&Fatal"));
+	_menDebugLevel->AppendRadioItem(ID_Main_Debug_level_err, _("&Error"));
+	_menDebugLevel->AppendRadioItem(ID_Main_Debug_level_war, _("&Warning"));
+	_menDebugLevel->AppendRadioItem(ID_Main_Debug_level_mes, _("&Message"))->Check(true);
+	_menDebugLevel->AppendRadioItem(ID_Main_Debug_level_deb, _("&Debug"));
 
 	// Create the debug menu
-	mMenDebug = new wxMenu;
-	mMenDebug->Append(ID_Main_Debug_cpu, _("&CPU"));
-	mMenDebug->Append(ID_Main_Debug_mem, _("&Memory"));
-	mMenDebug->Append(ID_Main_Debug_gpu, _("&GPU"));
-	mMenDebug->Append(ID_Main_Debug_window, _("&Debug"));
-	mMenDebug->AppendSubMenu(mMenDebugLevel, _("Debug &Level"));
+	_menDebug = new wxMenu;
+	_menDebug->Append(ID_Main_Debug_cpu, _("&CPU"));
+	_menDebug->Append(ID_Main_Debug_mem, _("&Memory"));
+	_menDebug->Append(ID_Main_Debug_gpu, _("&GPU"));
+	_menDebug->Append(ID_Main_Debug_window, _("&Debug"));
+	_menDebug->AppendSubMenu(_menDebugLevel, _("Debug &Level"));
 
 	// create the menubar
-	mBar = new wxMenuBar;
-	mBar->Append(mMenFile, _("&File"));
-	mBar->Append(mMenOptions, _("&Options"));
-	mBar->Append(mMenDebug, _("&Debug"));
+	_bar = new wxMenuBar;
+	_bar->Append(_menFile, _("&File"));
+	_bar->Append(_menOptions, _("&Options"));
+	_bar->Append(_menDebug, _("&Debug"));
 
-	SetMenuBar(mBar);
+	SetMenuBar(_bar);
 }
 
 void MainFrame::DrawGL(int user)
 {
-	if (mEmulator.emu != NULL)
+	if (_emulator.emu != NULL)
 	{
-		mEmulator.emu->Draw(mEmulator.handle, user);
+		_emulator.emu->Draw(_emulator.handle, user);
 	}
 	else {
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -203,7 +203,7 @@ void MainFrame::LoadEmulator(std::string &fileName)
 {
 	// Load the emulator
 	// Detect and create the emulator
-	EmulatorInterface *emu = mEmulators->GetCompatibleEmulator(fileName.c_str());
+	EmulatorInterface *emu = _emulators->GetCompatibleEmulator(fileName.c_str());
 	if (!emu)
 	{
 		Log(Error, "Could not find compatible emulator for %s", fileName.c_str());
@@ -234,8 +234,8 @@ void MainFrame::LoadEmulator(std::string &fileName)
 	}
 
 	int w, h;
-	mDisplay->GetSize(&w, &h);
-	emu->Reshape(handle, w, h, mOptions.videoOptions.keepAspect);
+	_display->GetSize(&w, &h);
+	emu->Reshape(handle, w, h, _options.videoOptions.keepAspect);
 
 	// Loading the rom in memory
 	Log(Message, "Loading the ROM in memory");
@@ -263,12 +263,12 @@ void MainFrame::LoadEmulator(std::string &fileName)
 			saveData.romDataLen = read;
 		}
 	}
-	mSaveFilePath = fileName;
-	mSaveFilePath.append(".sav");
-	mSaveStateFilePath= fileName;
-	mSaveStateFilePath.append(".ss");
+	_saveFilePath = fileName;
+	_saveFilePath.append(".sav");
+	_saveStateFilePath= fileName;
+	_saveStateFilePath.append(".ss");
 	Log(Message, "Loading save data");
-	SaveFile::ReadSaveFile(mSaveFilePath, saveData);
+	SaveFile::ReadSaveFile(_saveFilePath, saveData);
 
 	if (!emu->Load(handle, &saveData))
 	{
@@ -282,19 +282,19 @@ void MainFrame::LoadEmulator(std::string &fileName)
 	if (saveData.miscData != NULL) delete[] saveData.miscData;
 
 	// store emulator
-	mEmulator.emu = emu;
-	mEmulator.handle = handle;
+	_emulator.emu = emu;
+	_emulator.handle = handle;
 
 	// Register for keybindings
-	mInputHandler.RegisterClient(mEmulator);
+	_inputHandler.RegisterClient(_emulator);
 
 	// Load debuggers
-	mCpuDebugger->SetEmulator(mEmulator);
-	mMemDebugger->SetEmulator(mEmulator);
-	mGpuDebugger->SetEmulator(mEmulator);
+	_cpuDebugger->SetEmulator(_emulator);
+	_memDebugger->SetEmulator(_emulator);
+	_gpuDebugger->SetEmulator(_emulator);
 
 	// Update save state labels
-	mOptions.SaveRecentFile(mFilePath.c_str());
+	_options.SaveRecentFile(_filePath.c_str());
 	UpdateSaveStateLabels();
 	UpdateRecentFiles();
 	return;
@@ -303,36 +303,36 @@ void MainFrame::LoadEmulator(std::string &fileName)
 void MainFrame::CloseEmulator()
 {
 	// is a emulator running, yes then close it
-	if (mEmulator.emu != NULL)
+	if (_emulator.emu != NULL)
 	{
 		Log(Message, "Emulator closed");
 		Emulator emu;
 		emu.emu = NULL;
 		emu.handle = NULL;
 
-		mCpuDebugger->SetEmulator(emu);
-		mMemDebugger->SetEmulator(emu);
-		mGpuDebugger->SetEmulator(emu);
+		_cpuDebugger->SetEmulator(emu);
+		_memDebugger->SetEmulator(emu);
+		_gpuDebugger->SetEmulator(emu);
 
-		mDisplay->DestroyGL();
+		_display->DestroyGL();
 
-		mInputHandler.ClearClient(mEmulator);
+		_inputHandler.ClearClient(_emulator);
 		SaveData_t saveData;
 		saveData.miscData = saveData.ramData = saveData.romData = NULL;
 		saveData.miscDataLen = saveData.ramDataLen = saveData.romDataLen = 0;
-		mEmulator.emu->Save(mEmulator.handle, &saveData);
-		SaveFile::WriteSaveFile(mSaveFilePath, saveData);
-		mEmulator.emu->ReleaseSaveData(mEmulator.handle, &saveData);
-		mEmulator.emu->ReleaseEmulator(mEmulator.handle);
+		_emulator.emu->Save(_emulator.handle, &saveData);
+		SaveFile::WriteSaveFile(_saveFilePath, saveData);
+		_emulator.emu->ReleaseSaveData(_emulator.handle, &saveData);
+		_emulator.emu->ReleaseEmulator(_emulator.handle);
 
-		mEmulator = emu;
+		_emulator = emu;
 	}
 }
 
 void MainFrame::UpdateSaveStateLabels()
 {
 	for (int i = 0; i < 10; i++) {
-		wxString filePath = mSaveStateFilePath;
+		wxString filePath = _saveStateFilePath;
 		filePath.Append(std::to_string(i));
 		wxFileName file(filePath);
 		wxString name;
@@ -340,8 +340,8 @@ void MainFrame::UpdateSaveStateLabels()
 			wxDateTime date = file.GetModificationTime();
 			name = wxString::Format(_("(%s)"),date.Format());
 		}
-		mMenSaveState->SetLabel(ID_Main_File_SaveState + i, wxString::Format(_("Save State %d %s\tCtrl+Shift+F%d"), i + 1, name, i + 1));
-		mMenLoadState->SetLabel(ID_Main_File_LoadState + i, wxString::Format(_("Load State %d %s\tCtrl+F%d"), i + 1, name, i + 1));
+		_menSaveState->SetLabel(ID_Main_File_SaveState + i, wxString::Format(_("Save State %d %s\tCtrl+Shift+F%d"), i + 1, name, i + 1));
+		_menLoadState->SetLabel(ID_Main_File_LoadState + i, wxString::Format(_("Load State %d %s\tCtrl+F%d"), i + 1, name, i + 1));
 	}
 }
 
@@ -350,8 +350,8 @@ void MainFrame::UpdateRecentFiles()
 	const int maxLength = 35;
 	for (int i = 0; i < 5; i++) {
 		wxString name("---");
-		if (!mOptions.recentFiles[i].empty()) {
-			wxFileName fileName(mOptions.recentFiles[i]);
+		if (!_options.recentFiles[i].empty()) {
+			wxFileName fileName(_options.recentFiles[i]);
 			wxString path = fileName.GetFullPath();
 			if (path.length() > maxLength) {
 				wxString base = fileName.GetVolume() + wxFileName::GetVolumeSeparator() + wxFileName::GetPathSeparator() + 
@@ -370,38 +370,38 @@ void MainFrame::UpdateRecentFiles()
 				name += fileName.GetFullName();
 			}
 		}
-		mMenFile->SetLabel(ID_Main_File_RecentFile + i, wxString::Format(_("%d. %s"), i+1, name));
+		_menFile->SetLabel(ID_Main_File_RecentFile + i, wxString::Format(_("%d. %s"), i+1, name));
 	}
 }
 
 void MainFrame::Update()
 {
-	if (mCpuDebugger != NULL)
-		mCpuDebugger->Update();
-	if (mMemDebugger != NULL)
-		mMemDebugger->Update();
-	if (mGpuDebugger != NULL)
-		mGpuDebugger->Update();
+	if (_cpuDebugger != NULL)
+		_cpuDebugger->Update();
+	if (_memDebugger != NULL)
+		_memDebugger->Update();
+	if (_gpuDebugger != NULL)
+		_gpuDebugger->Update();
 }
 
 void MainFrame::OnClose(wxCloseEvent &evt)
 {
 	// Event when the frame closes
 	CloseEmulator();
-	if(mTimer != NULL)
+	if(_timer != NULL)
 	{
-		mTimer->Stop();
-		delete mTimer;
-		mTimer = NULL;
+		_timer->Stop();
+		delete _timer;
+		_timer = NULL;
 	}
-	if(mAudio != NULL)
+	if(_audio != NULL)
 	{
-		mAudio->Close();
-		delete mAudio;
-		mAudio = NULL;
+		_audio->Close();
+		delete _audio;
+		_audio = NULL;
 	}
 
-	mOptions.SaveOptions();
+	_options.SaveOptions();
 
 	// Destroy the window
 	Destroy();
@@ -415,11 +415,11 @@ void MainFrame::OnQuit(wxCommandEvent &evt)
 
 void MainFrame::OnOpen(wxCommandEvent &evt)
 {
-	assert(mEmulators != NULL);
+	assert(_emulators != NULL);
 	// Event when clicked on the file open button
 
 	// Filter
-	std::string filter = mEmulators->GetFileFilters();
+	std::string filter = _emulators->GetFileFilters();
 	if (!filter.empty())
 	{
 		filter.append("|");
@@ -439,27 +439,27 @@ void MainFrame::OnOpen(wxCommandEvent &evt)
 	CloseEmulator();
 
 	// Check if the file exists
-	mFilePath = openFileDialog.GetPath();
+	_filePath = openFileDialog.GetPath();
 
 	// Load the file
-	LoadEmulator(mFilePath);
+	LoadEmulator(_filePath);
 }
 
 void MainFrame::OnOpenRecentFile(wxCommandEvent &evt)
 {
 	int idx = evt.GetId() - ID_Main_File_RecentFile;
 	if (idx < 0 || idx >= 5) return;
-	mFilePath = mOptions.recentFiles[idx];
+	_filePath = _options.recentFiles[idx];
 
 	CloseEmulator();
-	LoadEmulator(mFilePath);
+	LoadEmulator(_filePath);
 }
 
 void MainFrame::OnRun(wxCommandEvent &evt)
 {
-	if (mEmulator.emu != NULL)
+	if (_emulator.emu != NULL)
 	{
-		mEmulator.emu->Run(mEmulator.handle, true);
+		_emulator.emu->Run(_emulator.handle, true);
 		Update();
 	}
 }
@@ -477,10 +477,10 @@ void MainFrame::OnSaveState(wxCommandEvent &evt)
 		SaveData_t saveData;
 		saveData.romData = saveData.ramData = saveData.miscData = NULL;
 		saveData.romDataLen = saveData.ramDataLen = saveData.miscDataLen = 0;
-		mEmulator.emu->SaveState(mEmulator.handle, &saveData);
+		_emulator.emu->SaveState(_emulator.handle, &saveData);
 
 		// Write it to an file
-		wxString fileName = mSaveStateFilePath;
+		wxString fileName = _saveStateFilePath;
 		fileName.Append(std::to_string(state));
 		SaveFile::WriteStateFile(fileName, saveData);
 	}
@@ -500,18 +500,18 @@ void MainFrame::OnLoadState(wxCommandEvent &evt)
 		SaveData_t saveData;
 
 		// Read state from an file
-		wxString fileName = mSaveStateFilePath;
+		wxString fileName = _saveStateFilePath;
 		fileName.Append(std::to_string(state));
 		SaveFile::ReadStateFile(fileName, saveData);
 
-		mEmulator.emu->LoadState(mEmulator.handle, &saveData);
+		_emulator.emu->LoadState(_emulator.handle, &saveData);
 		Update();
 	}
 }
 
 void MainFrame::OnLogWindow(wxCommandEvent &evt)
 {
-	mLogger->Show(true);
+	_logger->Show(true);
 }
 
 void MainFrame::OnLogLevel(wxCommandEvent &evt)
@@ -546,20 +546,20 @@ void MainFrame::OnTimer(wxTimerEvent &evt)
 	if (time > FPS * 2000) 
 		time = FPS*2000;
 	sw.Start(0);
-	if(mEmulator.emu != NULL)
+	if(_emulator.emu != NULL)
 	{
-		if (mEmulator.emu->Tick(mEmulator.handle, time)) // GUI update necessary
+		if (_emulator.emu->Tick(_emulator.handle, time)) // GUI update necessary
 		{
 			Update();
 		}
 	}
-	mDisplay->Refresh();
+	_display->Refresh();
 	
 }
 
 void MainFrame::OnReset(wxCommandEvent &evt)
 {
-	if(mFilePath.empty())
+	if(_filePath.empty())
 	{
 		OnOpen(wxCommandEvent());
 		return;
@@ -568,7 +568,7 @@ void MainFrame::OnReset(wxCommandEvent &evt)
 	CloseEmulator();
 	
 	// Load the file
-	LoadEmulator(mFilePath);
+	LoadEmulator(_filePath);
 }
 
 void MainFrame::OnOptions(wxCommandEvent &evt)
@@ -576,54 +576,54 @@ void MainFrame::OnOptions(wxCommandEvent &evt)
 	switch (evt.GetId())
 	{
 	case ID_Main_Options_KeepAspect:
-		mOptions.videoOptions.keepAspect = evt.IsChecked();
-		if (mEmulator.emu != NULL)
+		_options.videoOptions.keepAspect = evt.IsChecked();
+		if (_emulator.emu != NULL)
 		{
 			int width, height;
-			mDisplay->GetSize(&width, &height);
-			mEmulator.emu->Reshape(mEmulator.handle, width, height, evt.IsChecked());
+			_display->GetSize(&width, &height);
+			_emulator.emu->Reshape(_emulator.handle, width, height, evt.IsChecked());
 		}
 		break;
 	case ID_Main_Options_input:
-		mInputOptionsFrame->Show();
+		_inputOptionsFrame->Show();
 		break;
 	}
 }
 
 void MainFrame::OnDebugCPU(wxCommandEvent &evt)
 {
-	mCpuDebugger->Show();
+	_cpuDebugger->Show();
 }
 
 void MainFrame::OnDebugMEM(wxCommandEvent &evt)
 {
-	mMemDebugger->Show();
+	_memDebugger->Show();
 }
 
 void MainFrame::OnDebugGPU(wxCommandEvent &evt)
 {
-	mGpuDebugger->Show();
+	_gpuDebugger->Show();
 }
 
 void MainFrame::OnResize(wxSizeEvent &evt)
 {
-	if (mEmulator.emu != NULL && mDisplay != NULL)
+	if (_emulator.emu != NULL && _display != NULL)
 	{
 		int width, height;
-		mDisplay->GetSize(&width, &height);
-		mEmulator.emu->Reshape(mEmulator.handle, width, height, mOptions.videoOptions.keepAspect);
+		_display->GetSize(&width, &height);
+		_emulator.emu->Reshape(_emulator.handle, width, height, _options.videoOptions.keepAspect);
 	}
-	if (mDisplay != NULL && mEmulator.emu == NULL)
+	if (_display != NULL && _emulator.emu == NULL)
 	{
-		mDisplay->Refresh();
+		_display->Refresh();
 	}
 }
 
 bool MainFrame::InitGL(int user)
 {
-	if (mEmulator.emu != NULL)
+	if (_emulator.emu != NULL)
 	{
-		return mEmulator.emu->InitGL(mEmulator.handle, user);
+		return _emulator.emu->InitGL(_emulator.handle, user);
 	}
 	else {
 		return false;
@@ -632,8 +632,8 @@ bool MainFrame::InitGL(int user)
 
 void MainFrame::DestroyGL(int user)
 {
-	if (mEmulator.emu != NULL)
+	if (_emulator.emu != NULL)
 	{
-		mEmulator.emu->DestroyGL(mEmulator.handle, user);
+		_emulator.emu->DestroyGL(_emulator.handle, user);
 	}
 }

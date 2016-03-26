@@ -31,9 +31,9 @@ namespace Debugger {
 			int mouseY;
 		};
 
-		Emulator *mEmu;
-		GLPane *mWidget;
-		Item mScreen;
+		Emulator *_emu;
+		GLPane *_widget;
+		Item _screen;
 	};
 }
 

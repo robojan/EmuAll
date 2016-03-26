@@ -5,7 +5,7 @@
 #include "util/log.h"
 
 InputMaster::InputMaster(Options *options) :
-	mOptions(options)
+	_options(options)
 {
 }
 
@@ -16,18 +16,18 @@ InputMaster::~InputMaster()
 
 void InputMaster::ClearAllClients()
 {
-	mClients.clear();
+	_clients.clear();
 }
 
 void InputMaster::ClearAllClients(std::string name)
 {
-	mClients[name].clear();
+	_clients[name].clear();
 }
 
 void InputMaster::ClearClient(const Emulator &client)
 {
 	std::string name = client.emu->GetName();
-	mClients[name].remove(client);
+	_clients[name].remove(client);
 }
 
 void InputMaster::RegisterInputs(std::list<EmulatorInput_t> inputs, std::string name)
@@ -35,21 +35,21 @@ void InputMaster::RegisterInputs(std::list<EmulatorInput_t> inputs, std::string 
 	std::list<EmulatorInput_t>::iterator it;
 	for (it = inputs.begin(); it != inputs.end(); ++it)
 	{
-		mOptions->AddKeyBinding(name, *it);
+		_options->AddKeyBinding(name, *it);
 	}
 }
 
 void InputMaster::RegisterClient(const Emulator &client)
 {
 	std::string name = client.emu->GetName();
-	mClients[name].push_back(client);
+	_clients[name].push_back(client);
 }
 
 bool InputMaster::SendKey(std::string name, int key, int pressed)
 {
 	bool sent = false;
-	std::map<std::string, std::list<Emulator>>::iterator client = mClients.find(name);
-	if(client == mClients.end())
+	std::map<std::string, std::list<Emulator>>::iterator client = _clients.find(name);
+	if(client == _clients.end())
 		return sent;
 
 	std::list<Emulator>::iterator it;
@@ -69,9 +69,9 @@ void InputMaster::OnKeyboard(wxKeyEvent &evt)
 		evt.GetKeyCode(), evt.GetRawKeyCode(), evt.GetModifiers());
 	
 	std::map<std::string, std::list<Emulator>>::iterator it;
-	for (it = mClients.begin(); it != mClients.end(); ++it)
+	for (it = _clients.begin(); it != _clients.end(); ++it)
 	{
-		const EmulatorInput_t *keyInfo = mOptions->GetKeyBindingInfo(it->first, evt.GetKeyCode());
+		const EmulatorInput_t *keyInfo = _options->GetKeyBindingInfo(it->first, evt.GetKeyCode());
 		if (keyInfo != NULL)
 		{
 			if (SendKey(it->first, keyInfo->key, evt.GetEventType() == wxEVT_KEY_DOWN) &&
