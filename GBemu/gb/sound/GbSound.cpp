@@ -11,7 +11,7 @@ GbSound::GbSound(Gameboy *master) :
 	_channel3(master),
 	_channel4(master)
 {
-	m_gb = master;
+	_gb = master;
 
 	// Init Audio state
 	alDistanceModel(AL_NONE);

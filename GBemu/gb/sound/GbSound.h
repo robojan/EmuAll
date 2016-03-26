@@ -28,7 +28,7 @@ public:
 	bool LoadState(const SaveData_t *data);
 	bool SaveState(std::vector<uint8_t> &data);
 private:
-	Gameboy			*m_gb;
+	Gameboy			*_gb;
 
 	GbChannel12		_channel1;
 	GbChannel12		_channel2;
