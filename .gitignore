@@ -27,7 +27,7 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
-tools/
+/tools/
 
 # Visual Studio 2015 cache/options directory
 .vs/
@@ -74,6 +74,7 @@ artifacts/
 *.svclog
 *.scc
 *.exe
+*.ipdb
 
 # Chutzpah Test files
 _Chutzpah*
@@ -226,6 +227,7 @@ TestROMs/*
 
 #generated files
 GBemu/resources/resources.h
+
 
 
 *.diagsession
