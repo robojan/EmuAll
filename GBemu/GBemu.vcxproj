@@ -223,7 +223,6 @@
     <ClCompile Include="gb\sound\GbChannel3.cpp" />
     <ClCompile Include="gb\sound\GbChannel4.cpp" />
     <ClCompile Include="gb\sound\GbSound.cpp" />
-    <ClCompile Include="types\EventQueue.cpp" />
     <ClCompile Include="types\tree.cpp" />
     <ClCompile Include="util\Endian.c" />
     <ClCompile Include="util\file.cpp" />

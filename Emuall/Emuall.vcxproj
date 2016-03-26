@@ -222,6 +222,9 @@
     <ClInclude Include="util\xml\pugiconfig.hpp" />
     <ClInclude Include="util\xml\pugixml.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\icon.xpm" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

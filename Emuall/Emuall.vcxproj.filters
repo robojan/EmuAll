@@ -249,4 +249,9 @@
       <Filter>Header Files\util</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\icon.xpm">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

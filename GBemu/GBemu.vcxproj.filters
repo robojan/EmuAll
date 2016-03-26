@@ -123,9 +123,6 @@
     <ClCompile Include="gb\sound\GbChannel12.cpp">
       <Filter>Source Files\gb\sound</Filter>
     </ClCompile>
-    <ClCompile Include="types\EventQueue.cpp">
-      <Filter>Source Files\types</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gb\defines.h">

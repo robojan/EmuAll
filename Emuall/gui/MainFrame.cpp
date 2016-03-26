@@ -8,6 +8,8 @@
 #include <wx/ffile.h>
 #include <wx/filename.h>
 
+#include "../resources/icon.xpm"
+
 BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_MENU(ID_Main_File_quit, MainFrame::OnQuit)
 	EVT_MENU(ID_Main_File_open, MainFrame::OnOpen)
@@ -98,6 +100,9 @@ MainFrame::~MainFrame()
 
 void MainFrame::CreateLayout()
 {
+	// Set the window icon
+	SetIcon(wxIcon(icon_xpm));
+
 	// Create the layout
 	CreateMenuBar();
 
