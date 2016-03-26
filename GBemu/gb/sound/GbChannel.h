@@ -5,6 +5,7 @@
 #include <queue>
 
 #include "../../util/wavaudiofile.h"
+#include "../../types/EventQueue.h"
 
 // The number of buffers
 #define NUM_BUFFERS 2
@@ -74,7 +75,8 @@ private:
 	uint_fast8_t _leftVolume;
 	uint_fast8_t _rightVolume;
 	const unsigned int _sampleFreq;
-	std::queue<struct ChannelEvent, std::deque<struct ChannelEvent>> _eventQueue;
+	//std::queue<struct ChannelEvent, std::deque<struct ChannelEvent>> _eventQueue;
+	EventQueue<struct ChannelEvent> _eventQueue;
 	bool _audioEnabled;
 };
 

@@ -223,6 +223,7 @@
     <ClCompile Include="gb\sound\GbChannel3.cpp" />
     <ClCompile Include="gb\sound\GbChannel4.cpp" />
     <ClCompile Include="gb\sound\GbSound.cpp" />
+    <ClCompile Include="types\EventQueue.cpp" />
     <ClCompile Include="types\tree.cpp" />
     <ClCompile Include="util\Endian.c" />
     <ClCompile Include="util\file.cpp" />
@@ -246,6 +247,7 @@
     <ClInclude Include="gb\sound\GbChannel4.h" />
     <ClInclude Include="gb\sound\GbSound.h" />
     <ClInclude Include="resources\resources.h" />
+    <ClInclude Include="types\EventQueue.h" />
     <ClInclude Include="types\tree.h" />
     <ClInclude Include="util\Endian.h" />
     <ClInclude Include="util\exceptions.h" />

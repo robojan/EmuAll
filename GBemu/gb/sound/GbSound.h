@@ -43,7 +43,6 @@ inline void GbSound::Tick()
 	_channel2.Tick();
 	_channel3.Tick();
 	_channel4.Tick();
-
 }
 
 #endif

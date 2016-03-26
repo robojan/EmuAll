@@ -157,7 +157,7 @@ void GbChannel::LoadBuffer(uint32_t buffer)
 	{
 		_playingCounter += FCPU / _sampleFreq;
 
-		if (event != NULL && event->when <= _playingCounter) {
+		while (event != NULL && event->when <= _playingCounter) {
 			// Handle the event
 			switch (event->type) {
 			case ChannelEvent::EVT_TYPE_SOUND_VALUE:
@@ -172,7 +172,7 @@ void GbChannel::LoadBuffer(uint32_t buffer)
 			}
 
 			// Get a new element
-			_eventQueue.pop();
+			_eventQueue.pop_front();
 			if (_eventQueue.empty()) {
 				event = NULL;
 			}
@@ -195,12 +195,12 @@ void GbChannel::LoadBuffer(uint32_t buffer)
 
 void GbChannel::CleanSoundOutput()
 {
-	if (_eventQueue.size() > 5000000) {
+	if (_eventQueue.size() > 100000) {
 		Log(Warn, "Sound event queue overflow");
 	}
 
-	while (_eventQueue.size() > 5000000)
-		_eventQueue.pop();
+	while (_eventQueue.size() > 100000)
+		_eventQueue.pop_front();
 }
 
 // 0 - tickCounter
@@ -238,7 +238,7 @@ uint8_t *GbChannel::LoadState(uint8_t *data, int &len)
 	const EndianFuncs *conv = getEndianFuncs(0);
 	// Clear eventqueue
 	while (!_eventQueue.empty())
-		_eventQueue.pop();
+		_eventQueue.clear();
 
 	if (len < 33) {
 		Log(Error, "Save state corrupt");
@@ -271,7 +271,7 @@ void GbChannel::SetAmplitude(uint_fast8_t left, uint_fast8_t right)
 	event.type = ChannelEvent::EVT_TYPE_VOLUME;
 	event.soundVolume.lVol = left;
 	event.soundVolume.rVol = right;
-	_eventQueue.push(event);
+	_eventQueue.push_back(event);
 
 	// fill up the buffer to now
 	int16_t val = (_lastLVol * _lastValue) / 7;
@@ -294,7 +294,7 @@ void GbChannel::SetOutputValue(int16_t value)
 	event.when = _tickCounter;
 	event.type = ChannelEvent::EVT_TYPE_SOUND_VALUE;
 	event.soundValue.value = value;
-	_eventQueue.push(event);
+	_eventQueue.push_back(event);
 
 	// fill up the buffer to now
 	int16_t val = (_lastLVol*_lastValue) / 7;
