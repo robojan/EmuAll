@@ -3,9 +3,9 @@
 #include "keyhandler.h"
 #include "util/memDbg.h"
 #include "util/log.h"
+#include "util/Options.h"
 
-InputMaster::InputMaster(Options *options) :
-	_options(options)
+InputMaster::InputMaster()
 {
 }
 
@@ -35,7 +35,7 @@ void InputMaster::RegisterInputs(std::list<EmulatorInput_t> inputs, std::string 
 	std::list<EmulatorInput_t>::iterator it;
 	for (it = inputs.begin(); it != inputs.end(); ++it)
 	{
-		_options->AddKeyBinding(name, *it);
+		Options::GetInstance().AddKeyBinding(name, *it);
 	}
 }
 
@@ -71,7 +71,7 @@ void InputMaster::OnKeyboard(wxKeyEvent &evt)
 	std::map<std::string, std::list<Emulator>>::iterator it;
 	for (it = _clients.begin(); it != _clients.end(); ++it)
 	{
-		const EmulatorInput_t *keyInfo = _options->GetKeyBindingInfo(it->first, evt.GetKeyCode());
+		const EmulatorInput_t *keyInfo = Options::GetInstance().GetKeyBindingInfo(it->first, evt.GetKeyCode());
 		if (keyInfo != NULL)
 		{
 			if (SendKey(it->first, keyInfo->key, evt.GetEventType() == wxEVT_KEY_DOWN) &&

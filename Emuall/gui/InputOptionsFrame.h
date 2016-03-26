@@ -3,7 +3,6 @@
 
 #include <wx/wx.h>
 #include <wx/notebook.h>
-#include "../util/Options.h"
 #include "../keyhandler.h"
 #include "keyBindBox.h"
 
@@ -13,7 +12,7 @@ class InputOptionsFrame : public wxFrame
 	DECLARE_EVENT_TABLE();
 
 public:
-	InputOptionsFrame(wxFrame *parent, Options *options);
+	InputOptionsFrame(wxFrame *parent);
 	~InputOptionsFrame();
 
 	std::string KeyToString(int key);
@@ -28,7 +27,6 @@ private:
 	void RestoreBinding();
 
 	std::map<std::string, std::map<int, KeyBindBox *>> _bindingBoxes;
-	Options *_options;
 	wxNotebook *_notebook;
 	KeyBindBox *_activeRebind;
 };

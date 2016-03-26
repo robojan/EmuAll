@@ -13,10 +13,9 @@ BEGIN_EVENT_TABLE(InputOptionsFrame, wxFrame)
 END_EVENT_TABLE()
 
 
-InputOptionsFrame::InputOptionsFrame(wxFrame *parent, Options *options) :
+InputOptionsFrame::InputOptionsFrame(wxFrame *parent) :
 	wxFrame(parent, wxID_ANY, _("Input options"))
 {
-	_options = options;
 
 	_notebook = new wxNotebook(this, wxID_ANY);
 	_activeRebind = NULL;
@@ -170,7 +169,8 @@ void InputOptionsFrame::OnShow(wxShowEvent &evt)
 		return;
 	if (_notebook->GetPageCount() >0 && _notebook->GetPageText(0) == _("No emulators"))
 		_notebook->DeletePage(0);
-	if (_options->_keyBindings.size() == 0)
+	Options &options = Options::GetInstance();
+	if (options._keyBindings.size() == 0)
 	{
 		// Add empty page
 		wxPanel *emptyPage = new wxPanel(_notebook);
@@ -185,7 +185,7 @@ void InputOptionsFrame::OnShow(wxShowEvent &evt)
 	else {
 		// Add a new page for each emulator
 		std::map<std::string, std::map<int, EmulatorInput_t >>::iterator it;
-		for (it = _options->_keyBindings.begin(); it != _options->_keyBindings.end(); ++it)
+		for (it = options._keyBindings.begin(); it != options._keyBindings.end(); ++it)
 		{
 			bool pageExists = false;
 			for (size_t i = 0; i < _notebook->GetPageCount(); i++)
@@ -210,7 +210,7 @@ void InputOptionsFrame::OnShow(wxShowEvent &evt)
 			{
 				wxStaticText *labelKey = new wxStaticText(emuPage, wxID_ANY, wxString(it2->second.name));
 				KeyBindBox *textBoxKey = new KeyBindBox(it->first, it2->second.key, emuPage, wxID_ANY, wxDefaultPosition, wxDefaultSize);
-				textBoxKey->SetLabelText(KeyToString(_options->GetInputKeyBinding(it->first, it2->second.key, 0)));
+				textBoxKey->SetLabelText(KeyToString(options.GetInputKeyBinding(it->first, it2->second.key, 0)));
 				textBoxKey->Bind(wxEVT_LEFT_UP, &InputOptionsFrame::OnBindingClick, this, wxID_ANY, wxID_ANY, NULL);
 				_bindingBoxes[it->first][it2->second.key] = textBoxKey;
 				fgsizer1->Add(labelKey);
@@ -226,7 +226,8 @@ void InputOptionsFrame::OnShow(wxShowEvent &evt)
 
 void InputOptionsFrame::RestoreBinding()
 {
-	_activeRebind->SetLabelText(KeyToString(_options->GetInputKeyBinding(_activeRebind->GetName(), _activeRebind->GetKey(), 0)));
+	_activeRebind->SetLabelText(KeyToString(Options::GetInstance().GetInputKeyBinding(
+		_activeRebind->GetName(), _activeRebind->GetKey(), 0)));
 	_activeRebind = NULL;
 }
 
@@ -251,13 +252,14 @@ void InputOptionsFrame::OnKeyboardInput(wxKeyEvent &evt)
 	if (_activeRebind == NULL || keyCode == 0)
 		return; // How the hell did we come here?
 
-	_options->RebindKey(_activeRebind->GetName(), _activeRebind->GetKey(), evt.GetKeyCode());
+	Options &options = Options::GetInstance();
+	options.RebindKey(_activeRebind->GetName(), _activeRebind->GetKey(), evt.GetKeyCode());
 	_activeRebind->Unbind(wxEVT_KEY_UP, &InputOptionsFrame::OnKeyboardInput,this, wxID_ANY, wxID_ANY, NULL);
 	// Update all boxes
 	std::map<int, KeyBindBox *>::iterator it;
 	for (it = _bindingBoxes[_activeRebind->GetName()].begin(); it != _bindingBoxes[_activeRebind->GetName()].end(); ++it)
 	{
-		it->second->SetLabelText(KeyToString(_options->GetInputKeyBinding(it->second->GetName(), it->second->GetKey(), 0)));
+		it->second->SetLabelText(KeyToString(options.GetInputKeyBinding(it->second->GetName(), it->second->GetKey(), 0)));
 	}
 	_activeRebind = NULL;
 }
@@ -271,7 +273,8 @@ void InputOptionsFrame::OnPageChanging(wxNotebookEvent &evt)
 		std::map<int, KeyBindBox *>::iterator it;
 		for (it = _bindingBoxes[_activeRebind->GetName()].begin(); it != _bindingBoxes[_activeRebind->GetName()].end(); ++it)
 		{
-			it->second->SetLabelText(KeyToString(_options->GetInputKeyBinding(it->second->GetName(), it->second->GetKey(), 0)));
+			it->second->SetLabelText(KeyToString(Options::GetInstance().GetInputKeyBinding(
+				it->second->GetName(), it->second->GetKey(), 0)));
 		}
 	}
 }

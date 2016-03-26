@@ -34,8 +34,7 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 END_EVENT_TABLE()
 
 MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &size) :
-	wxFrame(NULL, ID_MainFrame, title, pos, size),
-	_inputHandler(&_options)
+	wxFrame(NULL, ID_MainFrame, title, pos, size)
 {	
 	_bar = NULL;
 	_menFile = NULL;
@@ -59,13 +58,16 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
 	_logger->SetLogLevel(wxLOG_Message);
 	InitLog(&_logDst);
 
+	// Load options
+	Options::GetInstance().LoadOptions();
+
+	// Create layout
 	CreateLayout();
 
-	// Load options
-	_options.LoadOptions();
-	_inputOptionsFrame = new InputOptionsFrame(this, &_options);
-	UpdateRecentFiles();
-
+	// create Options frames
+	_inputOptionsFrame = new InputOptionsFrame(this);
+	
+	// load plugins
 	_emulators = new EmulatorList("plugins");
 	std::list<EmulatorInterface *>::iterator it;
 	for (it = _emulators->begin(); it != _emulators->end(); ++it)
@@ -154,13 +156,14 @@ void MainFrame::CreateMenuBar()
 		_menFile->Append(ID_Main_File_RecentFile + i, wxString::Format(_("%d. ---"), i + 1));
 	}
 	Bind(wxEVT_MENU, &MainFrame::OnOpenRecentFile, this, ID_Main_File_RecentFile, ID_Main_File_RecentFile + 4);
+	UpdateRecentFiles();
 	_menFile->AppendSeparator();
 	_menFile->Append(ID_Main_File_quit, _("&Quit"));
 
 	// Create the options menu
 	_menOptions = new wxMenu;
 	_menOptions->AppendCheckItem(ID_Main_Options_KeepAspect, _("Keep aspect ratio"));
-	_menOptions->Check(ID_Main_Options_KeepAspect, _options.videoOptions.keepAspect);
+	_menOptions->Check(ID_Main_Options_KeepAspect, Options::GetInstance().videoOptions.keepAspect);
 	_menOptions->Append(ID_Main_Options_input, _("&Input"));
 
 	// Create the debug level menu
@@ -235,7 +238,7 @@ void MainFrame::LoadEmulator(std::string &fileName)
 
 	int w, h;
 	_display->GetSize(&w, &h);
-	emu->Reshape(handle, w, h, _options.videoOptions.keepAspect);
+	emu->Reshape(handle, w, h, Options::GetInstance().videoOptions.keepAspect);
 
 	// Loading the rom in memory
 	Log(Message, "Loading the ROM in memory");
@@ -294,7 +297,7 @@ void MainFrame::LoadEmulator(std::string &fileName)
 	_gpuDebugger->SetEmulator(_emulator);
 
 	// Update save state labels
-	_options.SaveRecentFile(_filePath.c_str());
+	Options::GetInstance().SaveRecentFile(_filePath.c_str());
 	UpdateSaveStateLabels();
 	UpdateRecentFiles();
 	return;
@@ -348,10 +351,11 @@ void MainFrame::UpdateSaveStateLabels()
 void MainFrame::UpdateRecentFiles()
 {
 	const int maxLength = 35;
+	Options &options = Options::GetInstance();
 	for (int i = 0; i < 5; i++) {
 		wxString name("---");
-		if (!_options.recentFiles[i].empty()) {
-			wxFileName fileName(_options.recentFiles[i]);
+		if (!options.recentFiles[i].empty()) {
+			wxFileName fileName(options.recentFiles[i]);
 			wxString path = fileName.GetFullPath();
 			if (path.length() > maxLength) {
 				wxString base = fileName.GetVolume() + wxFileName::GetVolumeSeparator() + wxFileName::GetPathSeparator() + 
@@ -401,7 +405,7 @@ void MainFrame::OnClose(wxCloseEvent &evt)
 		_audio = NULL;
 	}
 
-	_options.SaveOptions();
+	Options::GetInstance().SaveOptions();
 
 	// Destroy the window
 	Destroy();
@@ -449,7 +453,7 @@ void MainFrame::OnOpenRecentFile(wxCommandEvent &evt)
 {
 	int idx = evt.GetId() - ID_Main_File_RecentFile;
 	if (idx < 0 || idx >= 5) return;
-	_filePath = _options.recentFiles[idx];
+	_filePath = Options::GetInstance().recentFiles[idx];
 
 	CloseEmulator();
 	LoadEmulator(_filePath);
@@ -576,7 +580,7 @@ void MainFrame::OnOptions(wxCommandEvent &evt)
 	switch (evt.GetId())
 	{
 	case ID_Main_Options_KeepAspect:
-		_options.videoOptions.keepAspect = evt.IsChecked();
+		Options::GetInstance().videoOptions.keepAspect = evt.IsChecked();
 		if (_emulator.emu != NULL)
 		{
 			int width, height;
@@ -611,7 +615,7 @@ void MainFrame::OnResize(wxSizeEvent &evt)
 	{
 		int width, height;
 		_display->GetSize(&width, &height);
-		_emulator.emu->Reshape(_emulator.handle, width, height, _options.videoOptions.keepAspect);
+		_emulator.emu->Reshape(_emulator.handle, width, height, Options::GetInstance().videoOptions.keepAspect);
 	}
 	if (_display != NULL && _emulator.emu == NULL)
 	{

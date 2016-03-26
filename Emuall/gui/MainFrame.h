@@ -51,7 +51,6 @@ private:
 	std::string _saveFilePath;
 	std::string _saveStateFilePath;
 	Audio		*_audio;
-	Options		_options;
 	InputMaster _inputHandler;
 
 	// private functions

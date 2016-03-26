@@ -24,8 +24,10 @@ class Options
 {
 	friend class InputOptionsFrame;
 public:
-	Options();
 	~Options();
+
+	static Options &GetInstance();
+
 	void LoadOptions();
 	void SaveOptions();
 	int GetKeyBinding(std::string name, int key, int defaultKey);
@@ -42,6 +44,9 @@ public:
 	OptionsVid_t videoOptions;
 	OptionsAud_t audioOptions;
 private:
+	Options();
+	
+	static Options _instance;
 	std::map<std::string, std::map<int, EmulatorInput_t>> _keyBindings;
 };
 

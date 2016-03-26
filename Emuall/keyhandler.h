@@ -2,7 +2,6 @@
 #define _KEYHANDLER_H
 
 #include "Emulator\Emulator.h"
-#include "util/Options.h"
 #include <map>
 #include <list>
 #include <vector>
@@ -12,7 +11,7 @@
 class InputMaster : public wxEvtHandler
 {
 public:
-	InputMaster(Options *options);
+	InputMaster();
 	~InputMaster();
 
 	void ClearAllClients();
@@ -27,7 +26,6 @@ private:
 	bool SendKey(std::string name, int key, int pressed);
 
 	std::map<std::string, std::list<Emulator>> _clients;
-	Options *_options;
 };
 
 #endif

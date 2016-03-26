@@ -15,9 +15,16 @@ Options::Options()
 
 }
 
+Options Options::_instance;
+
 Options::~Options()
 {
 
+}
+
+Options & Options::GetInstance()
+{
+	return _instance;
 }
 
 void Options::LoadOptions()
