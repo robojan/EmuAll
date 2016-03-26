@@ -53,13 +53,13 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
 	mAudio = NULL;
 	mInputOptionsFrame = NULL;
 
-	CreateLayout();
-
 	// Constructor
 	mLogger = new wxLogWindow(this, _("Debug Log"), false, false);
 	mLogger->SetVerbose(true);
 	mLogger->SetLogLevel(wxLOG_Message);
 	InitLog(&mLogDst);
+
+	CreateLayout();
 
 	// Load options
 	mOptions.LoadOptions();
@@ -111,7 +111,7 @@ void MainFrame::CreateLayout()
 	wxGLContextAttrs ctxAttr;
 	ctxAttr.Reset();
 	ctxAttr.CoreProfile();
-	ctxAttr.OGLVersion(3, 2);
+	//ctxAttr.OGLVersion(3, 2);
 	ctxAttr.ForwardCompatible();
 	ctxAttr.EndList();
 	mDisplay = new GLPane(this, this, 0, ID_Main_display, wxDefaultPosition,
@@ -450,7 +450,8 @@ void MainFrame::OnOpenRecentFile(wxCommandEvent &evt)
 	int idx = evt.GetId() - ID_Main_File_RecentFile;
 	if (idx < 0 || idx >= 5) return;
 	mFilePath = mOptions.recentFiles[idx];
-	
+
+	CloseEmulator();
 	LoadEmulator(mFilePath);
 }
 

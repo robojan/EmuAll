@@ -366,6 +366,7 @@ bool EmulatorInterface::InitGL(EMUHANDLE handle, int id)
 {
 	if (_initGL == NULL)
 		return false;
+	Log(Debug, "InitGL %d", id);
 	return _initGL(handle, id) != 0;
 }
 
@@ -373,6 +374,7 @@ void EmulatorInterface::DestroyGL(EMUHANDLE handle, int id)
 {
 	if (_destroyGL == NULL)
 		return;
+	Log(Debug, "DestoyGL %d", id);
 	_destroyGL(handle, id);
 }
 
@@ -436,6 +438,7 @@ void EmulatorInterface::Draw(EMUHANDLE handle, int id)
 {
 	if (_draw == NULL)
 		return;
+	Log(Debug, "Draw %d", id);
 	_draw(handle, id);
 }
 

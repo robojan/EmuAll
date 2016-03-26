@@ -1,6 +1,4 @@
 
-#include <gl/glew.h>
-#include <GL/GLU.h>
 #include "GLPane.h"
 #include "../util/memDbg.h"
 #include <limits.h>
@@ -18,6 +16,10 @@ mClearB(0.0), mClearA(1.0), mInitialized(false), mGLAttr(attr), mCtxAttr(ctxAttr
 {
 	wxASSERT(callback != NULL);
 	mContext = new wxGLContext(this, NULL, &mCtxAttr);
+	if (!mContext->IsOK()) {
+		Log(Error, "Could not create openGL context");
+	}
+	
 	mCallback = callback;
 
 }
@@ -48,7 +50,7 @@ void GLPane::DestroyGL()
 {
 	if (IsShownOnScreen())
 	{
-		wxGLCanvas::SetCurrent(*mContext);
+		SetCurrent(*mContext);
 	}
 	mCallback->DestroyGL(mUser);
 	mInitialized = false;
@@ -58,9 +60,8 @@ void GLPane::Render( wxPaintEvent &evt)
 {
 	if (!IsShownOnScreen())
 		return;
-	wxGLCanvas::SetCurrent(*mContext);
+	SetCurrent(*mContext);
 	wxPaintDC(this);
-
 
 	if (mClearColourChanged)
 	{
@@ -68,13 +69,12 @@ void GLPane::Render( wxPaintEvent &evt)
 		mClearColourChanged = false;
 	}
 
-	if (!mInitialized )
+	if (!mInitialized)
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
-		mInitialized = mCallback->InitGL(mUser);;
+		mInitialized = mCallback->InitGL(mUser);
 	}
-	else
-	{
+	else {
 		mCallback->DrawGL(mUser);
 	}
 
