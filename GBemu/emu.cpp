@@ -1,6 +1,6 @@
 #include "util/memDbg.h"
 
-#include "emu.h"
+#include <emu.h>
 #include "util/log.h"
 #include "util/Endian.h"
 #include "gb/Gameboy.h"
@@ -20,11 +20,11 @@ int32_t __stdcall GetValI(EMUHANDLE handle, int32_t id)
 	Gameboy *emulator = (Gameboy *) handle;
 	if (emulator == NULL)
 		return 0;
-	switch (id) // See description XML for ids
-	{
-	default:
+	//switch (id) // See description XML for ids
+	//{
+	//default:
 		return GetValU(handle, id); // default try unsigned values
-	}
+	//}
 }
 
 uint32_t __stdcall GetValU(EMUHANDLE handle, int32_t id)
@@ -263,12 +263,12 @@ int32_t __stdcall Init(EMUHANDLE handle, callBackfunctions_t funcs)
 	return emulator->Init();
 }
 
-int32_t __stdcall Load(EMUHANDLE handle, const uint8_t * filename)
+int32_t __stdcall Load(EMUHANDLE handle, const SaveData_t *data)
 {
 	Gameboy *emulator = (Gameboy *) handle;
 	if (handle == NULL)
 		return false;
-	return emulator->Load((const char*) filename);
+	return emulator->Load(data);
 }
 
 uint32_t __stdcall InitGL(EMUHANDLE handle, int32_t id)
@@ -369,12 +369,28 @@ void __stdcall Reshape(EMUHANDLE handle, int32_t width, int32_t height, int32_t 
 }
 
 // stopping functions
-int32_t __stdcall Save(EMUHANDLE handle, const uint8_t *filename)
+int32_t __stdcall Save(EMUHANDLE handle, SaveData_t *data)
 {
 	Gameboy *emulator = (Gameboy *) handle;
 	if (handle == NULL)
 		return false;
-	return emulator->Save((const char *)filename);
+	return emulator->Save(data);
+}
+
+int32_t __stdcall SaveState(EMUHANDLE handle, SaveData_t *data)
+{
+	Gameboy *emulator = (Gameboy *)handle;
+	if (handle == NULL)
+		return false;
+	return emulator->SaveState(data);
+}
+
+int32_t __stdcall LoadState(EMUHANDLE handle, const SaveData_t *data)
+{
+	Gameboy *emulator = (Gameboy *)handle;
+	if (handle == NULL)
+		return false;
+	return emulator->LoadState(data);
 }
 
 uint8_t __stdcall Disassemble(EMUHANDLE handle, uint32_t pos, const uint8_t **raw, const uint8_t **instr)

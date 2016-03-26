@@ -7,8 +7,9 @@
 extern "C" {
 #endif
 
-typedef struct EndianFuncs_s
+typedef struct
 {
+
 	uint16_t(*convu16)(uint16_t i);
 	int16_t(*convi16)(int16_t i);
 	uint32_t(*convu32)(uint32_t i);

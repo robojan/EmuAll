@@ -126,3 +126,72 @@ void GbChannel3::UpdateStatus()
 		nr52 |= 0x4;
 	_gb->_mem->write(NR52, nr52, false);
 }
+
+// 0 - powered << 0 | enabled << 1 | playing << 2 | lengthEnabled << 3
+// 1 - outputLevel
+// 2 - waveBuffer
+// 18 - volume
+// 20 - volumeCtrl
+// 21 - periodCounter
+// 23 - frequency
+// 25 - wavCounter
+// 26 - lastSample
+// 27 - soundLength
+// 29 - frameSequencer
+// 31
+
+void GbChannel3::SaveState(std::vector<uint8_t> &data)
+{
+	GbChannel::SaveState(data);
+
+	const EndianFuncs *conv = getEndianFuncs(0);
+	int dataLen = 31;
+	data.resize(data.size() + dataLen);
+	uint8_t *ptr = data.data() + data.size() - dataLen;
+	ptr[0] = (_powered ? 0x01 : 0x00) |
+		(_enabled ? 0x02 : 0x00) |
+		(_playing ? 0x04 : 0x00) |
+		(_lengthEnabled ? 0x08 : 0x00);
+	ptr[1] = _outputLevel;
+	for (int i = 0; i < 16; i++) {
+		ptr[2 + i] = _waveBuffer[i];
+	}
+	*(uint16_t *)(ptr + 18) = conv->convu16(_volume);
+	ptr[20] = _volumeCtrl;
+	*(uint16_t *)(ptr + 21) = conv->convu16(_periodCounter);
+	*(uint16_t *)(ptr + 23) = conv->convu16(_frequency);
+	ptr[25] = _wavCounter;
+	ptr[26] = _lastSample;
+	*(uint16_t *)(ptr + 27) = conv->convu16(_soundLength);
+	*(uint16_t *)(ptr + 29) = conv->convu16(_frameSequencer);
+}
+
+uint8_t * GbChannel3::LoadState(uint8_t *data, int &len)
+{
+	data = GbChannel::LoadState(data, len);
+	const EndianFuncs *conv = getEndianFuncs(0);
+
+
+	if (len < 31) {
+		Log(Error, "Save state corrupt");
+		return data;
+	}
+	_powered = (data[0] & 0x1) != 0;
+	_enabled = (data[0] & 0x2) != 0;
+	_playing = (data[0] & 0x4) != 0;
+	_lengthEnabled = (data[0] & 0x8) != 0;
+	_outputLevel = data[1];
+	for (int i = 0; i < 16; i++) {
+		_waveBuffer[i] = data[2 + i];
+	}
+	_volume = conv->convu16(*(uint16_t *)(data + 18));
+	_volumeCtrl = data[20];
+	_periodCounter = conv->convu16(*(uint16_t *)(data + 21));
+	_frequency = conv->convu16(*(uint16_t *)(data + 23));
+	_wavCounter = data[25];
+	_lastSample = data[26];
+	_soundLength = conv->convu16(*(uint16_t *)(data + 27));
+	_frameSequencer = conv->convu16(*(uint16_t *)(data + 29));
+	len -= 31;
+	return data + 31;
+}

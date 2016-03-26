@@ -8,6 +8,7 @@
 #include <map>
 #include "../util/xml/pugixml.hpp"
 #include "../gui/debugger/DebuggerRoot.h"
+#include <emu.h>
 
 class Emulator;
 
@@ -83,19 +84,13 @@ typedef struct {
 	int audioSources;
 } EmulatorSettings_t;
 
-typedef void *EMUHANDLE;
-typedef struct
-{
-	void(*Log)(enum loglevel, char *, ...);
-} callBackfunctions_t;
-
 class EmulatorInterface
 {
 public:
 	EmulatorInterface(const std::string &dllName);
 	~EmulatorInterface();
 
-	bool IsValid() {return mValid;}
+	bool IsValid() {return _valid;}
 
 	std::string GetFileFilterEntry() const;
 	std::string GetName() const;
@@ -114,9 +109,11 @@ public:
 	EMUHANDLE CreateEmulator();
 	void ReleaseEmulator(EMUHANDLE handle);
 	int Init(EMUHANDLE handle, callBackfunctions_t funcs);
-	int Load(EMUHANDLE handle, const char *filename);
+	int Load(EMUHANDLE handle, const SaveData_t *data);
+	int LoadState(EMUHANDLE handle, const SaveData_t *state);
 	bool InitGL(EMUHANDLE handle, int id);
 	void DestroyGL(EMUHANDLE handle, int id);
+	void ReleaseSaveData(EMUHANDLE handle, SaveData_t *data);
 
 	const char *GetDescription(unsigned int *size);
 	int IsCompatible(const char *filename);
@@ -129,7 +126,8 @@ public:
 	void Draw(EMUHANDLE handle, int id);
 	void Reshape(EMUHANDLE handle, int width, int height, bool keepAspect);
 
-	int Save(EMUHANDLE handle, const char *filename);
+	int Save(EMUHANDLE handle, SaveData_t* data);
+	int SaveState(EMUHANDLE handle, SaveData_t *state);
 
 	// Debugging
 	char Disassemble(EMUHANDLE handle, unsigned int pos, const char **raw, const char **instr);
@@ -140,50 +138,54 @@ public:
 private:
 	unsigned int GetXMLVal(EMUHANDLE handle, pugi::xml_node &node, const char *element) const;
 
-	void *mhDLL;
-	bool mValid;
-	pugi::xml_document mDescription;
-	pugi::xml_node mRoot;
+	void *_hDLL;
+	bool _valid;
+	pugi::xml_document _description;
+	pugi::xml_node _root;
 
 
 
 	// DLL functions
 	// Initialization functions
-	EMUHANDLE( __stdcall *mCreateEmulator)();
-	void(__stdcall *mReleaseEmulator)(EMUHANDLE);
-	int32_t(__stdcall *mInit)(EMUHANDLE, callBackfunctions_t);
-	int32_t(__stdcall *mLoad)(EMUHANDLE, const uint8_t *);
-	uint32_t(__stdcall *mInitGL)(EMUHANDLE, int32_t);
-	void(__stdcall *mDestroyGL)(EMUHANDLE, int32_t);
+	EMUHANDLE( __stdcall *_createEmulator)();
+	void(__stdcall *_releaseEmulator)(EMUHANDLE);
+	int32_t(__stdcall *_init)(EMUHANDLE, callBackfunctions_t);
+	int32_t(__stdcall *_load)(EMUHANDLE, const SaveData_t *);
+	int32_t(__stdcall *_loadState)(EMUHANDLE, const SaveData_t *);
+	uint32_t(__stdcall *_initGL)(EMUHANDLE, int32_t);
+	void(__stdcall *_destroyGL)(EMUHANDLE, int32_t);
+
 
 	// Misc functions
-	int32_t(__stdcall *mGetValI)(EMUHANDLE, int32_t);
-	uint32_t(__stdcall *mGetValU)(EMUHANDLE, int32_t);
-	const uint8_t *(__stdcall *mGetString)(EMUHANDLE, int32_t);
-	void(__stdcall *mSetValI)(EMUHANDLE, int32_t, int32_t);
-	void(__stdcall *mSetValU)(EMUHANDLE, int32_t, uint32_t);
-	const uint8_t *(__stdcall *mGetDescription)(uint32_t *);
-	int32_t(__stdcall *mIsCompatible)(const uint8_t *);
-	int32_t(__stdcall *mGetInterfaceVersion)();
-	void(__stdcall *mRun)(EMUHANDLE, int32_t);
-	void(__stdcall *mStep)(EMUHANDLE);
-	int32_t(__stdcall *mIsRunning)(EMUHANDLE);
+	int32_t(__stdcall *_getValI)(EMUHANDLE, int32_t);
+	uint32_t(__stdcall *_getValU)(EMUHANDLE, int32_t);
+	const uint8_t *(__stdcall *_getString)(EMUHANDLE, int32_t);
+	void(__stdcall *_setValI)(EMUHANDLE, int32_t, int32_t);
+	void(__stdcall *_setValU)(EMUHANDLE, int32_t, uint32_t);
+	const uint8_t *(__stdcall *_getDescription)(uint32_t *);
+	int32_t(__stdcall *_isCompatible)(const uint8_t *);
+	int32_t(__stdcall *_getInterfaceVersion)();
+	void(__stdcall *_run)(EMUHANDLE, int32_t);
+	void(__stdcall *_step)(EMUHANDLE);
+	int32_t(__stdcall *_isRunning)(EMUHANDLE);
+	void(__stdcall *_releaseSaveData)(EMUHANDLE, SaveData_t *);
 
 	// Running functions
-	int32_t(__stdcall *mTick)(EMUHANDLE, uint32_t);
-	void(__stdcall *mInput)(EMUHANDLE, int32_t, int32_t);
-	void(__stdcall *mDraw)(EMUHANDLE, int32_t);
-	void(__stdcall *mReshape)(EMUHANDLE, int32_t, int32_t, int32_t);
+	int32_t(__stdcall *_tick)(EMUHANDLE, uint32_t);
+	void(__stdcall *_input)(EMUHANDLE, int32_t, int32_t);
+	void(__stdcall *_draw)(EMUHANDLE, int32_t);
+	void(__stdcall *_reshape)(EMUHANDLE, int32_t, int32_t, int32_t);
 
 	// stopping functions
-	int32_t(__stdcall *mSave)(EMUHANDLE, const uint8_t *);
+	int32_t(__stdcall *_save)(EMUHANDLE, SaveData_t *);
+	int32_t(__stdcall *_saveState)(EMUHANDLE, SaveData_t *);
 
 	// Debugging functions
-	uint8_t(__stdcall *mDisassemble)(EMUHANDLE, uint32_t, const uint8_t **, const uint8_t **);
-	void(__stdcall *mAddBreakpoint)(EMUHANDLE, uint32_t);
-	void(__stdcall *mRemoveBreakpoint)(EMUHANDLE, uint32_t);
-	int32_t(__stdcall *mIsBreakpoint)(EMUHANDLE, uint32_t);
-	uint8_t(__stdcall *mGetMemoryData)(EMUHANDLE, int32_t, uint32_t);
+	uint8_t(__stdcall *_disassemble)(EMUHANDLE, uint32_t, const uint8_t **, const uint8_t **);
+	void(__stdcall *_addBreakpoint)(EMUHANDLE, uint32_t);
+	void(__stdcall *_removeBreakpoint)(EMUHANDLE, uint32_t);
+	int32_t(__stdcall *_isBreakpoint)(EMUHANDLE, uint32_t);
+	uint8_t(__stdcall *_getMemoryData)(EMUHANDLE, int32_t, uint32_t);
 };
 
 class Emulator

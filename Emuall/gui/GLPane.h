@@ -17,7 +17,8 @@ class GLPane : public wxGLCanvas
 	DECLARE_CLASS(GLPane);
 	DECLARE_EVENT_TABLE();
 public:
-	GLPane(wxWindow *parent, GLPaneI *callback, int user, wxWindowID id, const wxPoint &pos, const wxSize &size, long style, int *args);
+	GLPane(wxWindow *parent, GLPaneI *callback, int user, wxWindowID id, const wxPoint &pos, 
+		const wxSize &size, long style, const wxGLAttributes &attr, const wxGLContextAttrs &ctxAttr);
 	~GLPane();
 
 	void SetUserData(int user) { mUser = user; }
@@ -37,6 +38,8 @@ private:
 	bool		mInitialized;
 	float		mClearR, mClearG, mClearB, mClearA;
 	bool		mClearColourChanged;
+	wxGLAttributes mGLAttr;
+	wxGLContextAttrs mCtxAttr;
 };
 
 #endif

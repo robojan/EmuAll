@@ -16,6 +16,11 @@ public:
 
 	void MemEvent(address_t address, gbByte val);
 	inline void Tick();
+
+protected:
+	virtual void SaveState(std::vector<uint8_t> &data);
+	virtual uint8_t *LoadState(uint8_t *data, int &len);
+
 private:
 	void RegisterEvents();
 	void UpdateStatus();

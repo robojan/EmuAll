@@ -13,154 +13,210 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\util">
+      <UniqueIdentifier>{d3cd36f4-c411-404f-a933-d02f1694fd50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\types">
+      <UniqueIdentifier>{8008fe06-6e5f-46e7-998b-30b9897c4bff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gb">
+      <UniqueIdentifier>{a78400e8-92f7-49eb-b597-e40d51c9c0bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gb\cpu">
+      <UniqueIdentifier>{3ac7b68c-e98d-4a41-8988-ac1b8ffa53ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gb\debug">
+      <UniqueIdentifier>{e19559d3-909b-4b30-9529-95aa380ce19b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gb\gpu">
+      <UniqueIdentifier>{4b78e62b-32a1-4b05-ae96-282f84283ddd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gb\input">
+      <UniqueIdentifier>{19011de5-478a-4761-b4db-997b1d5cb447}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gb\mem">
+      <UniqueIdentifier>{90619499-ee11-48b0-8246-46b0a718adc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gb\sound">
+      <UniqueIdentifier>{b8bfd73f-a952-47d7-83f7-5e57c6a7f7b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gb">
+      <UniqueIdentifier>{eed291f2-2c69-4123-972d-25f81b346847}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gb\cpu">
+      <UniqueIdentifier>{c3e2f074-a7bd-4151-afe0-a79fdca0f3e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gb\debug">
+      <UniqueIdentifier>{8f24a375-1b83-4c05-ae6e-ce24361b095e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gb\gpu">
+      <UniqueIdentifier>{464ad8a6-9513-4315-9e8a-e6304917e852}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gb\input">
+      <UniqueIdentifier>{bc4ce58e-f2a6-4e48-89aa-76c12550e674}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gb\mem">
+      <UniqueIdentifier>{db368623-2905-4674-ba06-eef81a5f6120}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gb\sound">
+      <UniqueIdentifier>{654673ea-2d44-4309-9167-68c944dbef94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util">
+      <UniqueIdentifier>{de3a94bd-4429-499b-a9c4-98f93e38ef3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\types">
+      <UniqueIdentifier>{9241d822-097e-405a-bb8d-412c11616ec3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="gb\cpu\GbCpu.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gb\gpu\GbGpu.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gb\input\GbInput.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gb\sound\GbChannel3.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gb\sound\GbChannel4.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gb\sound\GbChannel12.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gb\sound\GbSound.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gb\Gameboy.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="types\tree.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="emu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="util\shaders.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gb\debug\GbDis.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gb\mem\GbMem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sound\audio.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gb\sound\gbchannel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="util\Endian.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\util</Filter>
     </ClCompile>
     <ClCompile Include="util\file.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\shaders.cpp">
+      <Filter>Source Files\util</Filter>
     </ClCompile>
     <ClCompile Include="util\wavaudiofile.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="types\tree.cpp">
+      <Filter>Source Files\types</Filter>
+    </ClCompile>
+    <ClCompile Include="gb\Gameboy.cpp">
+      <Filter>Source Files\gb</Filter>
+    </ClCompile>
+    <ClCompile Include="gb\cpu\GbCpu.cpp">
+      <Filter>Source Files\gb\cpu</Filter>
+    </ClCompile>
+    <ClCompile Include="gb\debug\GbDis.cpp">
+      <Filter>Source Files\gb\debug</Filter>
     </ClCompile>
     <ClCompile Include="gb\gpu\GbGpuDrawing.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\gb\gpu</Filter>
+    </ClCompile>
+    <ClCompile Include="gb\gpu\GbGpu.cpp">
+      <Filter>Source Files\gb\gpu</Filter>
+    </ClCompile>
+    <ClCompile Include="gb\input\GbInput.cpp">
+      <Filter>Source Files\gb\input</Filter>
+    </ClCompile>
+    <ClCompile Include="gb\mem\GbMem.cpp">
+      <Filter>Source Files\gb\mem</Filter>
+    </ClCompile>
+    <ClCompile Include="gb\sound\GbSound.cpp">
+      <Filter>Source Files\gb\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="gb\sound\gbchannel.cpp">
+      <Filter>Source Files\gb\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="gb\sound\GbChannel3.cpp">
+      <Filter>Source Files\gb\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="gb\sound\GbChannel4.cpp">
+      <Filter>Source Files\gb\sound</Filter>
+    </ClCompile>
+    <ClCompile Include="gb\sound\GbChannel12.cpp">
+      <Filter>Source Files\gb\sound</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="gb\cpu\GbCpu.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gb\cpu\GbInterrupt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gb\cpu\Gbopcodes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gb\gpu\GbGpu.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gb\input\GbInput.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gb\mem\GbMem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gb\sound\GbChannel3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gb\sound\GbChannel4.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gb\sound\GbChannel12.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gb\sound\GbSound.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="gb\defines.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gb</Filter>
     </ClInclude>
     <ClInclude Include="gb\Gameboy.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="types\general.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="types\tree.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="emu.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="util\log.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="util\shaders.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gb\debug\gbDis.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="util\exceptions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="util\memDbg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Sound\audio.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gb</Filter>
     </ClInclude>
     <ClInclude Include="gb\sound\GbChannel.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\gb\sound</Filter>
     </ClInclude>
-    <ClInclude Include="util\Endian.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="gb\sound\GbChannel3.h">
+      <Filter>Header Files\gb\sound</Filter>
     </ClInclude>
-    <ClInclude Include="util\file.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="gb\sound\GbChannel4.h">
+      <Filter>Header Files\gb\sound</Filter>
     </ClInclude>
-    <ClInclude Include="util\wavaudiofile.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="gb\sound\GbChannel12.h">
+      <Filter>Header Files\gb\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="gb\cpu\GbCpu.h">
+      <Filter>Header Files\gb\cpu</Filter>
+    </ClInclude>
+    <ClInclude Include="gb\gpu\GbGpu.h">
+      <Filter>Header Files\gb\gpu</Filter>
+    </ClInclude>
+    <ClInclude Include="gb\input\GbInput.h">
+      <Filter>Header Files\gb\input</Filter>
+    </ClInclude>
+    <ClInclude Include="gb\cpu\GbInterrupt.h">
+      <Filter>Header Files\gb\cpu</Filter>
+    </ClInclude>
+    <ClInclude Include="gb\cpu\Gbopcodes.h">
+      <Filter>Header Files\gb\cpu</Filter>
+    </ClInclude>
+    <ClInclude Include="gb\mem\GbMem.h">
+      <Filter>Header Files\gb\mem</Filter>
+    </ClInclude>
+    <ClInclude Include="gb\sound\GbSound.h">
+      <Filter>Header Files\gb\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="gb\debug\gbDis.h">
+      <Filter>Header Files\gb\debug</Filter>
     </ClInclude>
     <ClInclude Include="resources\resources.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="types\tree.h">
+      <Filter>Header Files\types</Filter>
+    </ClInclude>
+    <ClInclude Include="types\general.h">
+      <Filter>Header Files\types</Filter>
+    </ClInclude>
+    <ClInclude Include="util\Endian.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\exceptions.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\file.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\log.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\memDbg.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\shaders.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\wavaudiofile.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Emuall\include\emu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="resources\gb.frag" />
-    <Text Include="resources\gb.vert" />
+    <Text Include="resources\gb.vert">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="resources\gb.frag">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="resources\gbemu.xml" />
+    <CustomBuild Include="resources\resources.rlst">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="resources\resources.rlst" />
+    <Xml Include="resources\gbemu.xml">
+      <Filter>Resource Files</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

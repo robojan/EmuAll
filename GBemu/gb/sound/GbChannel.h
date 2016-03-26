@@ -9,7 +9,7 @@
 // The number of buffers
 #define NUM_BUFFERS 2
 // How long each buffer wil contain audio data
-#define BUFFER_TIME 50
+#define BUFFER_TIME 80
 // The amplitude of the signal
 #define CHANNEL_AMPLITUDE 6000
 
@@ -27,6 +27,9 @@ protected:
 	inline void CpuTick() { _tickCounter++; }
 	void SetOutputValue(int16_t value);
 	void CleanSoundOutput();
+
+	virtual void SaveState(std::vector<uint8_t> &data);
+	virtual uint8_t *LoadState(uint8_t *data, int &len);
 
 	uint64_t _tickCounter; 
 private:

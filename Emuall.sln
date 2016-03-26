@@ -18,6 +18,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "resourceCompiler", "resourceCompiler\resourceCompiler.vcxproj", "{A122A494-9AC9-4D75-8CA4-5A6835329F52}"
 EndProject
 Global
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug inline|Win32 = Debug inline|Win32
 		Debug inline|x64 = Debug inline|x64

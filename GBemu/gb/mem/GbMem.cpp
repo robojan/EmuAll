@@ -47,12 +47,11 @@ GbMem::GbMem(Gameboy *master)
 	vramAccess = true;
 	oamAccess = true;
 	m_rtc = false;
-	m_latchedTime.day = 0;
-	m_latchedTime.hours = 0;
-	m_latchedTime.minutes = 0;
-	m_latchedTime.seconds = 0;
-	time(&m_latchedTime.systemTime);
-	m_timeStamp = m_latchedTime;
+	m_timeStamp.day = 0;
+	m_timeStamp.hours = 0;
+	m_timeStamp.minutes = 0;
+	m_timeStamp.seconds = 0;
+	m_timeStamp.systemTime = time(NULL);
 	m_rtcRegister = 0x08;
 	m_rtcActive = true;
 	m_lastLatch = 0xFF;
@@ -140,10 +139,119 @@ uint8_t GbMem::GetWRAMData(unsigned int address) const
 	return wram[address / WRAM_BANK_SIZE][address % WRAM_BANK_SIZE];
 }
 
+static const uint32_t StateMEMid = 0x4D454D20;
+
+// 0 - id
+// 4 - size
+// 8 - romBank
+// 12 - vramBank
+// 16 - wramBank
+// 20 - eramBank
+// 24 - vramAccess << 3 | oamAccess << 2 | rtc << 1 | rtcActive << 0
+// 25 - rtcRegister
+// 26 - lastLatch
+// 27 - seconds
+// 28 - minutes
+// 29 - hours
+// 30 - days
+// 34 - systemtime
+// 42 - vram[VRAM_BANKS * VRAM_BANK_SIZE]
+// 16462 - wram[WRAM_BANKS * WRAM_BANK_SIZE]
+// 49194 - regs[REGS_BANK_SIZE]
+// 53290
+
+bool GbMem::LoadState(const SaveData_t *data)
+{
+	const EndianFuncs *conv = getEndianFuncs(0);
+	uint8_t *ptr = (uint8_t *)data->miscData;
+	int miscLen = data->miscDataLen;
+	int expectedDataLen = 42 + VRAM_BANKS * VRAM_BANK_SIZE + WRAM_BANKS * WRAM_BANK_SIZE + REGS_BANK_SIZE;
+	// Find cpu segment
+	while (miscLen >= 8) {
+		uint32_t id = conv->convu32(*(uint32_t *)(ptr + 0));
+		uint32_t len = conv->convu32(*(uint32_t *)(ptr + 4));
+		if (id == StateMEMid && len >= (uint32_t)expectedDataLen) {
+			break;
+		}
+		ptr += len;
+		miscLen -= len;
+	}
+	if (miscLen < expectedDataLen) return false;
+	for (int i = 0; i < eramSize && (unsigned int)((i + 1) * ERAM_BANK_SIZE) < data->ramDataLen; i++)
+	{
+		memcpy(eram[i], (uint8_t *)data->ramData + (i*ERAM_BANK_SIZE), ERAM_BANK_SIZE);
+	}
+	for (int i = 0; i < WRAM_BANKS; i++) {
+		memcpy(wram[i], ptr + 42 + VRAM_BANKS * VRAM_BANK_SIZE + i * WRAM_BANK_SIZE, WRAM_BANK_SIZE);
+	}
+	for (int i = 0; i < VRAM_BANKS; i++) {
+		memcpy(vram[i], ptr + 42 + VRAM_BANK_SIZE * i, VRAM_BANK_SIZE);
+	}
+	memcpy(regs, ptr + 42 + VRAM_BANKS * VRAM_BANK_SIZE + WRAM_BANKS * WRAM_BANK_SIZE, REGS_BANK_SIZE);
+	switchBank(conv->convu32(*(uint32_t *)(ptr + 8)));
+	switchVramBank(conv->convu32(*(uint32_t *)(ptr + 12)));
+	switchWramBank(conv->convu32(*(uint32_t *)(ptr + 16)));
+	switchEramBank(conv->convu32(*(uint32_t *)(ptr + 20)));
+	m_rtcActive = (ptr[24] & 0x01) != 0;
+	m_rtc = (ptr[24] & 0x02) != 0;
+	oamAccess = (ptr[24] & 0x04) != 0;
+	vramAccess = (ptr[24] & 0x08) != 0;
+	m_rtcRegister = ptr[25];
+	m_lastLatch = ptr[26];
+	m_timeStamp.seconds = ptr[27];
+	m_timeStamp.minutes = ptr[28];
+	m_timeStamp.hours = ptr[29];
+	m_timeStamp.day = conv->convu32(*(uint32_t *)(ptr + 30));
+	m_timeStamp.systemTime = conv->convu64(*(uint64_t *)(ptr + 34));
+	return true;
+}
+
+bool GbMem::SaveState(rom_t *rom, rom_t *ram, std::vector<uint8_t> &data)
+{
+	const EndianFuncs *conv = getEndianFuncs(0);
+	rom->data = NULL;
+	rom->length = 0;
+	ram->length = eramSize * ERAM_BANK_SIZE;
+	ram->data = new uint8_t[ram->length];
+	for (int i = 0; i < eramSize; i++) {
+		memcpy(ram->data + i * ERAM_BANK_SIZE, eram[i], ERAM_BANK_SIZE);
+	}
+	int dataLen = 42 + VRAM_BANKS * VRAM_BANK_SIZE + WRAM_BANKS * WRAM_BANK_SIZE + REGS_BANK_SIZE;
+	data.resize(data.size() + dataLen);
+	uint8_t *ptr = data.data() + data.size() - dataLen;
+
+	*(uint32_t *)(ptr + 0) = conv->convu32(StateMEMid);
+	*(uint32_t *)(ptr + 4) = conv->convu32(dataLen);
+	*(uint32_t *)(ptr + 8) = conv->convu32(romBank);
+	*(uint32_t *)(ptr + 12) = conv->convu32(vramBank);
+	*(uint32_t *)(ptr + 16) = conv->convu32(wramBank);
+	*(uint32_t *)(ptr + 20) = conv->convu32(eramBank);
+	ptr[24] =
+		(m_rtcActive ? 0x01 : 0x00) |
+		(m_rtc ? 0x02 : 0x00) |
+		(oamAccess ? 0x04 : 0x00) |
+		(vramAccess ? 0x08 : 0x00);
+	ptr[25] = m_rtcRegister;
+	ptr[26] = m_lastLatch;
+	ptr[27] = m_timeStamp.seconds;
+	ptr[28] = m_timeStamp.minutes;
+	ptr[29] = m_timeStamp.hours;
+	*(uint32_t *)(ptr + 30) = conv->convu32(m_timeStamp.day);
+	*(uint64_t *)(ptr + 34) = conv->convu64(m_timeStamp.systemTime);
+	for (int i = 0; i < VRAM_BANKS; i++) {
+		memcpy(ptr + 42 + i * VRAM_BANK_SIZE, vram[i], VRAM_BANK_SIZE);
+	}
+	for (int i = 0; i < WRAM_BANKS; i++) {
+		memcpy(ptr + 42 + VRAM_BANKS * VRAM_BANK_SIZE + i * WRAM_BANK_SIZE, wram[i], WRAM_BANK_SIZE);
+	}
+	memcpy(ptr + 42 + VRAM_BANKS * VRAM_BANK_SIZE + WRAM_BANKS * WRAM_BANK_SIZE, regs, REGS_BANK_SIZE);
+	return true;
+}
+
 void GbMem::CalculateRTC(gbTime *timeStamp)
 {
 	time_t now = time(NULL);
-	int difference = difftime(now, timeStamp->systemTime);
+	int difference = (int)difftime(now, timeStamp->systemTime);
 	timeStamp->seconds += difference % 60;
 	difference = difference / 60;
 	timeStamp->minutes += difference % 60;
@@ -252,7 +360,7 @@ void GbMem::setAccessable(bool vram, bool oam)
 	this->oamAccess = oam;
 }
 
-bool GbMem::load(rom_t *rom, rom_t *ram)
+bool GbMem::load(rom_t *rom, rom_t *ram, rom_t *misc)
 {
 	// Load the rom
 	this->rom = rom;
@@ -322,14 +430,17 @@ bool GbMem::load(rom_t *rom, rom_t *ram)
 			mem[0xA] = eram[0];
 			eramSize = 1;
 		}
-		if (ram->data != NULL && ram->length >= (unsigned int) eramSize*ERAM_BANK_SIZE) // it is possible that there is rtc data
+		if (ram->data != NULL && ram->length >= 0) // it is possible that there is rtc data
 		{
-			int i;
-			for(i = 0; i< eramSize; i++)
+			for (int i = 0; i < eramSize && (unsigned int)((i + 1) * ERAM_BANK_SIZE) < ram->length; i++)
 			{
-				memcpy(eram[i],ram->data+(i*ERAM_BANK_SIZE), ERAM_BANK_SIZE);
+				memcpy(eram[i], ram->data + (i*ERAM_BANK_SIZE), ERAM_BANK_SIZE);
 			}
-			if((type == MBC3_TIM_BAT || type == MBC3_TIM_RAM_BAT) && (ram->length == eramSize*ERAM_BANK_SIZE + 16*sizeof(uint8_t)))
+		}
+		if(misc->data != NULL && misc->length >= 16)
+		{
+			if((type == MBC3_TIM_BAT || type == MBC3_TIM_RAM_BAT) && 
+				(ram->length >= eramSize*ERAM_BANK_SIZE + 16*sizeof(uint8_t)))
 			{
 				// Read RTC info:
 				// little endian
@@ -339,15 +450,16 @@ bool GbMem::load(rom_t *rom, rom_t *ram)
 				// 1 byte hours
 				// 4 bytes days
 				// 8 bytes timestamp
-				int j = i * ERAM_BANK_SIZE;
+				int j = eramSize * ERAM_BANK_SIZE;
+				const EndianFuncs *conv = getEndianFuncs(0);
 				m_rtcActive = ram->data[j++] != 0;
 				m_timeStamp.seconds = ram->data[j++];
 				m_timeStamp.minutes = ram->data[j++];
 				m_timeStamp.hours = ram->data[j++];
-				m_timeStamp.day = 0;// BigEndianSystem ? BigInt32(*(uint32_t *)ram->data+j) : LittleInt32(*(uint32_t *)ram->data+j);
-				j+=4;
-				m_timeStamp.systemTime = 0;//BigEndianSystem ? BigInt64(*(uint64_t *)ram->data+j) : LittleInt64(*(uint64_t *)ram->data+j);
-				j+=8;
+				m_timeStamp.day = conv->convu32(*(uint32_t *)&ram->data[j]);
+				j += 4;
+				m_timeStamp.systemTime = (time_t)conv->convu64(*(uint64_t *)&ram->data[j]);
+				j += 8;
 			}
 		}
 		mem[0xe] = mem[0xc];
@@ -367,14 +479,18 @@ bool GbMem::load(rom_t *rom, rom_t *ram)
 	return true;
 }
 
-bool GbMem::Save(std::ofstream &file)
+bool GbMem::Save(SaveData_t *data)
 {
 	gbByte type = read(CARTRIDGE_TYPE);
 	gbByte size = read(RAM_SIZE);
+	data->ramDataLen = eramSize * ERAM_BANK_SIZE;
+	data->ramData = new uint8_t[data->ramDataLen];
 	for(int i = 0; i < eramSize; i++)
 	{
-		file.write((char *)eram[i], ERAM_BANK_SIZE);
+		memcpy(((char *)data->ramData) + i * ERAM_BANK_SIZE, eram[i], ERAM_BANK_SIZE);
 	}
+	data->miscDataLen = 0;
+	data->miscData = NULL;
 	if(type == MBC3_TIM_BAT || type == MBC3_TIM_RAM_BAT) // if the cardridge has a timer
 	{
 		// Write RTC info:
@@ -385,19 +501,20 @@ bool GbMem::Save(std::ofstream &file)
 		// 1 byte hours
 		// 4 bytes days
 		// 8 bytes timestamp
-		general_t gen;
-		gen.ui8 = m_rtcActive ? 0x01 : 0x00;
-		file.write((char *)&gen.ui8, 1);
-		file.write((char *)&m_timeStamp.seconds, 1);
-		file.write((char *) &m_timeStamp.minutes, 1);
-		file.write((char *) &m_timeStamp.hours, 1);
-		gen.ui32 = 0;//LittleInt32(m_timeStamp.day);
-		file.write((char *) &gen.ui32, 4);
-		gen.ui64 = 0;//LittleInt64((uint64_t)m_timeStamp.systemTime);
-		file.write((char *) &gen.ui64, 8);
+		data->miscDataLen = 16;
+		data->miscData = new uint8_t[data->miscDataLen];
+		const EndianFuncs *conv = getEndianFuncs(0);
+		char active = m_rtcActive ? 0x01 : 0x00;
+		uint32_t day = conv->convu32(m_timeStamp.day);
+		uint64_t systemtime = conv->convu64(m_timeStamp.systemTime);
+		((char *)data->miscData)[0] = active;
+		((char *)data->miscData)[1] = m_timeStamp.seconds;
+		((char *)data->miscData)[2] = m_timeStamp.minutes;
+		((char *)data->miscData)[3] = m_timeStamp.hours;
+		*(uint32_t *)((char *)data->miscData + 4) = m_timeStamp.day;
+		*(uint64_t *)((char *)data->miscData + 8) = m_timeStamp.systemTime;
 	}
-	file.flush();
-	return file.good();
+	return true;
 }
 
 void GbMem::registerEvent(address_t address, GbMemEvent *evt)

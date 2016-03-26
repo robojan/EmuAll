@@ -58,7 +58,7 @@ CPUDebugger::CPUDebugger(wxWindow* parent, wxWindowID id, const wxString& title,
 	gSizer4->Add(mStepOverButton, 1, wxALIGN_CENTER, 5);
 	mStepOutButton = new wxButton(this, ID_Debug_Cpu_stepOut, _("Step out"));
 	gSizer4->Add(mStepOutButton, 1, wxALIGN_CENTER, 5);
-	bSizer2->Add(gSizer4, 0, wxALIGN_BOTTOM | wxALIGN_CENTER | wxLEFT | wxRIGHT, 5);
+	bSizer2->Add(gSizer4, 0, wxALIGN_CENTER | wxLEFT | wxRIGHT, 5);
 
 
 	bSizer1->Add(bSizer2, 0, wxEXPAND, 5);

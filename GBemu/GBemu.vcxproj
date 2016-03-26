@@ -67,8 +67,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetExt>.dll</TargetExt>
-    <IncludePath>C:\libraries\openal-soft-1.16.0-bin\include;C:\libraries\glew-1.12.0\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\libraries\openal-soft-1.16.0-bin\libs\Win32;C:\libraries\glew-1.12.0\lib\Release\Win32;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)emuall\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\glew-1.13.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LIBDIR)\openal-soft-1.17.2-bin\libs\Win32;$(LIBDIR)\glew-1.13.0\lib\Release\$(PlatformName);$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName).emu</TargetName>
     <OutDir>$(SolutionDir)\$(Configuration)\plugins\</OutDir>
     <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
@@ -76,16 +76,16 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">
     <TargetExt>.dll</TargetExt>
-    <IncludePath>C:\libraries\openal-soft-1.16.0-bin\include;C:\libraries\glew-1.12.0\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\libraries\openal-soft-1.16.0-bin\libs\Win32;C:\libraries\glew-1.12.0\lib\Release\Win32;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)emuall\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\glew-1.13.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LIBDIR)\openal-soft-1.17.2-bin\libs\Win32;$(LIBDIR)\glew-1.13.0\lib\Release\$(PlatformName);$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName).emu</TargetName>
     <OutDir>$(SolutionDir)\$(Configuration)\plugins\</OutDir>
     <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\libraries\openal-soft-1.16.0-bin\include;C:\libraries\glew-1.12.0\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\libraries\openal-soft-1.16.0-bin\libs\Win32;C:\libraries\glew-1.12.0\lib\Release\Win32;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)emuall\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\glew-1.13.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LIBDIR)\openal-soft-1.17.2-bin\libs\Win32;$(LIBDIR)\glew-1.13.0\lib\Release\$(PlatformName);$(LibraryPath)</LibraryPath>
     <TargetExt>.dll</TargetExt>
     <TargetName>$(ProjectName).emu</TargetName>
     <OutDir>$(SolutionDir)\$(Configuration)\plugins\</OutDir>
@@ -93,8 +93,8 @@
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">
-    <IncludePath>C:\libraries\openal-soft-1.16.0-bin\include;C:\libraries\glew-1.12.0\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\libraries\openal-soft-1.16.0-bin\libs\Win32;C:\libraries\glew-1.12.0\lib\Release\Win32;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)emuall\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\glew-1.13.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LIBDIR)\openal-soft-1.17.2-bin\libs\Win32;$(LIBDIR)\glew-1.13.0\lib\Release\$(PlatformName);$(LibraryPath)</LibraryPath>
     <TargetExt>.dll</TargetExt>
     <TargetName>$(ProjectName).emu</TargetName>
     <OutDir>$(SolutionDir)\$(Configuration)\plugins\</OutDir>
@@ -109,6 +109,9 @@
       <PreprocessorDefinitions>EMUDLL;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerOutput>All</AssemblerOutput>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -220,7 +223,6 @@
     <ClCompile Include="gb\sound\GbChannel3.cpp" />
     <ClCompile Include="gb\sound\GbChannel4.cpp" />
     <ClCompile Include="gb\sound\GbSound.cpp" />
-    <ClCompile Include="Sound\audio.cpp" />
     <ClCompile Include="types\tree.cpp" />
     <ClCompile Include="util\Endian.c" />
     <ClCompile Include="util\file.cpp" />
@@ -228,7 +230,7 @@
     <ClCompile Include="util\wavaudiofile.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="emu.h" />
+    <ClInclude Include="..\Emuall\include\emu.h" />
     <ClInclude Include="gb\cpu\GbCpu.h" />
     <ClInclude Include="gb\cpu\GbInterrupt.h" />
     <ClInclude Include="gb\cpu\Gbopcodes.h" />
@@ -244,7 +246,6 @@
     <ClInclude Include="gb\sound\GbChannel4.h" />
     <ClInclude Include="gb\sound\GbSound.h" />
     <ClInclude Include="resources\resources.h" />
-    <ClInclude Include="Sound\audio.h" />
     <ClInclude Include="types\general.h" />
     <ClInclude Include="types\tree.h" />
     <ClInclude Include="util\Endian.h" />

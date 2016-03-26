@@ -9,6 +9,7 @@
 #include "../defines.h"
 #include "../../util/log.h"
 #include <stdint.h>
+#include <vector>
 
 typedef union
 {
@@ -94,6 +95,9 @@ public:
 	void Reshape(int width, int height, bool keepAspect);
 
 	bool IsEnabled() const { return m_enabled; }
+
+	bool LoadState(const SaveData_t *data);
+	bool SaveState(std::vector<uint8_t> &data);
 
 	// Debugging
 	BackgroundDebuggerData *GetBackgroundDebugInfo() { return &mBGDebug; }

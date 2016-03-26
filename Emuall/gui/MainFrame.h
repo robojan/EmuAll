@@ -33,6 +33,8 @@ private:
 	wxMenu		*mMenOptions;
 	wxMenu		*mMenDebug;
 	wxMenu		*mMenDebugLevel;
+	wxMenu		*mMenSaveState;
+	wxMenu		*mMenLoadState;
 	GLPane		*mDisplay;
 	wxLogWindow *mLogger;
 	wxTimer		*mTimer;
@@ -46,6 +48,8 @@ private:
 	Emulator	mEmulator;
 	EmulatorList *mEmulators;
 	std::string	mFilePath;
+	std::string mSaveFilePath;
+	std::string mSaveStateFilePath;
 	Audio		*mAudio;
 	Options		mOptions;
 	InputMaster mInputHandler;
@@ -56,11 +60,17 @@ private:
 	void LoadEmulator(std::string &fileName);
 	void CloseEmulator();
 
+	void UpdateSaveStateLabels();
+	void UpdateRecentFiles();
+
 	void OnClose(wxCloseEvent &evt);
 	void OnQuit(wxCommandEvent &evt);
 	void OnOpen(wxCommandEvent &evt);
+	void OnOpenRecentFile(wxCommandEvent &evt);
 	void OnReset(wxCommandEvent &evt);
 	void OnRun(wxCommandEvent &evt);
+	void OnSaveState(wxCommandEvent &evt);
+	void OnLoadState(wxCommandEvent &evt);
 	void OnLogWindow(wxCommandEvent &evt);
 	void OnLogLevel(wxCommandEvent &evt);
 	void OnOptions(wxCommandEvent &evt);

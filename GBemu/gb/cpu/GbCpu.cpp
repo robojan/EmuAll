@@ -6,6 +6,7 @@
 #include "../defines.h"
 #include "../../util/log.h"
 #include "../../util/exceptions.h"
+#include "../../util/Endian.h"
 #include "Gbopcodes.h"
 #include "GbInterrupt.h"
 
@@ -236,4 +237,86 @@ uint16_t GbCpu::GetRegisterPair(int id) const
 	return 0;
 }
 
+static const uint32_t StateCPUid = 0x43505520;
+
+// 0 - id
+// 4 - size
+// 8 - regAF
+// 10 - regBC
+// 12 - regDE
+// 14 - regHL
+// 16 - regSP
+// 18 - regPC
+// 20 - runningMode
+// 21 - ime << 4 | stopped << 3 | halted << 2 | doubleSpeed << 1 | m_tim_enabled << 0
+// 22 - cycles
+// 26 - m_div_counter
+// 30 - m_tim_counter
+// 34 - timerClocks
+// 38 - dividerClocks
+// 42 -
+
+bool GbCpu::LoadState(const SaveData_t *data)
+{
+	const EndianFuncs *conv = getEndianFuncs(0);
+	uint8_t *ptr = (uint8_t *)data->miscData;
+	int miscLen = data->miscDataLen;
+	// Find cpu segment
+	while (miscLen >= 8) {
+		uint32_t id = conv->convu32(*(uint32_t *)(ptr + 0));
+		uint32_t len = conv->convu32(*(uint32_t *)(ptr + 4));
+		if (id == StateCPUid && len >= 42) {
+			regAF = conv->convu16(*(uint16_t *)(ptr + 8));
+			regBC = conv->convu16(*(uint16_t *)(ptr + 10));
+			regDE = conv->convu16(*(uint16_t *)(ptr + 12));
+			regHL = conv->convu16(*(uint16_t *)(ptr + 14));
+			regSP = conv->convu16(*(uint16_t *)(ptr + 16));
+			regPC = conv->convu16(*(uint16_t *)(ptr + 18));
+			runningMode = (GbCpuRunningMode)ptr[20];
+			m_tim_enabled = (ptr[21] & 0x01) != 0;
+			doubleSpeed = (ptr[21] & 0x02) != 0;
+			halted = (ptr[21] & 0x04) != 0;
+			stopped = (ptr[21] & 0x08) != 0;
+			ime = (ptr[21] & 0x10) != 0;
+			cycles = conv->convi32(*(int32_t *)(ptr + 22));
+			m_div_counter = conv->convi32(*(int32_t *)(ptr + 26));
+			m_tim_counter = conv->convi32(*(int32_t *)(ptr + 30));
+			timerClocks = conv->convi32(*(int32_t *)(ptr + 34));
+			dividerClocks = conv->convi32(*(int32_t *)(ptr + 38));
+			return true;
+		}
+		ptr += len;
+		miscLen -= len;
+	}
+	return false;
+}
+
+bool GbCpu::SaveState(std::vector<uint8_t> &data)
+{
+	const EndianFuncs *conv = getEndianFuncs(0);
+	int dataLen = 42;
+	data.resize(data.size() + dataLen);
+	uint8_t *ptr = data.data() + data.size() - dataLen;
+	*(uint32_t *)(ptr + 0) = conv->convu32(StateCPUid);
+	*(uint32_t *)(ptr + 4) = conv->convu32(dataLen);
+	*(uint16_t *)(ptr + 8) = conv->convu16(regAF);
+	*(uint16_t *)(ptr + 10) = conv->convu16(regBC);
+	*(uint16_t *)(ptr + 12) = conv->convu16(regDE);
+	*(uint16_t *)(ptr + 14) = conv->convu16(regHL);
+	*(uint16_t *)(ptr + 16) = conv->convu16(regSP);
+	*(uint16_t *)(ptr + 18) = conv->convu16(regPC);
+	ptr[20] = (uint8_t)runningMode;
+	ptr[21] =
+		(m_tim_enabled ? 0x01 : 0x00) |
+		(doubleSpeed ? 0x02 : 0x00) |
+		(halted ? 0x04 : 0x00) |
+		(stopped ? 0x08 : 0x00) |
+		(ime ? 0x10 : 0x00);
+	*(int32_t *)(ptr + 22) = conv->convi32(cycles);
+	*(int32_t *)(ptr + 26) = conv->convi32(m_div_counter);
+	*(int32_t *)(ptr + 30) = conv->convi32(m_tim_counter);
+	*(int32_t *)(ptr + 34) = conv->convi32(timerClocks);
+	*(int32_t *)(ptr + 38) = conv->convi32(dividerClocks);
+	return true;
+}
 

@@ -34,8 +34,6 @@ GbGpu::GbGpu(Gameboy *master)
 	mBGDebug.mapMode = 2;
 	mBGDebug.dataMode = 2;
 
-	// Initialize GLEW
-	glewInit();
 }
 
 GbGpu::~GbGpu(void)
@@ -338,4 +336,75 @@ bool GbGpu::compSprite(int a, int b)
 		return a < b;
 	}
 	return ptrA[1] < ptrB[1];
+}
+
+static const uint32_t StateGPUid = 0x47505520;
+
+// 0 - id
+// 4 - size
+// 8 - enabled
+// 9 - mode
+// 10 - clocks
+// 14 - linecounter
+// 18 - linesprites[40]
+// 178 - ly
+// 182 - bgPaletteData[64]
+// 246 - oPaletteData[64]
+// 310 - 
+
+bool GbGpu::LoadState(const SaveData_t *data)
+{
+	const EndianFuncs *conv = getEndianFuncs(0);
+	uint8_t *ptr = (uint8_t *)data->miscData;
+	int miscLen = data->miscDataLen;
+	// Find gpu segment
+	while (miscLen >= 8) {
+		uint32_t id = conv->convu32(*(uint32_t *)(ptr + 0));
+		uint32_t len = conv->convu32(*(uint32_t *)(ptr + 4));
+		if (id == StateGPUid && len >= 310) {
+			m_enabled = ptr[8] != 0;
+			m_mode = ptr[9];
+			m_clocks = conv->convi32(*(int32_t *)(ptr + 10));
+			m_lineCounter = conv->convi32(*(int32_t *)(ptr + 14));
+			for (int i = 0; i < 40; i++) {
+				m_lineSprites[i]  = conv->convi32(*(int32_t *)(ptr + 18 + sizeof(int) * i));
+			}
+			m_ly = conv->convi32(*(int32_t *)(ptr + 178));
+			for (int i = 0; i < PALETTE_SIZE; i++) {
+				m_bgPaletteData[i] = ptr[182 + sizeof(gbPallete) * i];
+			}
+			for (int i = 0; i < PALETTE_SIZE; i++) {
+				m_oPaletteData[i] = ptr[246 + sizeof(gbPallete) * i];
+			}
+			return true;
+		}
+		ptr += len;
+		miscLen -= len;
+	}
+	return false;
+}
+
+bool GbGpu::SaveState(std::vector<uint8_t> &data)
+{
+	const EndianFuncs *conv = getEndianFuncs(0);
+	int dataLen = 310;
+	data.resize(data.size() + dataLen);
+	uint8_t *ptr = data.data() + data.size() - dataLen;
+	*(uint32_t *)(ptr + 0) = conv->convu32(StateGPUid);
+	*(uint32_t *)(ptr + 4) = conv->convu32(dataLen);
+	ptr[8] = m_enabled ? 0x01 : 0x00;
+	ptr[9] = m_mode;
+	*(uint32_t *)(ptr + 10) = conv->convi32(m_clocks);
+	*(uint32_t *)(ptr + 14) = conv->convi32(m_lineCounter);
+	for (int i = 0; i < 40; i++) {
+		*(uint32_t *)(ptr + 18 + sizeof(int) * i) = conv->convi32(m_lineSprites[i]);
+	}
+	*(uint32_t *)(ptr + 178) = conv->convi32(m_ly);
+	for (int i = 0; i < PALETTE_SIZE; i++) {
+		ptr[182 + sizeof(gbPallete) * i] = m_bgPaletteData[i];
+	}
+	for (int i = 0; i < PALETTE_SIZE; i++) {
+		ptr[246 + sizeof(gbPallete) * i] = m_oPaletteData[i];
+	}
+	return true;
 }

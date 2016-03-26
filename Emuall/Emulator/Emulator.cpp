@@ -11,22 +11,22 @@
 
 
 EmulatorInterface::EmulatorInterface(const std::string &dllName) :
-	mhDLL(NULL), mValid(false), mGetInterfaceVersion(NULL), mCreateEmulator(NULL), mReleaseEmulator(NULL),
-	mInit(NULL), mLoad(NULL), mGetDescription(NULL), mIsCompatible(NULL), mInitGL(NULL), mDestroyGL(NULL),
-	mRun(NULL), mIsRunning(NULL), mTick(NULL), mInput(NULL), 
-	mDraw(NULL), mReshape(NULL), mSave(NULL), mStep(NULL),
-	mDisassemble(NULL), mAddBreakpoint(NULL), mRemoveBreakpoint(NULL), mIsBreakpoint(NULL),
-	mGetMemoryData(NULL), mGetValI(NULL), mGetValU(NULL), mGetString(NULL)
+	_hDLL(NULL), _valid(false), _getInterfaceVersion(NULL), _createEmulator(NULL), _releaseEmulator(NULL),
+	_init(NULL), _load(NULL), _getDescription(NULL), _isCompatible(NULL), _initGL(NULL), _destroyGL(NULL),
+	_run(NULL), _isRunning(NULL), _tick(NULL), _input(NULL), 
+	_draw(NULL), _reshape(NULL), _save(NULL), _step(NULL), _saveState(NULL), _loadState(NULL),
+	_disassemble(NULL), _addBreakpoint(NULL), _removeBreakpoint(NULL), _isBreakpoint(NULL),
+	_getMemoryData(NULL), _getValI(NULL), _getValU(NULL), _getString(NULL)
 {
-	mhDLL = LoadSharedLibrary(dllName.c_str());
-	if (mhDLL == NULL)
+	_hDLL = LoadSharedLibrary(dllName.c_str());
+	if (_hDLL == NULL)
 	{
 		Log(Error, "Could not load emulator %s: %d", dllName.c_str(), GetLastError());
 		return;
 	}
-	mGetInterfaceVersion = (int32_t(__stdcall*)())GetStdcallFunc(mhDLL, "GetInterfaceVersion");
-	mGetDescription = (const uint8_t *(__stdcall*)(uint32_t *))GetStdcallFunc<uint32_t *>(mhDLL, "GetDescription");
-	if (!mGetInterfaceVersion)
+	_getInterfaceVersion = (int32_t(__stdcall*)())GetStdcallFunc(_hDLL, "GetInterfaceVersion");
+	_getDescription = (const uint8_t *(__stdcall*)(uint32_t *))GetStdcallFunc<uint32_t *>(_hDLL, "GetDescription");
+	if (!_getInterfaceVersion)
 	{
 		// Not valid emulator
 		Log(Error, "Could not load emulator %s: Could not get the interface version", dllName.c_str());
@@ -39,57 +39,60 @@ EmulatorInterface::EmulatorInterface(const std::string &dllName) :
 	}
 	unsigned int xmlSize;
 	const char *xml = GetDescription(&xmlSize);
-	pugi::xml_parse_result result = mDescription.load_buffer(xml, xmlSize);
+	pugi::xml_parse_result result = _description.load_buffer(xml, xmlSize);
 	if (!result)
 	{
 		Log(Error, "Could not load emulator %s: Parsing error \"%s\" in description at position %d ", dllName.c_str(), result.description(), result.offset);
 		return;
 	}
-	mRoot = mDescription.child("emulator");
-	if (!mRoot)
+	_root = _description.child("emulator");
+	if (!_root)
 	{
 		Log(Error, "Could not load emulator %s: description does not contain an 'emulator' root", dllName.c_str());
 		return;
 	}
 
-	int version = mGetInterfaceVersion();
+	int version = _getInterfaceVersion();
 	if (version >= 100)
 	{
-		mGetValI				= (int32_t(__stdcall*)(EMUHANDLE, int32_t))					GetStdcallFunc<EMUHANDLE, int32_t>				(mhDLL, "GetValI");
-		mGetValU				= (uint32_t(__stdcall*)(EMUHANDLE, int32_t))				GetStdcallFunc<EMUHANDLE, int32_t>				(mhDLL, "GetValU");
-		mGetString				= (const uint8_t*(__stdcall*)(EMUHANDLE, int32_t))			GetStdcallFunc<EMUHANDLE, int32_t>				(mhDLL, "GetString");
-		mSetValI				= (void(__stdcall *)(EMUHANDLE, int32_t, int32_t))			GetStdcallFunc<EMUHANDLE, int32_t, int32_t>		(mhDLL, "SetValI");
-		mSetValU				= (void(__stdcall *)(EMUHANDLE, int32_t, uint32_t))			GetStdcallFunc<EMUHANDLE, int32_t, uint32_t>	(mhDLL, "SetValU");
-		mCreateEmulator			= (EMUHANDLE(__stdcall*)())									GetStdcallFunc									(mhDLL, "CreateEmulator");
-		mReleaseEmulator		= (void(__stdcall*)(EMUHANDLE))								GetStdcallFunc<EMUHANDLE>						(mhDLL, "ReleaseEmulator");
-		mInit					= (int32_t(__stdcall*)(EMUHANDLE, callBackfunctions_t))		GetStdcallFunc<EMUHANDLE, callBackfunctions_t>	(mhDLL, "Init");
-		mLoad					= (int32_t(__stdcall*)(EMUHANDLE, const uint8_t *))			GetStdcallFunc<EMUHANDLE, const uint8_t *>		(mhDLL, "Load");
-		mInitGL					= (uint32_t(__stdcall*)(EMUHANDLE, int32_t))				GetStdcallFunc<EMUHANDLE, int32_t>				(mhDLL, "InitGL");
-		mDestroyGL				= (void(__stdcall*)(EMUHANDLE, int32_t))		 			GetStdcallFunc<EMUHANDLE, int32_t>				(mhDLL, "DestroyGL");
-		mIsCompatible			= (int32_t(__stdcall*)(const uint8_t *))					GetStdcallFunc<const uint8_t *>					(mhDLL, "IsCompatible");
-		mRun					= (void(__stdcall*)(EMUHANDLE, int32_t))					GetStdcallFunc<EMUHANDLE, int32_t>				(mhDLL, "Run");
-		mStep					= (void(__stdcall*)(EMUHANDLE))								GetStdcallFunc<EMUHANDLE>						(mhDLL, "Step");
-		mIsRunning				= (int32_t(__stdcall*)(EMUHANDLE))							GetStdcallFunc<EMUHANDLE>						(mhDLL, "IsRunning");
-		mTick					= (int32_t(__stdcall*)(EMUHANDLE, uint32_t))				GetStdcallFunc<EMUHANDLE, uint32_t>				(mhDLL, "Tick");
-		mInput					= (void(__stdcall*)(EMUHANDLE, int32_t, int32_t))			GetStdcallFunc<EMUHANDLE, int32_t, int32_t>		(mhDLL, "Input");
-		mDraw					= (void(__stdcall*)(EMUHANDLE, int32_t))					GetStdcallFunc<EMUHANDLE, int32_t>				(mhDLL, "Draw");
-		mReshape				= (void(__stdcall*)(EMUHANDLE, int32_t, int32_t, int32_t))	GetStdcallFunc<EMUHANDLE, int32_t, int32_t, int32_t>(mhDLL, "Reshape");
-		mSave					= (int32_t(__stdcall*)(EMUHANDLE, const uint8_t *))			GetStdcallFunc<EMUHANDLE, const uint8_t *>		(mhDLL, "Save");
-		mDisassemble			= (uint8_t(__stdcall*)(EMUHANDLE, uint32_t, const uint8_t **, const uint8_t **))GetStdcallFunc<EMUHANDLE, uint32_t, const uint8_t **, const uint8_t **>(mhDLL, "Disassemble");
-		mAddBreakpoint			= (void(__stdcall*)(EMUHANDLE, uint32_t))					GetStdcallFunc<EMUHANDLE, uint32_t>				(mhDLL, "AddBreakpoint");
-		mRemoveBreakpoint		= (void(__stdcall*)(EMUHANDLE, uint32_t))					GetStdcallFunc<EMUHANDLE, uint32_t>				(mhDLL, "RemoveBreakpoint");
-		mIsBreakpoint			= (int32_t(__stdcall*)(EMUHANDLE, uint32_t))				GetStdcallFunc<EMUHANDLE, uint32_t>				(mhDLL, "IsBreakpoint");
-		mGetMemoryData			= (uint8_t(__stdcall*)(EMUHANDLE, int32_t, uint32_t))		GetStdcallFunc<EMUHANDLE, int32_t, uint32_t>	(mhDLL, "GetMemoryData");
+		_getValI				= (int32_t(__stdcall*)(EMUHANDLE, int32_t))					GetStdcallFunc<EMUHANDLE, int32_t>				(_hDLL, "GetValI");
+		_getValU				= (uint32_t(__stdcall*)(EMUHANDLE, int32_t))				GetStdcallFunc<EMUHANDLE, int32_t>				(_hDLL, "GetValU");
+		_getString				= (const uint8_t*(__stdcall*)(EMUHANDLE, int32_t))			GetStdcallFunc<EMUHANDLE, int32_t>				(_hDLL, "GetString");
+		_setValI				= (void(__stdcall *)(EMUHANDLE, int32_t, int32_t))			GetStdcallFunc<EMUHANDLE, int32_t, int32_t>		(_hDLL, "SetValI");
+		_setValU				= (void(__stdcall *)(EMUHANDLE, int32_t, uint32_t))			GetStdcallFunc<EMUHANDLE, int32_t, uint32_t>	(_hDLL, "SetValU");
+		_createEmulator			= (EMUHANDLE(__stdcall*)())									GetStdcallFunc									(_hDLL, "CreateEmulator");
+		_releaseEmulator		= (void(__stdcall*)(EMUHANDLE))								GetStdcallFunc<EMUHANDLE>						(_hDLL, "ReleaseEmulator");
+		_init					= (int32_t(__stdcall*)(EMUHANDLE, callBackfunctions_t))		GetStdcallFunc<EMUHANDLE, callBackfunctions_t>	(_hDLL, "Init");
+		_load					= (int32_t(__stdcall*)(EMUHANDLE, const SaveData_t *))		GetStdcallFunc<EMUHANDLE, const SaveData_t *>	(_hDLL, "Load");
+		_loadState				= (int32_t(__stdcall*)(EMUHANDLE, const SaveData_t *))		GetStdcallFunc<EMUHANDLE, const SaveData_t *>	(_hDLL, "LoadState");
+		_initGL					= (uint32_t(__stdcall*)(EMUHANDLE, int32_t))				GetStdcallFunc<EMUHANDLE, int32_t>				(_hDLL, "InitGL");
+		_destroyGL				= (void(__stdcall*)(EMUHANDLE, int32_t))		 			GetStdcallFunc<EMUHANDLE, int32_t>				(_hDLL, "DestroyGL");
+		_isCompatible			= (int32_t(__stdcall*)(const uint8_t *))					GetStdcallFunc<const uint8_t *>					(_hDLL, "IsCompatible");
+		_releaseSaveData		= (void(__stdcall*)(EMUHANDLE, SaveData_t *))				GetStdcallFunc<EMUHANDLE, SaveData_t *>			(_hDLL, "ReleaseSaveData");
+		_run					= (void(__stdcall*)(EMUHANDLE, int32_t))					GetStdcallFunc<EMUHANDLE, int32_t>				(_hDLL, "Run");
+		_step					= (void(__stdcall*)(EMUHANDLE))								GetStdcallFunc<EMUHANDLE>						(_hDLL, "Step");
+		_isRunning				= (int32_t(__stdcall*)(EMUHANDLE))							GetStdcallFunc<EMUHANDLE>						(_hDLL, "IsRunning");
+		_tick					= (int32_t(__stdcall*)(EMUHANDLE, uint32_t))				GetStdcallFunc<EMUHANDLE, uint32_t>				(_hDLL, "Tick");
+		_input					= (void(__stdcall*)(EMUHANDLE, int32_t, int32_t))			GetStdcallFunc<EMUHANDLE, int32_t, int32_t>		(_hDLL, "Input");
+		_draw					= (void(__stdcall*)(EMUHANDLE, int32_t))					GetStdcallFunc<EMUHANDLE, int32_t>				(_hDLL, "Draw");
+		_reshape				= (void(__stdcall*)(EMUHANDLE, int32_t, int32_t, int32_t))	GetStdcallFunc<EMUHANDLE, int32_t, int32_t, int32_t>(_hDLL, "Reshape");
+		_save					= (int32_t(__stdcall*)(EMUHANDLE, SaveData_t *))			GetStdcallFunc<EMUHANDLE, SaveData_t *>			(_hDLL, "Save");
+		_saveState				= (int32_t(__stdcall*)(EMUHANDLE, SaveData_t *))			GetStdcallFunc<EMUHANDLE, SaveData_t *>			(_hDLL, "SaveState");
+		_disassemble			= (uint8_t(__stdcall*)(EMUHANDLE, uint32_t, const uint8_t **, const uint8_t **))GetStdcallFunc<EMUHANDLE, uint32_t, const uint8_t **, const uint8_t **>(_hDLL, "Disassemble");
+		_addBreakpoint			= (void(__stdcall*)(EMUHANDLE, uint32_t))					GetStdcallFunc<EMUHANDLE, uint32_t>				(_hDLL, "AddBreakpoint");
+		_removeBreakpoint		= (void(__stdcall*)(EMUHANDLE, uint32_t))					GetStdcallFunc<EMUHANDLE, uint32_t>				(_hDLL, "RemoveBreakpoint");
+		_isBreakpoint			= (int32_t(__stdcall*)(EMUHANDLE, uint32_t))				GetStdcallFunc<EMUHANDLE, uint32_t>				(_hDLL, "IsBreakpoint");
+		_getMemoryData			= (uint8_t(__stdcall*)(EMUHANDLE, int32_t, uint32_t))		GetStdcallFunc<EMUHANDLE, int32_t, uint32_t>	(_hDLL, "GetMemoryData");
 	}
-	mValid = true;
+	_valid = true;
 	Log(Debug, "Loaded functions from emulator");
 }
 
 EmulatorInterface::~EmulatorInterface()
 {
-	if (mhDLL)
+	if (_hDLL)
 	{
-		FreeSharedLibrary(mhDLL);
+		FreeSharedLibrary(_hDLL);
 	}
 
 }
@@ -98,7 +101,7 @@ std::string EmulatorInterface::GetFileFilterEntry() const
 {
 	std::string entry = GetName();
 	entry.append("(");
-	const char *filter = mRoot.child_value("fileFilter");
+	const char *filter = _root.child_value("fileFilter");
 	if (*filter == '\0')
 	{
 		static const char *allFiles = "*.*";
@@ -113,7 +116,7 @@ std::string EmulatorInterface::GetFileFilterEntry() const
 
 std::string EmulatorInterface::GetName() const
 {
-	std::string name = mRoot.child_value("name");
+	std::string name = _root.child_value("name");
 	if (name.empty())
 	{
 		name = "Error!";
@@ -124,7 +127,7 @@ std::string EmulatorInterface::GetName() const
 std::list<EmulatorInput_t> EmulatorInterface::GetEmulatorInputs() const
 {
 	std::list<EmulatorInput_t> ret;
-	pugi::xml_node inputs = mRoot.child("input");
+	pugi::xml_node inputs = _root.child("input");
 	if (!inputs)
 	{
 		Log(Warn, "Emulator \"%s\" has no input", GetName().c_str());
@@ -155,7 +158,7 @@ CpuDebuggerInfo_t EmulatorInterface::GetCpuDebuggerInfo() const
 	ret.step = false;
 	ret.stepOut = false;
 	ret.stepOver = false;
-	pugi::xml_node cpu = mRoot.child("debugging").child("cpu");
+	pugi::xml_node cpu = _root.child("debugging").child("cpu");
 	if (!cpu)
 	{
 		Log(Warn, "Emulator \"%s\" has no \"debugging/cpu\" section", GetName().c_str());
@@ -202,7 +205,7 @@ CpuDebuggerInfo_t EmulatorInterface::GetCpuDebuggerInfo() const
 MemDebuggerInfo_t EmulatorInterface::GetMemDebuggerInfo(EMUHANDLE handle) const
 {
 	MemDebuggerInfo_t ret; 
-	pugi::xml_node mem = mRoot.child("debugging").child("mem");
+	pugi::xml_node mem = _root.child("debugging").child("mem");
 	if (!mem)
 	{
 		Log(Warn, "Emulator \"%s\" has no \"debugging/mem\" section", GetName().c_str());
@@ -260,7 +263,7 @@ MemDebuggerInfo_t EmulatorInterface::GetMemDebuggerInfo(EMUHANDLE handle) const
 
 Debugger::DebuggerRoot *EmulatorInterface::GetGpuDebuggerInfo(Emulator *emu) const
 {
-	pugi::xml_node gpu = mRoot.child("debugging").child("gpu");
+	pugi::xml_node gpu = _root.child("debugging").child("gpu");
 	if (!gpu)
 	{
 		Log(Warn, "Emulator \"%s\" has no \"debugging/gpu\" section", GetName().c_str());
@@ -275,199 +278,221 @@ Debugger::DebuggerRoot *EmulatorInterface::GetGpuDebuggerInfo(Emulator *emu) con
 EmulatorSettings_t EmulatorInterface::GetEmulatorSettings() const
 {
 	EmulatorSettings_t ret;
-	ret.audioSources = mRoot.child("audio").child("sources").text().as_int(0);
+	ret.audioSources = _root.child("audio").child("sources").text().as_int(0);
 	return ret;
 }
 
 uint32_t EmulatorInterface::GetValU(EMUHANDLE handle, int id) const
 {
-	if (mGetValU == NULL)
+	if (_getValU == NULL)
 	{
 		return 0;
 	}
-	return mGetValU(handle, id);
+	return _getValU(handle, id);
 }
 
 int32_t EmulatorInterface::GetValI(EMUHANDLE handle, int id) const
 {
-	if (mGetValI == NULL)
+	if (_getValI == NULL)
 	{
 		return 0;
 	}
-	return mGetValI(handle, id);
+	return _getValI(handle, id);
 }
 
 const char *EmulatorInterface::GetString(EMUHANDLE handle, int id) const
 {
-	if (mGetString == NULL)
+	if (_getString == NULL)
 	{
 		return NULL;
 	}
-	return (const char *)mGetString(handle, id);
+	return (const char *)_getString(handle, id);
 }
 
 void EmulatorInterface::SetValI(EMUHANDLE handle, int id, int32_t val) const
 {
-	if (mSetValI == NULL)
+	if (_setValI == NULL)
 	{
 		return;
 	}
-	return mSetValI(handle, id, val);
+	return _setValI(handle, id, val);
 }
 
 void EmulatorInterface::SetValU(EMUHANDLE handle, int id, uint32_t val) const
 {
-	if (mSetValU == NULL)
+	if (_setValU == NULL)
 	{
 		return;
 	}
-	return mSetValU(handle, id, val);
+	return _setValU(handle, id, val);
 }
 
 EMUHANDLE EmulatorInterface::CreateEmulator()
 {
-	if (mCreateEmulator == NULL)
+	if (_createEmulator == NULL)
 		return NULL;
-	return mCreateEmulator();
+	return _createEmulator();
 }
 
 void EmulatorInterface::ReleaseEmulator(EMUHANDLE handle)
 {
-	if (mReleaseEmulator == NULL)
+	if (_releaseEmulator == NULL)
 		return;
-	mReleaseEmulator(handle);
+	_releaseEmulator(handle);
 }
 
 int EmulatorInterface::Init(EMUHANDLE handle, callBackfunctions_t funcs)
 {
-	if (mInit == NULL)
+	if (_init == NULL)
 		return false;
-	return mInit(handle, funcs);
+	return _init(handle, funcs);
 }
-int EmulatorInterface::Load(EMUHANDLE handle, const char *filename)
+
+int EmulatorInterface::Load(EMUHANDLE handle, const SaveData_t *data)
 {
-	if (mLoad == NULL)
+	if (_load == NULL)
 		return false;
-	return mLoad(handle, (const uint8_t *)filename);
+	return _load(handle, data);
+}
+
+int EmulatorInterface::LoadState(EMUHANDLE handle, const SaveData_t *data)
+{
+	if (_loadState == NULL)
+		return false;
+	return _loadState(handle, data);
 }
 
 bool EmulatorInterface::InitGL(EMUHANDLE handle, int id)
 {
-	if (mInitGL == NULL)
+	if (_initGL == NULL)
 		return false;
-	return mInitGL(handle, id) != 0;
+	return _initGL(handle, id) != 0;
 }
 
 void EmulatorInterface::DestroyGL(EMUHANDLE handle, int id)
 {
-	if (mDestroyGL == NULL)
+	if (_destroyGL == NULL)
 		return;
-	mDestroyGL(handle, id);
+	_destroyGL(handle, id);
+}
+
+void EmulatorInterface::ReleaseSaveData(EMUHANDLE handle, SaveData_t *data)
+{
+	if (_releaseSaveData == NULL)
+		return;
+	_releaseSaveData(handle, data);
 }
 
 const char *EmulatorInterface::GetDescription(unsigned int *size)
 {
-	if (mGetDescription == NULL)
+	if (_getDescription == NULL)
 		return NULL;
-	return (const char *) mGetDescription(size);
+	return (const char *) _getDescription(size);
 }
 
 int EmulatorInterface::IsCompatible(const char *filename)
 {
-	if (mIsCompatible == NULL)
+	if (_isCompatible == NULL)
 		return false;
-	return mIsCompatible((const uint8_t *) filename);
+	return _isCompatible((const uint8_t *) filename);
 }
 
 void EmulatorInterface::Run(EMUHANDLE handle, int run)
 {
-	if (mRun == NULL)
+	if (_run == NULL)
 		return;
-	mRun(handle, run);
+	_run(handle, run);
 }
 
 void EmulatorInterface::Step(EMUHANDLE handle)
 {
-	if (mStep == NULL)
+	if (_step == NULL)
 		return;
-	mStep(handle);
+	_step(handle);
 }
 
 int EmulatorInterface::IsRunning(EMUHANDLE handle)
 {
-	if (mIsRunning == NULL)
+	if (_isRunning == NULL)
 		return -1;
-	return mIsRunning(handle);
+	return _isRunning(handle);
 }
 
 int EmulatorInterface::Tick(EMUHANDLE handle, uint32_t time)
 {
-	if (mTick == NULL)
+	if (_tick == NULL)
 		return false;
-	return mTick(handle, time);
+	return _tick(handle, time);
 }
 
 void EmulatorInterface::Input(EMUHANDLE handle, int key, int pressed)
 {
-	if (mInput == NULL)
+	if (_input == NULL)
 		return;
-	return mInput(handle, key, pressed);
+	return _input(handle, key, pressed);
 }
 
 void EmulatorInterface::Draw(EMUHANDLE handle, int id)
 {
-	if (mDraw == NULL)
+	if (_draw == NULL)
 		return;
-	mDraw(handle, id);
+	_draw(handle, id);
 }
 
 void EmulatorInterface::Reshape(EMUHANDLE handle, int width, int height, bool keepAspect)
 {
-	if (mReshape == NULL)
+	if (_reshape == NULL)
 		return;
-	mReshape(handle, width, height, keepAspect);
+	_reshape(handle, width, height, keepAspect);
 }
 
-int EmulatorInterface::Save(EMUHANDLE handle, const char *filename)
+int EmulatorInterface::Save(EMUHANDLE handle, SaveData_t *data)
 {
-	if (mSave == NULL)
+	if (_save == NULL)
 		return false;
-	return mSave(handle, (const uint8_t *) filename);
+	return _save(handle, data);
+}
+
+int EmulatorInterface::SaveState(EMUHANDLE handle, SaveData_t *data)
+{
+	if (_saveState == NULL)
+		return false;
+	return _saveState(handle, data);
 }
 
 char EmulatorInterface::Disassemble(EMUHANDLE handle, unsigned int pos, const char **raw, const char **instr)
 {
-	if (mDisassemble == NULL)
+	if (_disassemble == NULL)
 		return -1;
-	return mDisassemble(handle, pos, (const uint8_t **) raw, (const uint8_t **) instr);
+	return _disassemble(handle, pos, (const uint8_t **) raw, (const uint8_t **) instr);
 }
 
 void EmulatorInterface::AddBreakpoint(EMUHANDLE handle, unsigned int pos)
 {
-	if (mAddBreakpoint == NULL)
+	if (_addBreakpoint == NULL)
 		return;
-	return mAddBreakpoint(handle, pos);
+	return _addBreakpoint(handle, pos);
 }
 
 void EmulatorInterface::RemoveBreakpoint(EMUHANDLE handle, unsigned int pos)
 {
-	if (mRemoveBreakpoint == NULL)
+	if (_removeBreakpoint == NULL)
 		return;
-	return mRemoveBreakpoint(handle, pos);
+	return _removeBreakpoint(handle, pos);
 }
 
 int EmulatorInterface::IsBreakpoint(EMUHANDLE handle, unsigned int pos)
 {
-	if (mIsBreakpoint == NULL)
+	if (_isBreakpoint == NULL)
 		return 1 == 0;
-	return mIsBreakpoint(handle, pos);
+	return _isBreakpoint(handle, pos);
 }
 
 char EmulatorInterface::GetMemoryData(EMUHANDLE handle, int memory, unsigned int address)
 {
-	if (mGetMemoryData == NULL)
+	if (_getMemoryData == NULL)
 		return 0;
-	return mGetMemoryData(handle, memory, address);
+	return _getMemoryData(handle, memory, address);
 }
 
 unsigned int EmulatorInterface::GetXMLVal(EMUHANDLE handle, pugi::xml_node &node, const char *element) const 

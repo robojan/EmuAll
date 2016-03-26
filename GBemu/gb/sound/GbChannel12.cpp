@@ -124,6 +124,79 @@ void GbChannel12::MemEvent(address_t address, gbByte val)
 	}
 }
 
+// 0 - periodCounter
+// 2 - frameSequencer
+// 4 - dutyCouter
+// 5 - shadowFrequency
+// 7 - sweepCounter
+// 8 - sweepTimer
+// 9 - volume
+// 11 - volumeCtrl
+// 12 - volumeCounter
+// 13 - frequency
+// 15 - dutyMode
+// 16 - soundLength
+// 17 - powered << 0 | enabled << 1 | sweepEnabled << 2 | lengthEnabled << 3
+// 18
+
+void GbChannel12::SaveState(std::vector<uint8_t> &data)
+{
+	GbChannel::SaveState(data);
+
+	const EndianFuncs *conv = getEndianFuncs(0);
+	int dataLen = 18;
+	data.resize(data.size() + dataLen);
+	uint8_t *ptr = data.data() + data.size() - dataLen;
+	*(uint16_t *)(ptr + 0) = conv->convu16(_periodCounter);
+	*(uint16_t *)(ptr + 2) = conv->convu16(_frameSequencer);
+	ptr[4] = _dutyCounter;
+	*(uint16_t *)(ptr + 5) = conv->convu16(_shadowFrequency);
+	ptr[7] = _sweepCounter;
+	ptr[8] = _sweepTimer;
+	*(uint16_t *)(ptr + 9) = conv->convu16(_volume);
+	ptr[11] = _volumeCtrl;
+	ptr[12] = _volumeCounter;
+	*(uint16_t *)(ptr + 13) = conv->convu16(_frequency);
+	ptr[15] = _dutyMode;
+	ptr[16] = _soundLength;
+	ptr[17] = (_powered ? 0x01 : 0x00) |
+		(_enabled ? 0x02 : 0x00) |
+		(_sweepEnabled ? 0x04 : 0x00) | 
+		(_lengthEnabled  ? 0x08 : 0x00);
+
+}
+
+uint8_t * GbChannel12::LoadState(uint8_t *data, int &len)
+{
+	data = GbChannel::LoadState(data, len);
+	const EndianFuncs *conv = getEndianFuncs(0);
+
+
+	if (len < 18) {
+		Log(Error, "Save state corrupt");
+		return data;
+	}
+
+	_periodCounter = conv->convu16(*(uint16_t *)(data + 0));
+	_frameSequencer = conv->convu16(*(uint16_t *)(data + 2));
+	_dutyCounter = data[4];
+	_shadowFrequency = conv->convu16(*(uint16_t *)(data + 5));
+	_sweepCounter = data[7];
+	_sweepTimer = data[8];
+	_volume = conv->convu16(*(uint16_t *)(data + 9));
+	_volumeCtrl = data[11];
+	_volumeCounter = data[12];
+	_frequency = conv->convu16(*(uint16_t *)(data + 13));
+	_dutyMode = data[15];
+	_soundLength = data[16];
+	_powered = (data[17] & 0x1) != 0;
+	_enabled = (data[17] & 0x2) != 0;
+	_sweepEnabled = (data[17] & 0x4) != 0;
+	_lengthEnabled = (data[17] & 0x8) != 0;
+	len -= 18;
+	return data + 18;
+}
+
 void GbChannel12::RegisterEvents()
 {
 	// Gameboy sound channel 1/2 initialize

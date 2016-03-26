@@ -64,8 +64,9 @@ bool InputMaster::SendKey(std::string name, int key, int pressed)
 
 void InputMaster::OnKeyboard(wxKeyEvent &evt)
 {
-	bool skip = false;
-	Log(Debug, "Key: %d Scancode: %d", evt.GetKeyCode(), evt.GetRawKeyCode());
+	bool skip = true;
+	Log(Debug, "Key: %d, Scancode: %d, Modifiers: %d", 
+		evt.GetKeyCode(), evt.GetRawKeyCode(), evt.GetModifiers());
 	
 	std::map<std::string, std::list<Emulator>>::iterator it;
 	for (it = mClients.begin(); it != mClients.end(); ++it)
@@ -73,8 +74,10 @@ void InputMaster::OnKeyboard(wxKeyEvent &evt)
 		const EmulatorInput_t *keyInfo = mOptions->GetKeyBindingInfo(it->first, evt.GetKeyCode());
 		if (keyInfo != NULL)
 		{
-			if (SendKey(it->first, keyInfo->key, evt.GetEventType() == wxEVT_KEY_DOWN) && !(keyInfo->flags & EMU_INPUT_PASS))
-				skip = true;
+			if (SendKey(it->first, keyInfo->key, evt.GetEventType() == wxEVT_KEY_DOWN) &&
+				!(keyInfo->flags & EMU_INPUT_PASS)) {
+				skip = false;
+			}
 		}
 	}
 

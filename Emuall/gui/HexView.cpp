@@ -115,7 +115,7 @@ void HexView::SetSize(wxUint32 size)
 		grid->SetRowLabelSize(70);
 		grid->SetRowLabelAlignment(wxALIGN_CENTRE, wxALIGN_CENTRE);
 		grid->SetDefaultColSize(25, true);
-		grid->SetColumnWidth(0x10, 170);
+		grid->SetColSize(0x10, 170);
 		grid->SetDefaultCellFont(wxFont(10, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 	}
 }

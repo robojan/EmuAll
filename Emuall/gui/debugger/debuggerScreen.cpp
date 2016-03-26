@@ -58,10 +58,20 @@ GLPane *DebuggerScreen::GetWidget(wxWindow *parent, wxWindowID id)
 	}
 
 	// Create screen
-	int args [] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 32, 0 };
-
+	wxGLAttributes glAttr;
+	glAttr.PlatformDefaults();
+	glAttr.DoubleBuffer();
+	glAttr.RGBA();
+	glAttr.Depth(24);
+	glAttr.Stencil(8);
+	glAttr.EndList();
+	wxGLContextAttrs ctxAttr;
+	ctxAttr.CoreProfile();
+	ctxAttr.OGLVersion(3, 2);
+	ctxAttr.ForwardCompatible();
+	ctxAttr.EndList();
 	mWidget = new GLPane(parent, this, mScreen.id, id, wxDefaultPosition,
-		wxSize(mScreen.width, mScreen.height), wxFULL_REPAINT_ON_RESIZE, args);
+		wxSize(mScreen.width, mScreen.height), wxFULL_REPAINT_ON_RESIZE, glAttr, ctxAttr);
 	mWidget->Bind(wxEVT_MOTION, &DebuggerScreen::OnMotion, this);
 	mWidget->SetMaxSize(wxSize(mScreen.width, mScreen.height));
 	wxColour bgColour = parent->GetBackgroundColour();

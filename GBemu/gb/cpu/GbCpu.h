@@ -7,6 +7,7 @@
 #include "../mem/GbMem.h"
 #include <stdint.h>
 #include "../Gameboy.h"
+#include <vector>
 
 enum class GbCpuRunningMode
 {
@@ -37,6 +38,9 @@ public:
 	uint16_t GetRegisterPair(int id) const;
 	GbCpuRunningMode GetRunningMode() const { return runningMode; }
 	void SetRunningMode(GbCpuRunningMode mode) { runningMode = mode; }
+
+	bool LoadState(const SaveData_t *data);
+	bool SaveState(std::vector<uint8_t> &data);
 
 private:
 

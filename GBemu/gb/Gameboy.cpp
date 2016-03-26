@@ -66,65 +66,28 @@ bool Gameboy::Init()
 	return true;
 }
 
-bool Gameboy::Load(const std::string &fileName)
+bool Gameboy::Load(const SaveData_t *data)
 {
-	std::string file = fileName;
-	std::ifstream romFile(fileName, std::ios::in | std::ios::binary);
-	if(!romFile.is_open())
-	{
-		Log(Error, "Could not open ROM file: %s", fileName);
-		return false;
-	}
 	if(_rom.data != NULL)
 	{
 		delete _rom.data;
 		_rom.data = NULL;
 		_rom.length = 0;
 	}
-	// Get size of ROM file
-	romFile.seekg(0, std::ios::end);
-	_rom.length = (int)romFile.tellg();
-	romFile.seekg(0, std::ios::beg);
+	_rom.length = data->romDataLen;
 	// Make room for the data and read it
 	_rom.data = new uint8_t[_rom.length];
-	romFile.read((char *)_rom.data, _rom.length);
-
-	if(romFile.gcount() != _rom.length)
-	{
-		Log(Error, "Error while reading the file: %s", strerror(errno));
-		romFile.close();
-		return false;
-	}
-	romFile.close();
-	
+	memcpy(_rom.data, data->romData, _rom.length);
+		
 	rom_t ram;
-	ram.data = NULL;
-	ram.length = 0;
-	file.append(".sav");
-	std::ifstream ramFile(file, std::ios::in | std::ios::binary);
-	if(ramFile.is_open())
-	{
-		// Read the ram file size
-		ramFile.seekg(0, std::ios::end);
-		ram.length = (int) ramFile.tellg();
-		ramFile.seekg(0, std::ios::beg);
-		if (ram.length > 0)
-		{
-			// Allocate the data and read it
-			ram.data = new uint8_t[ram.length];
-			ramFile.read((char *) ram.data, ram.length);
-			if (ramFile.gcount() != ram.length)
-			{
-				Log(Error, "Error while reading the file: %s", strerror(errno));
-				delete[] ram.data;
-				ram.data = NULL;
-				ram.length = 0;
-			}
-		}
-		ramFile.close();
-	}
+	ram.length = data->ramDataLen;
+	ram.data = (uint8_t *)data->ramData;
 
-	if(_mem->load(&_rom, &ram) != true)
+	rom_t misc;
+	misc.length = data->miscDataLen;
+	misc.data = (uint8_t *)data->miscData;
+
+	if(_mem->load(&_rom, &ram, &misc) != true)
 	{
 		Log(Error, "Could not load the memory");
 		delete[] ram.data;
@@ -133,9 +96,6 @@ bool Gameboy::Load(const std::string &fileName)
 		return false;
 	}
 	// RAM is not needed anymore
-	delete[] ram.data;
-	ram.data = NULL;
-	ram.length = 0;
 	_gpu->registerEvents();
 	_cpu->registerEvents();
 	_input->registerEvents();
@@ -236,27 +196,44 @@ bool Gameboy::Input(int key, int pressed)
 	return false;
 }
 
-bool Gameboy::Save(const std::string &fileName)
+bool Gameboy::Save(SaveData_t *data)
 {
 	bool success = false;
 	// save ram
 	Run(false);
 
-	std::string file = fileName;
+	return _mem->Save(data);
+}
 
-	if (!file.empty() && _mem != NULL)
-	{
-		file.append(".sav");
-		std::ofstream ramFile(file, std::ios::binary | std::ios::out);
-		if(ramFile.is_open() == false)
-		{
-			Log(Error, "Could not save ram file");
-			return false;
-		}
-		success = _mem->Save(ramFile);
-		ramFile.close();
-	}
-	return success;
+bool Gameboy::LoadState(const SaveData_t *data)
+{
+	_mem->LoadState(data);
+	_cpu->LoadState(data);
+	_gpu->LoadState(data);
+	_input->LoadState(data);
+	_sound->LoadState(data);
+	return false;
+}
+
+bool Gameboy::SaveState(SaveData_t *data)
+{
+	std::vector<uint8_t> miscData;
+	rom_t rom, ram;
+	rom.data = (uint8_t *)data->romData;
+	rom.length = data->romDataLen;
+	ram.data = (uint8_t *)data->ramData;
+	ram.length = data->ramDataLen;
+	_mem->SaveState(&rom, &ram, miscData);
+	_cpu->SaveState(miscData);
+	_gpu->SaveState(miscData);
+	_input->SaveState(miscData);
+	_sound->SaveState(miscData);
+	data->miscDataLen = miscData.size();
+	data->miscData = new uint8_t[data->miscDataLen];
+	memcpy(data->miscData, miscData.data(), data->miscDataLen);
+	data->ramData = ram.data;
+	data->ramDataLen = ram.length;
+	return false;
 }
 
 bool Gameboy::Exit(void)

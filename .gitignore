@@ -6,6 +6,10 @@
 *.user
 *.userosscache
 *.sln.docstates
+*.opendb
+
+# Documentation
+documents/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -15,12 +19,15 @@
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
+[Dd]ebug inline/
+[Rr]elease wx/
 x64/
 x86/
 build/
 bld/
 [Bb]in/
 [Oo]bj/
+tools/
 
 # Visual Studio 2015 cache/options directory
 .vs/
@@ -66,6 +73,7 @@ artifacts/
 *.pidb
 *.svclog
 *.scc
+*.exe
 
 # Chutzpah Test files
 _Chutzpah*
@@ -211,11 +219,13 @@ GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
 
-Emuall.exe
-
 rom/
 Test/
 TestResults/*
 TestROMs/*
+
+#generated files
+GBemu/resources/resources.h
+
 
 *.diagsession

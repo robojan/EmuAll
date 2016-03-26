@@ -2,8 +2,11 @@
 #include "../util/memDbg.h"
 #include "IdList.h"
 #include "GLPane.h"
+#include "../Emulator/SaveFile.h"
 
 #include <errno.h>
+#include <wx/ffile.h>
+#include <wx/filename.h>
 
 BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_MENU(ID_Main_File_quit, MainFrame::OnQuit)
@@ -39,6 +42,8 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
 	mMenOptions = NULL;
 	mMenDebug = NULL;
 	mMenDebugLevel = NULL;
+	mMenSaveState = NULL;
+	mMenLoadState = NULL;
 	mDisplay = NULL;
 	mLogger = NULL;
 	mTimer = NULL;
@@ -59,6 +64,7 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
 	// Load options
 	mOptions.LoadOptions();
 	mInputOptionsFrame = new InputOptionsFrame(this, &mOptions);
+	UpdateRecentFiles();
 
 	mEmulators = new EmulatorList("plugins");
 	std::list<EmulatorInterface *>::iterator it;
@@ -94,22 +100,61 @@ void MainFrame::CreateLayout()
 	CreateMenuBar();
 
 	// Create the opengl screen
-	int args[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 32, 0 };
+	wxGLAttributes glAttr;
+	glAttr.Reset();
+	glAttr.PlatformDefaults();
+	glAttr.DoubleBuffer();
+	glAttr.RGBA();
+	glAttr.Depth(24);
+	glAttr.Stencil(8);
+	glAttr.EndList();
+	wxGLContextAttrs ctxAttr;
+	ctxAttr.Reset();
+	ctxAttr.CoreProfile();
+	ctxAttr.OGLVersion(3, 2);
+	ctxAttr.ForwardCompatible();
+	ctxAttr.EndList();
 	mDisplay = new GLPane(this, this, 0, ID_Main_display, wxDefaultPosition,
-		wxDefaultSize, wxFULL_REPAINT_ON_RESIZE, args);
+		wxDefaultSize, wxFULL_REPAINT_ON_RESIZE, glAttr, ctxAttr);
 
-	mDisplay->Connect(ID_Main_display, wxEVT_KEY_UP, wxKeyEventHandler(InputMaster::OnKeyboard), (wxObject *) NULL, &mInputHandler);
-	mDisplay->Connect(ID_Main_display, wxEVT_KEY_DOWN, wxKeyEventHandler(InputMaster::OnKeyboard), (wxObject *) NULL, &mInputHandler);
+	//mDisplay->Connect(ID_Main_display, wxEVT_KEY_UP, wxKeyEventHandler(InputMaster::OnKeyboard), (wxObject *) NULL, &mInputHandler);
+	//mDisplay->Connect(ID_Main_display, wxEVT_KEY_DOWN, wxKeyEventHandler(InputMaster::OnKeyboard), (wxObject *) NULL, &mInputHandler);
+	mDisplay->Bind(wxEVT_KEY_UP, &InputMaster::OnKeyboard, &mInputHandler);
+	mDisplay->Bind(wxEVT_KEY_DOWN, &InputMaster::OnKeyboard, &mInputHandler);
+	//Bind(wxEVT_CHAR_HOOK, &InputMaster::OnKeyboard, &mInputHandler);
 	mDisplay->Connect(ID_Main_display, wxEVT_SIZE, wxSizeEventHandler(MainFrame::OnResize), (wxObject *) NULL, this);
 }
 
 void MainFrame::CreateMenuBar()
 {	
+	// Create the save state menu
+	mMenSaveState = new wxMenu;
+
+	// Create the load state menu
+	mMenLoadState = new wxMenu;
+
+	for (int i = 0; i < 10; i++) {
+		mMenSaveState->Append(ID_Main_File_SaveState + i, wxString::Format(_("Save State %d\tCtrl+Shift+F%d"), i + 1, i + 1));
+		mMenLoadState->Append(ID_Main_File_LoadState + i, wxString::Format(_("Load State %d\tCtrl+F%d"), i + 1, i + 1));
+	}
+	UpdateSaveStateLabels();
+	Bind(wxEVT_MENU, &MainFrame::OnSaveState, this, ID_Main_File_SaveState, ID_Main_File_SaveState + 9);
+	Bind(wxEVT_MENU, &MainFrame::OnLoadState, this, ID_Main_File_LoadState, ID_Main_File_LoadState + 9);
+
 	// Create the File menu
 	mMenFile = new wxMenu;
-	mMenFile->Append(ID_Main_File_open, _("&Open"));
-	mMenFile->Append(ID_Main_File_run, _("&Run"));
-	mMenFile->Append(ID_Main_File_reset, _("&Reset"));
+	mMenFile->Append(ID_Main_File_open, _("&Open\tCtrl+O"));
+	mMenFile->Append(ID_Main_File_run, _("&Run\tCtrl+R"));
+	mMenFile->Append(ID_Main_File_reset, _("Reset"));
+	mMenFile->AppendSeparator();
+	mMenFile->AppendSubMenu(mMenSaveState, _("&Save state"));
+	mMenFile->AppendSubMenu(mMenLoadState, _("&Load state"));
+	mMenFile->AppendSeparator();
+	for (int i = 0; i < 5; i++) {
+		mMenFile->Append(ID_Main_File_RecentFile + i, wxString::Format(_("%d. ---"), i + 1));
+	}
+	Bind(wxEVT_MENU, &MainFrame::OnOpenRecentFile, this, ID_Main_File_RecentFile, ID_Main_File_RecentFile + 4);
+	mMenFile->AppendSeparator();
 	mMenFile->Append(ID_Main_File_quit, _("&Quit"));
 
 	// Create the options menu
@@ -194,12 +239,47 @@ void MainFrame::LoadEmulator(std::string &fileName)
 
 	// Loading the rom in memory
 	Log(Message, "Loading the ROM in memory");
-	if (!emu->Load(handle, fileName.c_str()))
+
+	SaveData_t saveData;
+	wxFFile romFile(fileName, "rb");
+	if (!romFile.IsOpened()) {
+		Log(Error, "Could not open the ROM file '%s'", fileName.c_str());
+		emu->ReleaseEmulator(handle);
+		return;
+	}
+	saveData.romDataLen = romFile.Length();
+	saveData.romData = new uint8_t[saveData.romDataLen];
+	int read = romFile.Read(saveData.romData, saveData.romDataLen);
+	if (read != saveData.romDataLen) {
+		if (romFile.Error()) {
+			Log(Error, "Error occurred while reading ROM data");
+			emu->ReleaseEmulator(handle);
+			delete[] saveData.romData;
+			saveData.romDataLen = 0;
+			return;
+		}
+		if (romFile.Eof()) {
+			Log(Warn, "End of ROM file reached before all the data was read");
+			saveData.romDataLen = read;
+		}
+	}
+	mSaveFilePath = fileName;
+	mSaveFilePath.append(".sav");
+	mSaveStateFilePath= fileName;
+	mSaveStateFilePath.append(".ss");
+	Log(Message, "Loading save data");
+	SaveFile::ReadSaveFile(mSaveFilePath, saveData);
+
+	if (!emu->Load(handle, &saveData))
 	{
 		Log(Error, "Could not load the ROM");
 		emu->ReleaseEmulator(handle);
 		return;
 	}
+
+	if (saveData.romData != NULL) delete[] saveData.romData;
+	if (saveData.ramData != NULL) delete[] saveData.ramData;
+	if (saveData.miscData != NULL) delete[] saveData.miscData;
 
 	// store emulator
 	mEmulator.emu = emu;
@@ -212,6 +292,11 @@ void MainFrame::LoadEmulator(std::string &fileName)
 	mCpuDebugger->SetEmulator(mEmulator);
 	mMemDebugger->SetEmulator(mEmulator);
 	mGpuDebugger->SetEmulator(mEmulator);
+
+	// Update save state labels
+	mOptions.SaveRecentFile(mFilePath.c_str());
+	UpdateSaveStateLabels();
+	UpdateRecentFiles();
 	return;
 }
 
@@ -232,11 +317,60 @@ void MainFrame::CloseEmulator()
 		mDisplay->DestroyGL();
 
 		mInputHandler.ClearClient(mEmulator);
-
-		mEmulator.emu->Save(mEmulator.handle, mFilePath.c_str());
+		SaveData_t saveData;
+		saveData.miscData = saveData.ramData = saveData.romData = NULL;
+		saveData.miscDataLen = saveData.ramDataLen = saveData.romDataLen = 0;
+		mEmulator.emu->Save(mEmulator.handle, &saveData);
+		SaveFile::WriteSaveFile(mSaveFilePath, saveData);
+		mEmulator.emu->ReleaseSaveData(mEmulator.handle, &saveData);
 		mEmulator.emu->ReleaseEmulator(mEmulator.handle);
 
 		mEmulator = emu;
+	}
+}
+
+void MainFrame::UpdateSaveStateLabels()
+{
+	for (int i = 0; i < 10; i++) {
+		wxString filePath = mSaveStateFilePath;
+		filePath.Append(std::to_string(i));
+		wxFileName file(filePath);
+		wxString name;
+		if (file.FileExists()) {
+			wxDateTime date = file.GetModificationTime();
+			name = wxString::Format(_("(%s)"),date.Format());
+		}
+		mMenSaveState->SetLabel(ID_Main_File_SaveState + i, wxString::Format(_("Save State %d %s\tCtrl+Shift+F%d"), i + 1, name, i + 1));
+		mMenLoadState->SetLabel(ID_Main_File_LoadState + i, wxString::Format(_("Load State %d %s\tCtrl+F%d"), i + 1, name, i + 1));
+	}
+}
+
+void MainFrame::UpdateRecentFiles()
+{
+	const int maxLength = 35;
+	for (int i = 0; i < 5; i++) {
+		wxString name("---");
+		if (!mOptions.recentFiles[i].empty()) {
+			wxFileName fileName(mOptions.recentFiles[i]);
+			wxString path = fileName.GetFullPath();
+			if (path.length() > maxLength) {
+				wxString base = fileName.GetVolume() + wxFileName::GetVolumeSeparator() + wxFileName::GetPathSeparator() + 
+					".." + wxFileName::GetPathSeparator();
+				const wxArrayString &dirs = fileName.GetDirs();
+				unsigned numDirs = 0;
+				int len = base.length() + fileName.GetFullName().length();
+				while(len < maxLength && numDirs < dirs.size()) {
+					len += 1 + dirs[dirs.size() - 1 - numDirs].length();
+					numDirs++;
+				}
+				name = base;
+				for (unsigned j = dirs.size() - numDirs + 1; j < dirs.size(); j++) {
+					name += dirs[j] + wxFileName::GetPathSeparator();
+				}
+				name += fileName.GetFullName();
+			}
+		}
+		mMenFile->SetLabel(ID_Main_File_RecentFile + i, wxString::Format(_("%d. %s"), i+1, name));
 	}
 }
 
@@ -299,7 +433,7 @@ void MainFrame::OnOpen(wxCommandEvent &evt)
 	// Check if a file was choosen
 	if(openFileDialog.ShowModal() == wxID_CANCEL)
 	{
-		Log(Debug, "Loading cancelled");
+		Log(Debug, "Loading canceled");
 		return;
 	}
 	CloseEmulator();
@@ -311,11 +445,65 @@ void MainFrame::OnOpen(wxCommandEvent &evt)
 	LoadEmulator(mFilePath);
 }
 
+void MainFrame::OnOpenRecentFile(wxCommandEvent &evt)
+{
+	int idx = evt.GetId() - ID_Main_File_RecentFile;
+	if (idx < 0 || idx >= 5) return;
+	mFilePath = mOptions.recentFiles[idx];
+	
+	LoadEmulator(mFilePath);
+}
+
 void MainFrame::OnRun(wxCommandEvent &evt)
 {
 	if (mEmulator.emu != NULL)
 	{
 		mEmulator.emu->Run(mEmulator.handle, true);
+		Update();
+	}
+}
+
+void MainFrame::OnSaveState(wxCommandEvent &evt)
+{
+	if (evt.GetEventType() == wxEVT_MENU) {
+		int state = evt.GetId() - ID_Main_File_SaveState;
+		if (state < 0 || state >= 10) {
+			Log(Warn, "Invalid save state event received");
+			return;
+		}
+
+		// Save the state
+		SaveData_t saveData;
+		saveData.romData = saveData.ramData = saveData.miscData = NULL;
+		saveData.romDataLen = saveData.ramDataLen = saveData.miscDataLen = 0;
+		mEmulator.emu->SaveState(mEmulator.handle, &saveData);
+
+		// Write it to an file
+		wxString fileName = mSaveStateFilePath;
+		fileName.Append(std::to_string(state));
+		SaveFile::WriteStateFile(fileName, saveData);
+	}
+	UpdateSaveStateLabels();
+}
+
+void MainFrame::OnLoadState(wxCommandEvent &evt)
+{
+	if (evt.GetEventType() == wxEVT_MENU) {
+		int state = evt.GetId() - ID_Main_File_LoadState;
+		if (state < 0 || state >= 10) {
+			Log(Warn, "Invalid save state event received");
+			return;
+		}
+
+		// Save the state
+		SaveData_t saveData;
+
+		// Read state from an file
+		wxString fileName = mSaveStateFilePath;
+		fileName.Append(std::to_string(state));
+		SaveFile::ReadStateFile(fileName, saveData);
+
+		mEmulator.emu->LoadState(mEmulator.handle, &saveData);
 		Update();
 	}
 }

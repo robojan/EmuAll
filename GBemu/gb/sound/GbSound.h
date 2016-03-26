@@ -6,6 +6,7 @@
 #include "GbChannel12.h"
 #include "GbChannel3.h"
 #include "GbChannel4.h"
+#include <vector>
 
 class GbSound : public GbMemEvent
 {
@@ -23,6 +24,9 @@ public:
 	void BeginTick();
 	void EnableAudio(bool enable);
 	uint_fast8_t GetEnabledFlags();
+
+	bool LoadState(const SaveData_t *data);
+	bool SaveState(std::vector<uint8_t> &data);
 private:
 	Gameboy			*m_gb;
 

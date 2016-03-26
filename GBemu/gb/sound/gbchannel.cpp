@@ -195,12 +195,70 @@ void GbChannel::LoadBuffer(uint32_t buffer)
 
 void GbChannel::CleanSoundOutput()
 {
-	if (_eventQueue.size() > 100000) {
+	if (_eventQueue.size() > 5000000) {
 		Log(Warn, "Sound event queue overflow");
 	}
 
-	while (_eventQueue.size() > 100000)
+	while (_eventQueue.size() > 5000000)
 		_eventQueue.pop();
+}
+
+// 0 - tickCounter
+// 8 - cpuWritten
+// 16 - lastValue
+// 18 - lastLVol
+// 19 - lastRVol
+// 20 - playingCounter
+// 28 - currentValue
+// 30 - leftVolume
+// 31 - rightVolume
+// 32 - audioEnabled
+// 33
+
+void GbChannel::SaveState(std::vector<uint8_t> &data)
+{
+	const EndianFuncs *conv = getEndianFuncs(0);
+	int dataLen = 33;
+	data.resize(data.size() + dataLen);
+	uint8_t *ptr = data.data() + data.size() - dataLen;
+	*(uint64_t *)(ptr + 0) = conv->convu64(_tickCounter);
+	*(uint64_t *)(ptr + 8) = conv->convu64(_cpuWritten);
+	*(uint16_t *)(ptr + 16) = conv->convu16(_lastValue);
+	ptr[18] = _lastLVol;
+	ptr[19] = _lastRVol;
+	*(uint64_t *)(ptr + 20) = conv->convu64(_playingCounter);
+	*(uint16_t *)(ptr + 28) = conv->convu16(_currentValue);
+	ptr[30] = _leftVolume;
+	ptr[31] = _rightVolume;
+	ptr[32] = _audioEnabled ? 1 : 0;
+}
+
+uint8_t *GbChannel::LoadState(uint8_t *data, int &len)
+{
+	const EndianFuncs *conv = getEndianFuncs(0);
+	// Clear eventqueue
+	while (!_eventQueue.empty())
+		_eventQueue.pop();
+
+	if (len < 33) {
+		Log(Error, "Save state corrupt");
+		return data;
+	}
+
+	_tickCounter = conv->convu64(*(uint64_t *)(data + 0));
+	_cpuWritten = conv->convu64(*(uint64_t *)(data + 8));
+	_lastValue = conv->convu16(*(uint16_t *)(data + 16));
+	_lastLVol = data[18];
+	_lastRVol = data[19];
+	_playingCounter = conv->convu64(*(uint64_t *)(data + 20));
+	_currentValue = conv->convu16(*(uint16_t *)(data + 28));
+	_leftVolume = data[30];
+	_rightVolume = data[31];
+	//_audioEnabled = data[32] != 0;
+
+	len -= 33;
+
+	return data + 33;
 }
 
 void GbChannel::SetAmplitude(uint_fast8_t left, uint_fast8_t right)

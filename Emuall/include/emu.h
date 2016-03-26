@@ -21,14 +21,26 @@ typedef struct
 	void (*Log)(enum loglevel, char *, ...);
 } callBackfunctions_t;
 
+typedef struct
+{
+	void *romData;
+	size_t romDataLen;
+	void *ramData;
+	size_t ramDataLen;
+	void *miscData;
+	size_t miscDataLen;
+} SaveData_t;
+
 #ifdef EMUDLL
 
 // General functions
 EMUEXPORT EMUHANDLE __stdcall CreateEmulator();
 EMUEXPORT void __stdcall ReleaseEmulator(EMUHANDLE handle);
 EMUEXPORT int32_t __stdcall Init(EMUHANDLE handle, callBackfunctions_t funcs);
-EMUEXPORT int32_t __stdcall Load(EMUHANDLE handle, const uint8_t *filename);
-EMUEXPORT int32_t  __stdcall Save(EMUHANDLE handle, const uint8_t *filename);
+EMUEXPORT int32_t __stdcall Load(EMUHANDLE handle, const SaveData_t *data);
+EMUEXPORT int32_t  __stdcall Save(EMUHANDLE handle, SaveData_t *data);
+EMUEXPORT int32_t __stdcall SaveState(EMUHANDLE handle, SaveData_t *data);
+EMUEXPORT int32_t __stdcall LoadState(EMUHANDLE handle, const SaveData_t *data);
 EMUEXPORT uint32_t __stdcall InitGL(EMUHANDLE handle, int32_t id);
 EMUEXPORT void __stdcall DestroyGL(EMUHANDLE handle, int32_t id);
 

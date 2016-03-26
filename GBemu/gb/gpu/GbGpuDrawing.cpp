@@ -10,36 +10,46 @@
 bool GbGpu::InitGL(int user)
 {
 	// Data for quad which will be displayed on the screen
-	static const GLfloat square [] = {
+	static const GLfloat square[] = {
+		-1.0f, 1.0f, 0.0f,
+		1.0f, 1.0f, 0.0f,
 		-1.0f, -1.0f, 0.0f,
 		1.0f, -1.0f, 0.0f,
-		1.0f, 1.0f, 0.0f,
-		-1.0f, 1.0f, 0.0f
 	};
-	static const GLfloat screenUVData [] = {
+	static const GLfloat screenUVData[] = {
+		0.0f, 0.0f,
+		SCREEN_WIDTH / 256.0f, 0.0f,
 		0.0f, SCREEN_HEIGHT / 256.0f,
 		SCREEN_WIDTH / 256.0f, SCREEN_HEIGHT / 256.0f,
-		SCREEN_WIDTH / 256.0f, 0.0f,
-		0.0f, 0.0f
 	};
 	static const GLfloat tilesUVData[] = {
+		0.0f, 0.0f,
+		289 / 512.0f, 0.0f,
 		0.0f, 217 / 512.0f,
 		289 / 512.0f, 217 / 512.0f,
-		289 / 512.0f, 0.0f,
-		0.0f, 0.0f
 	};
 	static const GLfloat oamUVData [] = {
+		0.0f, 0.0f,
+		73 / 128.0f, 0.0f,
 		0.0f, 86 / 128.0f,
 		73 / 128.0f, 86 / 128.0f,
-		73 / 128.0f, 0.0f,
-		0.0f, 0.0f
 	};
 	static const GLfloat totalUVData [] = {
+		0.0f, 0.0f,
+		1.0f, 0.0f,
 		0.0f, 1.0f,
 		1.0f, 1.0f,
-		1.0f, 0.0f,
-		0.0f, 0.0f
 	};
+
+	// Initialize GLEW
+	GLenum result = glewInit();
+	if (result != GLEW_OK) {
+		Log(Error, "GLEW could not be initialized: %s", glewGetErrorString(result));
+	}
+
+	Log(Message, "OpenGL information: \n\tVersion: %s\n\tVendor: %s\n\tRenderer: %s",
+		glGetString(GL_VERSION), glGetString(GL_VENDOR), glGetString(GL_RENDERER));
+
 	switch (user)
 	{
 		case 0: // main screen
@@ -47,11 +57,12 @@ bool GbGpu::InitGL(int user)
 			glEnable(GL_TEXTURE_2D);
 			glGenTextures(1, &m_texture);
 			glBindTexture(GL_TEXTURE_2D, m_texture);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 256, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
+			
 			glGenVertexArrays(1, &m_vao);
 			glBindVertexArray(m_vao);
 
@@ -74,7 +85,7 @@ bool GbGpu::InitGL(int user)
 		case 1: // Background screen
 			glGenTextures(1, &mBGTexture);
 			glBindTexture(GL_TEXTURE_2D, mBGTexture);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 256, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glGenVertexArrays(1, &mBGVAO);
@@ -90,7 +101,7 @@ bool GbGpu::InitGL(int user)
 		case 2: // Tiles screen
 			glGenTextures(1, &mTiTexture);
 			glBindTexture(GL_TEXTURE_2D, mTiTexture);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 512, 512, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 512, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glGenVertexArrays(1, &mTiVAO);
@@ -107,7 +118,7 @@ bool GbGpu::InitGL(int user)
 		case 3: // OAM screen
 			glGenTextures(1, &mOAMTexture);
 			glBindTexture(GL_TEXTURE_2D, mOAMTexture);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 128, 128, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 128, 128, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glGenVertexArrays(1, &mOAMVAO);
@@ -196,7 +207,7 @@ void GbGpu::drawGL(int user)
 		glBindTexture(GL_TEXTURE_2D, m_texture);
 
 		// Draw the screen
-		glDrawArrays(GL_QUADS, 0, 4);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 		// Unload the buffers
 		glDisableVertexAttribArray(0);
@@ -280,7 +291,7 @@ void GbGpu::DrawDebugBackground()
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0);
 
 	// Draw the screen
-	glDrawArrays(GL_QUADS, 0, 4);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 	// Unload the buffers
 	glDisableVertexAttribArray(0);
@@ -336,7 +347,7 @@ void GbGpu::DrawDebugTiles()
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0);
 
 	// Draw the screen
-	glDrawArrays(GL_QUADS, 0, 4);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 	// Unload the buffers
 	glDisableVertexAttribArray(0);
@@ -419,7 +430,7 @@ void GbGpu::DrawDebugOAM()
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0);
 
 	// Draw the screen
-	glDrawArrays(GL_QUADS, 0, 4);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 	// Unload the buffers
 	glDisableVertexAttribArray(0);
@@ -485,13 +496,7 @@ void GbGpu::drawing(gbByte ly)
 			m_screen[ly * SCREEN_WIDTH + x - scx].r = col.r;
 			m_screen[ly * SCREEN_WIDTH + x - scx].g = col.g;
 			m_screen[ly * SCREEN_WIDTH + x - scx].b = col.b;
-			if (be)
-			{
-				m_screen[ly * SCREEN_WIDTH + x - scx].p = PRIO_BG | pixel;
-			}
-			else {
-				m_screen[ly * SCREEN_WIDTH + x - scx].p = 0x00;
-			}
+			m_screen[ly * SCREEN_WIDTH + x - scx].p = pixel | (tile.attributes & PRIO_BG);
 		}
 		else {
 			if (be)
@@ -500,7 +505,7 @@ void GbGpu::drawing(gbByte ly)
 				m_screen[ly * SCREEN_WIDTH + x - scx].r = col.r;
 				m_screen[ly * SCREEN_WIDTH + x - scx].g = col.g;
 				m_screen[ly * SCREEN_WIDTH + x - scx].b = col.b;
-				m_screen[ly * SCREEN_WIDTH + x - scx].p = PRIO_BG | pixel;
+				m_screen[ly * SCREEN_WIDTH + x - scx].p = pixel | (tile.attributes & PRIO_BG);
 			}
 			else {
 				m_screen[ly * SCREEN_WIDTH + x - scx].r = 0xFF;
@@ -582,7 +587,7 @@ void GbGpu::drawing(gbByte ly)
 			{
 				gbByte screenx = (sprite.x - 8 + x);
 				if (screenx < 0 || screenx >= SCREEN_WIDTH ||
-					!(m_screen[ly * SCREEN_WIDTH + screenx].p & PRIO_BG))
+					((m_screen[ly * SCREEN_WIDTH + screenx].p & PRIO_BG) != 0))
 				{
 					// when the sprite is offscreen, dont draw it
 					// or the background has priority

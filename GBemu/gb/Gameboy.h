@@ -12,6 +12,7 @@ class GbDis;
 #include <string>
 #include <map>
 #include <inttypes.h>
+#include <emu.h>
 
 typedef uint_fast8_t	gbByte;
 typedef gbByte*			bank_t;
@@ -43,14 +44,16 @@ public:
 	Gameboy();
 	~Gameboy();
 	bool Init();
-	bool Load(const std::string &fileName);
 	void Step(void);
 	void Run(bool run = true);
 	inline bool IsRunning(void) const { return _running; }
 	bool Tick(uint32_t time);
 	void Reshape(int width, int height, bool keepAspect);
 	bool Input(int key, int pressed);
-	bool Save(const std::string &fileName);
+	bool Load(const SaveData_t *data);
+	bool Save(SaveData_t *fileName);
+	bool LoadState(const SaveData_t *data);
+	bool SaveState(SaveData_t *data);
 	bool Exit(void);
 	GbCpu *GetCpu() const;
 	GbMem *GetMem() const;

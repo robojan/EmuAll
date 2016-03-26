@@ -5,6 +5,7 @@
 #define DEFAULT_BUFFERSIZE 4096
 #define DEFAULT_KEEPASPECT true
 
+
 #include <map>
 #include "../Emulator/Emulator.h"
 
@@ -33,6 +34,11 @@ public:
 	void AddKeyBinding(std::string name, const EmulatorInput_t &keyInfo);
 	void RebindKey(std::string name, int emuKey, int inputKey);
 
+	void SaveRecentFile(std::string file);
+
+	std::string GetConfigFileName() const;
+
+	std::string recentFiles[5];
 	OptionsVid_t videoOptions;
 	OptionsAud_t audioOptions;
 private:

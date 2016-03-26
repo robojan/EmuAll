@@ -1,20 +1,25 @@
 
+#include <gl/glew.h>
+#include <GL/GLU.h>
 #include "GLPane.h"
 #include "../util/memDbg.h"
-#include <GL/GLU.h>
 #include <limits.h>
+#include "../util/log.h"
 
 IMPLEMENT_CLASS(GLPane, wxGLCanvas);
 BEGIN_EVENT_TABLE(GLPane, wxGLCanvas)
 	EVT_PAINT(GLPane::Render)
 END_EVENT_TABLE()
 
-GLPane::GLPane(wxWindow *parent, GLPaneI *callback, int user, wxWindowID id, const wxPoint &pos, const wxSize &size, long style, int *args) :
-wxGLCanvas(parent, id, args, pos, size, style), mUser(user), mClearR(0.0), mClearG(0.0), mClearB(0.0), mClearA(1.0), mInitialized(false)
+GLPane::GLPane(wxWindow *parent, GLPaneI *callback, int user, wxWindowID id, const wxPoint &pos, 
+	const wxSize &size, long style, const wxGLAttributes &attr, const wxGLContextAttrs &ctxAttr) :
+wxGLCanvas(parent, attr, id, pos, size, style), mUser(user), mClearR(0.0), mClearG(0.0), 
+mClearB(0.0), mClearA(1.0), mInitialized(false), mGLAttr(attr), mCtxAttr(ctxAttr)
 {
 	wxASSERT(callback != NULL);
-	mContext = new wxGLContext(this);
+	mContext = new wxGLContext(this, NULL, &mCtxAttr);
 	mCallback = callback;
+
 }
 
 GLPane::~GLPane()

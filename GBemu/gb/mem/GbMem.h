@@ -7,6 +7,7 @@
 #include "../../util/log.h"
 #include <ctime>
 #include "../Gameboy.h"
+#include <vector>
 
 typedef struct {
 	uint8_t	seconds;
@@ -14,7 +15,6 @@ typedef struct {
 	uint8_t	hours;
 	uint32_t day;
 	time_t	systemTime;
-
 } gbTime;
 
 class GbMemEvent
@@ -38,11 +38,11 @@ public:
 	void switchVramBank(unsigned int bank);
 	void switchEramBank(unsigned int bank);
 	void setAccessable(bool vram, bool oam);
-	bool load(rom_t *rom, rom_t *ram);
+	bool load(rom_t *rom, rom_t *ram, rom_t *misc);
 	void registerEvent(address_t address, GbMemEvent *evt);
 	void registerEvent(address_t rangeLow, address_t rangeHigh, GbMemEvent *evt);
 	void MemEvent(address_t address, gbByte val);
-	bool Save(std::ofstream &file);
+	bool Save(SaveData_t *data);
 	uint32_t GetUnbankedAddress(address_t address) const;
 	int GetROMSize() const;
 	int GetRAMSize() const;
@@ -58,6 +58,9 @@ public:
 
 	inline void write(address_t address, gbByte val, bool event = true);
 	inline gbByte read(address_t address) const;
+
+	bool LoadState(const SaveData_t *data);
+	bool SaveState(rom_t *rom, rom_t *ram, std::vector<uint8_t> &data);
 private:
 	// Memory data
 	rom_t *rom;
@@ -77,7 +80,6 @@ private:
 	bool			m_rtc;
 	bool			m_rtcActive;
 	gbByte			m_rtcRegister;
-	gbTime			m_latchedTime;
 	gbByte			m_lastLatch;
 	gbTime			m_timeStamp;
 	
@@ -177,11 +179,9 @@ inline void GbMem::write(address_t address, gbByte val, bool event)
 					{
 						CalculateRTC(&m_timeStamp);
 					}
-					m_latchedTime = m_timeStamp;
 				}
 				m_lastLatch = val;
-			}
-
+			} 
 			break;
 		case MBC4:
 		case MBC4_RAM:
@@ -220,10 +220,6 @@ inline void GbMem::write(address_t address, gbByte val, bool event)
 	}
 	if(m_rtc && address >= 0xA000 && address < 0xC000)
 	{
-		if(m_rtcActive)
-		{
-			CalculateRTC(&m_timeStamp);
-		}
 		switch(m_rtcRegister)
 		{
 		case 0x08:
@@ -292,19 +288,21 @@ inline gbByte GbMem::read(address_t address) const
 		switch(m_rtcRegister)
 		{
 		case 0x08:
-			return m_latchedTime.seconds;
+			return m_timeStamp.seconds;
 			break;
 		case 0x09:
-			return m_latchedTime.minutes;
+			return m_timeStamp.minutes;
 			break;
 		case 0x0A:
-			return m_latchedTime.hours;
+			return m_timeStamp.hours;
 			break;
 		case 0x0B:
-			return (gbByte)(m_latchedTime.day&0xFF);
+			return (gbByte)(m_timeStamp.day&0xFF);
 			break;
 		case 0x0C:
-			return (gbByte)(((m_latchedTime.day&0x100)>>8)| (m_rtcActive?0x00:0x40) | ((m_latchedTime.day&0x200)? 0x80:0x00));
+			return (gbByte)(((m_timeStamp.day&0x100)>>8)| 
+				(m_rtcActive?0x00:0x40) | 
+				((m_timeStamp.day&0x200)? 0x80:0x00));
 			break;
 		}
 	}

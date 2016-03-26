@@ -3,6 +3,7 @@
 
 #include "../mem/GbMem.h"
 #include "../Gameboy.h"
+#include <vector>
 
 class GbInput : public GbMemEvent 
 {
@@ -14,6 +15,9 @@ public:
 	void registerEvents();
 	void Input(int key, bool pressed);
 	void MemEvent(address_t address, gbByte val);
+
+	bool LoadState(const SaveData_t *data);
+	bool SaveState(std::vector<uint8_t> &data);
 private:
 	Gameboy			*m_gb;
 	bool			m_u;

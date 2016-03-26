@@ -106,3 +106,56 @@ void GbInput::Input(int key, bool pressed)
 	}
 	update();
 }
+
+static const uint32_t StateINPTid = 0x494e5054;
+
+// 0 - id
+// 4 - size
+// 8 - input
+// 9 - 
+
+bool GbInput::LoadState(const SaveData_t *data)
+{
+	const EndianFuncs *conv = getEndianFuncs(0);
+	uint8_t *ptr = (uint8_t *)data->miscData;
+	int miscLen = data->miscDataLen;
+	// Find cpu segment
+	while (miscLen >= 8) {
+		uint32_t id = conv->convu32(*(uint32_t *)(ptr + 0));
+		uint32_t len = conv->convu32(*(uint32_t *)(ptr + 4));
+		if (id == StateINPTid && len >= 9) {
+			m_u = (ptr[8] & 0x01) != 0;
+			m_d = (ptr[8] & 0x02) != 0;
+			m_l = (ptr[8] & 0x04) != 0;
+			m_r = (ptr[8] & 0x08) != 0;
+			m_a = (ptr[8] & 0x10) != 0;
+			m_b = (ptr[8] & 0x20) != 0;
+			m_se = (ptr[8] & 0x40) != 0;
+			m_st = (ptr[8] & 0x80) != 0;
+			return true;
+		}
+		ptr += len;
+		miscLen -= len;
+	}
+	return false;
+}
+
+bool GbInput::SaveState(std::vector<uint8_t> &data)
+{
+	const EndianFuncs *conv = getEndianFuncs(0);
+	int dataLen = 9;
+	data.resize(data.size() + dataLen);
+	uint8_t *ptr = data.data() + data.size() - dataLen;
+	*(uint32_t *)(ptr + 0) = conv->convu32(StateINPTid);
+	*(uint32_t *)(ptr + 4) = conv->convu32(dataLen);
+	ptr[8] =
+		(m_u ? 0x01 : 0x00) |
+		(m_d ? 0x02 : 0x00) |
+		(m_l ? 0x04 : 0x00) |
+		(m_r ? 0x08 : 0x00) |
+		(m_a ? 0x10 : 0x00) |
+		(m_b ? 0x20 : 0x00) |
+		(m_se ? 0x40 : 0x00) |
+		(m_st ? 0x80 : 0x00);
+	return true;
+}
