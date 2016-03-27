@@ -144,7 +144,7 @@ void GbChannel3::SaveState(std::vector<uint8_t> &data)
 {
 	GbChannel::SaveState(data);
 
-	const EndianFuncs *conv = getEndianFuncs(0);
+	Endian conv(false);
 	int dataLen = 31;
 	data.resize(data.size() + dataLen);
 	uint8_t *ptr = data.data() + data.size() - dataLen;
@@ -156,20 +156,20 @@ void GbChannel3::SaveState(std::vector<uint8_t> &data)
 	for (int i = 0; i < 16; i++) {
 		ptr[2 + i] = _waveBuffer[i];
 	}
-	*(uint16_t *)(ptr + 18) = conv->convu16(_volume);
+	*(uint16_t *)(ptr + 18) = conv.convu16(_volume);
 	ptr[20] = _volumeCtrl;
-	*(uint16_t *)(ptr + 21) = conv->convu16(_periodCounter);
-	*(uint16_t *)(ptr + 23) = conv->convu16(_frequency);
+	*(uint16_t *)(ptr + 21) = conv.convu16(_periodCounter);
+	*(uint16_t *)(ptr + 23) = conv.convu16(_frequency);
 	ptr[25] = _wavCounter;
 	ptr[26] = _lastSample;
-	*(uint16_t *)(ptr + 27) = conv->convu16(_soundLength);
-	*(uint16_t *)(ptr + 29) = conv->convu16(_frameSequencer);
+	*(uint16_t *)(ptr + 27) = conv.convu16(_soundLength);
+	*(uint16_t *)(ptr + 29) = conv.convu16(_frameSequencer);
 }
 
 uint8_t * GbChannel3::LoadState(uint8_t *data, int &len)
 {
 	data = GbChannel::LoadState(data, len);
-	const EndianFuncs *conv = getEndianFuncs(0);
+	Endian conv(false);
 
 
 	if (len < 31) {
@@ -184,14 +184,14 @@ uint8_t * GbChannel3::LoadState(uint8_t *data, int &len)
 	for (int i = 0; i < 16; i++) {
 		_waveBuffer[i] = data[2 + i];
 	}
-	_volume = conv->convu16(*(uint16_t *)(data + 18));
+	_volume = conv.convu16(*(uint16_t *)(data + 18));
 	_volumeCtrl = data[20];
-	_periodCounter = conv->convu16(*(uint16_t *)(data + 21));
-	_frequency = conv->convu16(*(uint16_t *)(data + 23));
+	_periodCounter = conv.convu16(*(uint16_t *)(data + 21));
+	_frequency = conv.convu16(*(uint16_t *)(data + 23));
 	_wavCounter = data[25];
 	_lastSample = data[26];
-	_soundLength = conv->convu16(*(uint16_t *)(data + 27));
-	_frameSequencer = conv->convu16(*(uint16_t *)(data + 29));
+	_soundLength = conv.convu16(*(uint16_t *)(data + 27));
+	_frameSequencer = conv.convu16(*(uint16_t *)(data + 29));
 	len -= 31;
 	return data + 31;
 }

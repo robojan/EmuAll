@@ -2,7 +2,7 @@
 #define _GBMEM_H
 
 #include "../../types/tree.h"
-#include "../../util/Endian.h"
+#include <emuall/util/endian.h>
 #include "../defines.h"
 #include "../../util/log.h"
 #include <ctime>

@@ -183,13 +183,11 @@
     <ClCompile Include="gui\memDebugger.cpp" />
     <ClCompile Include="keyhandler.cpp" />
     <ClCompile Include="util\dir.cpp" />
-    <ClCompile Include="util\Endian.c" />
     <ClCompile Include="util\Log.cpp" />
     <ClCompile Include="util\Options.cpp" />
     <ClCompile Include="util\xml\pugixml.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="emuAll.h" />
     <ClInclude Include="audio.h" />
     <ClInclude Include="Emulator\Emulator.h" />
     <ClInclude Include="Emulator\SaveFile.h" />
@@ -218,7 +216,6 @@
     <ClInclude Include="include\emu.h" />
     <ClInclude Include="keyhandler.h" />
     <ClInclude Include="util\dir.h" />
-    <ClInclude Include="util\Endian.h" />
     <ClInclude Include="util\log.h" />
     <ClInclude Include="util\logWx.h" />
     <ClInclude Include="util\memDbg.h" />

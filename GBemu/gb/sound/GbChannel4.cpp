@@ -147,7 +147,7 @@ void GbChannel4::SaveState(std::vector<uint8_t> &data)
 {
 	GbChannel::SaveState(data);
 
-	const EndianFuncs *conv = getEndianFuncs(0);
+	Endian conv(false);
 	int dataLen = 15;
 	data.resize(data.size() + dataLen);
 	uint8_t *ptr = data.data() + data.size() - dataLen;
@@ -155,21 +155,21 @@ void GbChannel4::SaveState(std::vector<uint8_t> &data)
 		(_enabled ? 0x02 : 0x00) |
 		(_width7 ? 0x04 : 0x00) |
 		(_lengthEnabled ? 0x08 : 0x00);
-	*(uint16_t *)(ptr + 1) = conv->convu16(_volume);
+	*(uint16_t *)(ptr + 1) = conv.convu16(_volume);
 	ptr[3] = _volumeCtrl;
 	ptr[4] = _volumeCounter;
-	*(uint16_t *)(ptr + 5) = conv->convu16(_periodCounter);
-	*(uint16_t *)(ptr + 7) = conv->convu16(_soundLength);
+	*(uint16_t *)(ptr + 5) = conv.convu16(_periodCounter);
+	*(uint16_t *)(ptr + 7) = conv.convu16(_soundLength);
 	ptr[9] = _divider;
 	ptr[10] = _shift;
-	*(uint16_t *)(ptr + 11) = conv->convu16(_frameSequencer);
-	*(uint16_t *)(ptr + 13) = conv->convu16(_lfsr);
+	*(uint16_t *)(ptr + 11) = conv.convu16(_frameSequencer);
+	*(uint16_t *)(ptr + 13) = conv.convu16(_lfsr);
 }
 
 uint8_t * GbChannel4::LoadState(uint8_t *data, int &len)
 {
 	data = GbChannel::LoadState(data, len);
-	const EndianFuncs *conv = getEndianFuncs(0);
+	Endian conv(false);
 
 
 	if (len < 15) {
@@ -180,15 +180,15 @@ uint8_t * GbChannel4::LoadState(uint8_t *data, int &len)
 	_enabled = (data[0] & 0x2) != 0;
 	_width7 = (data[0] & 0x4) != 0;
 	_lengthEnabled = (data[0] & 0x8) != 0;
-	_volume = conv->convu16(*(uint16_t *)(data + 1));
+	_volume = conv.convu16(*(uint16_t *)(data + 1));
 	_volumeCtrl = data[3];
 	_volumeCounter = data[4];
-	_periodCounter = conv->convu16(*(uint16_t *)(data + 5));
-	_soundLength = conv->convu16(*(uint16_t *)(data + 7));
+	_periodCounter = conv.convu16(*(uint16_t *)(data + 5));
+	_soundLength = conv.convu16(*(uint16_t *)(data + 7));
 	_divider = data[9];
 	_shift = data[10];
-	_frameSequencer = conv->convu16(*(uint16_t *)(data + 11));
-	_lfsr = conv->convu16(*(uint16_t *)(data + 13));
+	_frameSequencer = conv.convu16(*(uint16_t *)(data + 11));
+	_lfsr = conv.convu16(*(uint16_t *)(data + 13));
 	len -= 15;
 	return data + 15;
 }

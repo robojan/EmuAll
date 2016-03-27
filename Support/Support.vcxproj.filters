@@ -13,10 +13,16 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\Graphics">
+    <Filter Include="Header Files\util">
+      <UniqueIdentifier>{5e05a0f6-9409-4555-8943-3862072dd3d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util">
+      <UniqueIdentifier>{5cc89555-1b4c-4a6f-b4e7-b6de6f1c2bc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\graphics">
       <UniqueIdentifier>{91d6477d-e208-4c56-8a8c-d6003628ed30}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Graphics">
+    <Filter Include="Header Files\graphics">
       <UniqueIdentifier>{b6ee2d76-f831-4ff8-8b54-eca9ceb2298d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -25,7 +31,16 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="graphics\shader.cpp">
-      <Filter>Source Files\Graphics</Filter>
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="util\file.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\wavaudiofile.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\Endian.cpp">
+      <Filter>Source Files\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -33,10 +48,19 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\emuall\graphics\shader.h">
-      <Filter>Header Files\Graphics</Filter>
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\emuall\support.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\emuall\util\file.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\emuall\util\wavaudiofile.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\emuall\util\endian.h">
+      <Filter>Header Files\util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

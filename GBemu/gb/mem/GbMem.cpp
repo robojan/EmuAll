@@ -161,14 +161,14 @@ static const uint32_t StateMEMid = 0x4D454D20;
 
 bool GbMem::LoadState(const SaveData_t *data)
 {
-	const EndianFuncs *conv = getEndianFuncs(0);
+	Endian conv(false);
 	uint8_t *ptr = (uint8_t *)data->miscData;
 	int miscLen = data->miscDataLen;
 	int expectedDataLen = 42 + VRAM_BANKS * VRAM_BANK_SIZE + WRAM_BANKS * WRAM_BANK_SIZE + REGS_BANK_SIZE;
 	// Find cpu segment
 	while (miscLen >= 8) {
-		uint32_t id = conv->convu32(*(uint32_t *)(ptr + 0));
-		uint32_t len = conv->convu32(*(uint32_t *)(ptr + 4));
+		uint32_t id = conv.convu32(*(uint32_t *)(ptr + 0));
+		uint32_t len = conv.convu32(*(uint32_t *)(ptr + 4));
 		if (id == StateMEMid && len >= (uint32_t)expectedDataLen) {
 			break;
 		}
@@ -187,10 +187,10 @@ bool GbMem::LoadState(const SaveData_t *data)
 		memcpy(_vram[i], ptr + 42 + VRAM_BANK_SIZE * i, VRAM_BANK_SIZE);
 	}
 	memcpy(_regs, ptr + 42 + VRAM_BANKS * VRAM_BANK_SIZE + WRAM_BANKS * WRAM_BANK_SIZE, REGS_BANK_SIZE);
-	switchBank(conv->convu32(*(uint32_t *)(ptr + 8)));
-	switchVramBank(conv->convu32(*(uint32_t *)(ptr + 12)));
-	switchWramBank(conv->convu32(*(uint32_t *)(ptr + 16)));
-	switchEramBank(conv->convu32(*(uint32_t *)(ptr + 20)));
+	switchBank(conv.convu32(*(uint32_t *)(ptr + 8)));
+	switchVramBank(conv.convu32(*(uint32_t *)(ptr + 12)));
+	switchWramBank(conv.convu32(*(uint32_t *)(ptr + 16)));
+	switchEramBank(conv.convu32(*(uint32_t *)(ptr + 20)));
 	_rtcActive = (ptr[24] & 0x01) != 0;
 	_rtc = (ptr[24] & 0x02) != 0;
 	_oamAccess = (ptr[24] & 0x04) != 0;
@@ -200,14 +200,14 @@ bool GbMem::LoadState(const SaveData_t *data)
 	_timeStamp.seconds = ptr[27];
 	_timeStamp.minutes = ptr[28];
 	_timeStamp.hours = ptr[29];
-	_timeStamp.day = conv->convu32(*(uint32_t *)(ptr + 30));
-	_timeStamp.systemTime = conv->convu64(*(uint64_t *)(ptr + 34));
+	_timeStamp.day = conv.convu32(*(uint32_t *)(ptr + 30));
+	_timeStamp.systemTime = conv.convu64(*(uint64_t *)(ptr + 34));
 	return true;
 }
 
 bool GbMem::SaveState(rom_t *rom, rom_t *ram, std::vector<uint8_t> &data)
 {
-	const EndianFuncs *conv = getEndianFuncs(0);
+	Endian conv(false);
 	rom->data = NULL;
 	rom->length = 0;
 	ram->length = _eramSize * ERAM_BANK_SIZE;
@@ -219,12 +219,12 @@ bool GbMem::SaveState(rom_t *rom, rom_t *ram, std::vector<uint8_t> &data)
 	data.resize(data.size() + dataLen);
 	uint8_t *ptr = data.data() + data.size() - dataLen;
 
-	*(uint32_t *)(ptr + 0) = conv->convu32(StateMEMid);
-	*(uint32_t *)(ptr + 4) = conv->convu32(dataLen);
-	*(uint32_t *)(ptr + 8) = conv->convu32(_romBank);
-	*(uint32_t *)(ptr + 12) = conv->convu32(_vramBank);
-	*(uint32_t *)(ptr + 16) = conv->convu32(_wramBank);
-	*(uint32_t *)(ptr + 20) = conv->convu32(_eramBank);
+	*(uint32_t *)(ptr + 0) = conv.convu32(StateMEMid);
+	*(uint32_t *)(ptr + 4) = conv.convu32(dataLen);
+	*(uint32_t *)(ptr + 8) = conv.convu32(_romBank);
+	*(uint32_t *)(ptr + 12) = conv.convu32(_vramBank);
+	*(uint32_t *)(ptr + 16) = conv.convu32(_wramBank);
+	*(uint32_t *)(ptr + 20) = conv.convu32(_eramBank);
 	ptr[24] =
 		(_rtcActive ? 0x01 : 0x00) |
 		(_rtc ? 0x02 : 0x00) |
@@ -235,8 +235,8 @@ bool GbMem::SaveState(rom_t *rom, rom_t *ram, std::vector<uint8_t> &data)
 	ptr[27] = _timeStamp.seconds;
 	ptr[28] = _timeStamp.minutes;
 	ptr[29] = _timeStamp.hours;
-	*(uint32_t *)(ptr + 30) = conv->convu32(_timeStamp.day);
-	*(uint64_t *)(ptr + 34) = conv->convu64(_timeStamp.systemTime);
+	*(uint32_t *)(ptr + 30) = conv.convu32(_timeStamp.day);
+	*(uint64_t *)(ptr + 34) = conv.convu64(_timeStamp.systemTime);
 	for (int i = 0; i < VRAM_BANKS; i++) {
 		memcpy(ptr + 42 + i * VRAM_BANK_SIZE, _vram[i], VRAM_BANK_SIZE);
 	}
@@ -450,14 +450,14 @@ bool GbMem::load(rom_t *rom, rom_t *ram, rom_t *misc)
 				// 4 bytes days
 				// 8 bytes timestamp
 				int j = _eramSize * ERAM_BANK_SIZE;
-				const EndianFuncs *conv = getEndianFuncs(0);
+				Endian conv(false);
 				_rtcActive = ram->data[j++] != 0;
 				_timeStamp.seconds = ram->data[j++];
 				_timeStamp.minutes = ram->data[j++];
 				_timeStamp.hours = ram->data[j++];
-				_timeStamp.day = conv->convu32(*(uint32_t *)&ram->data[j]);
+				_timeStamp.day = conv.convu32(*(uint32_t *)&ram->data[j]);
 				j += 4;
-				_timeStamp.systemTime = (time_t)conv->convu64(*(uint64_t *)&ram->data[j]);
+				_timeStamp.systemTime = (time_t)conv.convu64(*(uint64_t *)&ram->data[j]);
 				j += 8;
 			}
 		}
@@ -502,10 +502,10 @@ bool GbMem::Save(SaveData_t *data)
 		// 8 bytes timestamp
 		data->miscDataLen = 16;
 		data->miscData = new uint8_t[data->miscDataLen];
-		const EndianFuncs *conv = getEndianFuncs(0);
+		Endian conv(false);
 		char active = _rtcActive ? 0x01 : 0x00;
-		uint32_t day = conv->convu32(_timeStamp.day);
-		uint64_t systemtime = conv->convu64(_timeStamp.systemTime);
+		uint32_t day = conv.convu32(_timeStamp.day);
+		uint64_t systemtime = conv.convu64(_timeStamp.systemTime);
 		((char *)data->miscData)[0] = active;
 		((char *)data->miscData)[1] = _timeStamp.seconds;
 		((char *)data->miscData)[2] = _timeStamp.minutes;

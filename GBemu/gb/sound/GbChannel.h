@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <queue>
 
-#include "../../util/wavaudiofile.h"
+#include <emuall/util/wavaudiofile.h>
 #include "../../types/EventQueue.h"
 
 // The number of buffers
@@ -58,8 +58,6 @@ private:
 
 	// Misc
 	int _channel;
-	robojan::WavFileOutStream *_audioOut;
-	robojan::WavFileOutStream *_audioCpuOut;
 	uint64_t _cpuWritten;
 	int16_t _lastValue;
 	int8_t _lastLVol;

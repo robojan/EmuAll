@@ -2,7 +2,6 @@
 
 #include "GbChannel12.h"
 #include "../../util/log.h"
-#include "../../util/Endian.h"
 #include "GbSound.h"
 GbChannel12::GbChannel12(Gameboy *master, bool channel2) : 
 	_gb(master), _channel2(channel2), GbChannel(44100, channel2 ? 2 : 1),
@@ -143,20 +142,20 @@ void GbChannel12::SaveState(std::vector<uint8_t> &data)
 {
 	GbChannel::SaveState(data);
 
-	const EndianFuncs *conv = getEndianFuncs(0);
+	Endian conv(false);
 	int dataLen = 18;
 	data.resize(data.size() + dataLen);
 	uint8_t *ptr = data.data() + data.size() - dataLen;
-	*(uint16_t *)(ptr + 0) = conv->convu16(_periodCounter);
-	*(uint16_t *)(ptr + 2) = conv->convu16(_frameSequencer);
+	*(uint16_t *)(ptr + 0) = conv.convu16(_periodCounter);
+	*(uint16_t *)(ptr + 2) = conv.convu16(_frameSequencer);
 	ptr[4] = _dutyCounter;
-	*(uint16_t *)(ptr + 5) = conv->convu16(_shadowFrequency);
+	*(uint16_t *)(ptr + 5) = conv.convu16(_shadowFrequency);
 	ptr[7] = _sweepCounter;
 	ptr[8] = _sweepTimer;
-	*(uint16_t *)(ptr + 9) = conv->convu16(_volume);
+	*(uint16_t *)(ptr + 9) = conv.convu16(_volume);
 	ptr[11] = _volumeCtrl;
 	ptr[12] = _volumeCounter;
-	*(uint16_t *)(ptr + 13) = conv->convu16(_frequency);
+	*(uint16_t *)(ptr + 13) = conv.convu16(_frequency);
 	ptr[15] = _dutyMode;
 	ptr[16] = _soundLength;
 	ptr[17] = (_powered ? 0x01 : 0x00) |
@@ -169,7 +168,7 @@ void GbChannel12::SaveState(std::vector<uint8_t> &data)
 uint8_t * GbChannel12::LoadState(uint8_t *data, int &len)
 {
 	data = GbChannel::LoadState(data, len);
-	const EndianFuncs *conv = getEndianFuncs(0);
+	Endian conv(false);
 
 
 	if (len < 18) {
@@ -177,16 +176,16 @@ uint8_t * GbChannel12::LoadState(uint8_t *data, int &len)
 		return data;
 	}
 
-	_periodCounter = conv->convu16(*(uint16_t *)(data + 0));
-	_frameSequencer = conv->convu16(*(uint16_t *)(data + 2));
+	_periodCounter = conv.convu16(*(uint16_t *)(data + 0));
+	_frameSequencer = conv.convu16(*(uint16_t *)(data + 2));
 	_dutyCounter = data[4];
-	_shadowFrequency = conv->convu16(*(uint16_t *)(data + 5));
+	_shadowFrequency = conv.convu16(*(uint16_t *)(data + 5));
 	_sweepCounter = data[7];
 	_sweepTimer = data[8];
-	_volume = conv->convu16(*(uint16_t *)(data + 9));
+	_volume = conv.convu16(*(uint16_t *)(data + 9));
 	_volumeCtrl = data[11];
 	_volumeCounter = data[12];
-	_frequency = conv->convu16(*(uint16_t *)(data + 13));
+	_frequency = conv.convu16(*(uint16_t *)(data + 13));
 	_dutyMode = data[15];
 	_soundLength = data[16];
 	_powered = (data[17] & 0x1) != 0;

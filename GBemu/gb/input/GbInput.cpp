@@ -116,13 +116,13 @@ static const uint32_t StateINPTid = 0x494e5054;
 
 bool GbInput::LoadState(const SaveData_t *data)
 {
-	const EndianFuncs *conv = getEndianFuncs(0);
+	Endian conv(false);
 	uint8_t *ptr = (uint8_t *)data->miscData;
 	int miscLen = data->miscDataLen;
 	// Find cpu segment
 	while (miscLen >= 8) {
-		uint32_t id = conv->convu32(*(uint32_t *)(ptr + 0));
-		uint32_t len = conv->convu32(*(uint32_t *)(ptr + 4));
+		uint32_t id = conv.convu32(*(uint32_t *)(ptr + 0));
+		uint32_t len = conv.convu32(*(uint32_t *)(ptr + 4));
 		if (id == StateINPTid && len >= 9) {
 			_u = (ptr[8] & 0x01) != 0;
 			_d = (ptr[8] & 0x02) != 0;
@@ -142,12 +142,12 @@ bool GbInput::LoadState(const SaveData_t *data)
 
 bool GbInput::SaveState(std::vector<uint8_t> &data)
 {
-	const EndianFuncs *conv = getEndianFuncs(0);
+	Endian conv(false);
 	int dataLen = 9;
 	data.resize(data.size() + dataLen);
 	uint8_t *ptr = data.data() + data.size() - dataLen;
-	*(uint32_t *)(ptr + 0) = conv->convu32(StateINPTid);
-	*(uint32_t *)(ptr + 4) = conv->convu32(dataLen);
+	*(uint32_t *)(ptr + 0) = conv.convu32(StateINPTid);
+	*(uint32_t *)(ptr + 4) = conv.convu32(dataLen);
 	ptr[8] =
 		(_u ? 0x01 : 0x00) |
 		(_d ? 0x02 : 0x00) |

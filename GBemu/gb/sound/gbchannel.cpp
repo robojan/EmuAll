@@ -9,19 +9,9 @@ GbChannel::GbChannel(unsigned int sampleFreq, int channel) :
 	_source(-1), _tickCounter(0), _currentValue(0), _workingBuffer(NULL), 
 	_workingBufferSamples(0), _playingCounter(0), _leftVolume(7), _rightVolume(7),
 	_sampleFreq(sampleFreq), _channel(channel), _audioEnabled(false), 
-	_audioOut(NULL), _audioCpuOut(NULL), _cpuWritten(0), _lastValue(0), _lastLVol(7), _lastRVol(7)
+	_cpuWritten(0), _lastValue(0), _lastLVol(7), _lastRVol(7)
 {
 	ALenum alRet;
-
-	std::string outputname = "ch";
-	outputname.append(std::to_string(channel));
-	outputname.append(".wav");
-
-	_audioOut = new robojan::WavFileOutStream(outputname.c_str(), robojan::WavFileOutStream::PCM16, _sampleFreq, 2);
-	outputname = "ch";
-	outputname.append(std::to_string(channel));
-	outputname.append("_cpu.wav");
-	_audioCpuOut = new robojan::WavFileOutStream(outputname.c_str(), robojan::WavFileOutStream::PCM16, _sampleFreq, 1);
 
 	// Reset openAL errors
 	alGetError();
@@ -58,15 +48,6 @@ GbChannel::GbChannel(unsigned int sampleFreq, int channel) :
 
 GbChannel::~GbChannel()
 {
-
-	if (_audioOut)
-	{
-		delete _audioOut;
-	}
-	if (_audioCpuOut)
-	{
-		delete _audioCpuOut;
-	}
 	if (_workingBuffer)
 	{
 		delete[] _workingBuffer;
@@ -185,8 +166,6 @@ void GbChannel::LoadBuffer(uint32_t buffer)
 		_workingBuffer[i + 1] = (_rightVolume*_currentValue) / 7;
 	}
 	alBufferData(buffer, AL_FORMAT_STEREO16, (ALvoid*) _workingBuffer, _workingBufferSamples*sizeof(int16_t), _sampleFreq);
-	if (_audioOut)
-		_audioOut->WritePCM16(_workingBuffer, _workingBufferSamples/2);
 	if ((alRet = alGetError()) != AL_NO_ERROR)
 	{
 		Log(Error, "Could not load audio buffer for channel %d: %d", _channel, alRet);
@@ -217,17 +196,17 @@ void GbChannel::CleanSoundOutput()
 
 void GbChannel::SaveState(std::vector<uint8_t> &data)
 {
-	const EndianFuncs *conv = getEndianFuncs(0);
+	Endian conv(false);
 	int dataLen = 33;
 	data.resize(data.size() + dataLen);
 	uint8_t *ptr = data.data() + data.size() - dataLen;
-	*(uint64_t *)(ptr + 0) = conv->convu64(_tickCounter);
-	*(uint64_t *)(ptr + 8) = conv->convu64(_cpuWritten);
-	*(uint16_t *)(ptr + 16) = conv->convu16(_lastValue);
+	*(uint64_t *)(ptr + 0) = conv.convu64(_tickCounter);
+	*(uint64_t *)(ptr + 8) = conv.convu64(_cpuWritten);
+	*(uint16_t *)(ptr + 16) = conv.convu16(_lastValue);
 	ptr[18] = _lastLVol;
 	ptr[19] = _lastRVol;
-	*(uint64_t *)(ptr + 20) = conv->convu64(_playingCounter);
-	*(uint16_t *)(ptr + 28) = conv->convu16(_currentValue);
+	*(uint64_t *)(ptr + 20) = conv.convu64(_playingCounter);
+	*(uint16_t *)(ptr + 28) = conv.convu16(_currentValue);
 	ptr[30] = _leftVolume;
 	ptr[31] = _rightVolume;
 	ptr[32] = _audioEnabled ? 1 : 0;
@@ -235,7 +214,7 @@ void GbChannel::SaveState(std::vector<uint8_t> &data)
 
 uint8_t *GbChannel::LoadState(uint8_t *data, int &len)
 {
-	const EndianFuncs *conv = getEndianFuncs(0);
+	Endian conv(false);
 	// Clear eventqueue
 	while (!_eventQueue.empty())
 		_eventQueue.clear();
@@ -245,13 +224,13 @@ uint8_t *GbChannel::LoadState(uint8_t *data, int &len)
 		return data;
 	}
 
-	_tickCounter = conv->convu64(*(uint64_t *)(data + 0));
-	_cpuWritten = conv->convu64(*(uint64_t *)(data + 8));
-	_lastValue = conv->convu16(*(uint16_t *)(data + 16));
+	_tickCounter = conv.convu64(*(uint64_t *)(data + 0));
+	_cpuWritten = conv.convu64(*(uint64_t *)(data + 8));
+	_lastValue = conv.convu16(*(uint16_t *)(data + 16));
 	_lastLVol = data[18];
 	_lastRVol = data[19];
-	_playingCounter = conv->convu64(*(uint64_t *)(data + 20));
-	_currentValue = conv->convu16(*(uint16_t *)(data + 28));
+	_playingCounter = conv.convu64(*(uint64_t *)(data + 20));
+	_currentValue = conv.convu16(*(uint16_t *)(data + 28));
 	_leftVolume = data[30];
 	_rightVolume = data[31];
 	//_audioEnabled = data[32] != 0;
@@ -277,7 +256,6 @@ void GbChannel::SetAmplitude(uint_fast8_t left, uint_fast8_t right)
 	int16_t val = (_lastLVol * _lastValue) / 7;
 	while (_cpuWritten < _tickCounter)
 	{
-		_audioCpuOut->WritePCM16(&val, 1);
 		_cpuWritten += FCPU / _sampleFreq;
 	}
 
@@ -300,7 +278,6 @@ void GbChannel::SetOutputValue(int16_t value)
 	int16_t val = (_lastLVol*_lastValue) / 7;
 	while (_cpuWritten < _tickCounter)
 	{
-		_audioCpuOut->WritePCM16(&val, 1);
 		_cpuWritten += FCPU/_sampleFreq;
 	}
 

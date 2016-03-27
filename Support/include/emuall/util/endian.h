@@ -2,13 +2,14 @@
 #define _ENDIAN_H
 
 #include <stdint.h>
+#include <emuall/common.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-typedef struct
+class EMUEXPORT Endian
 {
+public:
+	Endian(bool bigEndian);
+	static bool isHostLittleEndian();
+	static const Endian *getSingleton(bool bigEndian);
 
 	uint16_t(*convu16)(uint16_t i);
 	int16_t(*convi16)(int16_t i);
@@ -18,13 +19,10 @@ typedef struct
 	int64_t(*convi64)(int64_t i);
 	float(*convf)(float f);
 	double(*convd)(double d);
-} EndianFuncs;
+private:
+	static Endian _BEConv;
+	static Endian _LEConv;
+};
 
-const EndianFuncs *getEndianFuncs(char bigEndian);
-int isHostLittleEndian();
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

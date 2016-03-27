@@ -2,7 +2,7 @@
 
 #include <emu.h>
 #include "util/log.h"
-#include "util/Endian.h"
+#include <emuall/util/Endian.h>
 #include "gb/Gameboy.h"
 #include "gb/defines.h"
 #include <algorithm>

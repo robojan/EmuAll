@@ -3,7 +3,7 @@
 
 #include <wx/filename.h>
 #include "../util/log.h"
-#include "../util/Endian.h"
+#include <emuall/util/Endian.h>
 
 void SaveFile::ReadSaveFile(wxString fileName, SaveData_t &data)
 {
@@ -24,7 +24,7 @@ void SaveFile::ReadSaveFile(wxString fileName, SaveData_t &data)
 		Log(Warn, "Error reading save file");
 		return;
 	}
-	id = getEndianFuncs(0)->convu32(id);
+	id = Endian::getSingleton(false)->convu32(id);
 	if (id == SaveFile::saveID) {
 		ReadSection(file, &data.ramDataLen, &data.ramData);
 		ReadSection(file, &data.miscDataLen, &data.miscData);
@@ -97,7 +97,7 @@ void SaveFile::ReadStateFile(wxString fileName, SaveData_t &data)
 		Log(Error, "Error reading state file");
 		return;
 	}
-	id = getEndianFuncs(0)->convu32(id);
+	id = Endian::getSingleton(false)->convu32(id);
 	if (id != SaveFile::stateID) {
 		Log(Error, "Corrupted state data");
 		return;
@@ -142,7 +142,7 @@ void SaveFile::ReadSection(wxFFile &file, size_t *len, void **data)
 	if (file.Read(&sectionLen, sizeof(uint32_t)) != sizeof(uint32_t)) {
 		return;
 	}
-	sectionLen = getEndianFuncs(0)->convu32(sectionLen);
+	sectionLen = Endian::getSingleton(false)->convu32(sectionLen);
 	if (sectionLen > 0) {
 		*data = new uint8_t[sectionLen];
 		if ((*len = file.Read(*data, sectionLen)) != sectionLen) {

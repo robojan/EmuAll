@@ -1,4 +1,4 @@
-#include "Endian.h"
+#include <emuall/util/endian.h>
 
 uint16_t swapUInt16(uint16_t i)
 {
@@ -185,31 +185,55 @@ double noSwapDouble(double d)
 }
 
 const uint8_t _endiannessTest[2] = { 0x01, 0x00 };
-const EndianFuncs _endianSwap = {
+/*
+const Endian _endianSwap = {
 	swapUInt16, swapInt16,
 	swapUInt32, swapInt32,
 	swapUInt64, swapInt64,
 	swapFloat, swapDouble
 };
-const EndianFuncs _endianNoSwap = {
+const Endian _endianNoSwap = {
 	noSwapUInt16, noSwapInt16,
 	noSwapUInt32, noSwapInt32,
 	noSwapUInt64, noSwapInt64,
 	noSwapFloat, noSwapDouble
-};
+};*/
 
-const EndianFuncs *getEndianFuncs(char bigEndian)
+
+Endian::Endian(bool bigEndian)
 {
-	if ((*(short *) _endiannessTest == 1/*Little Endian*/) && (bigEndian == 0))
+	if ((*(short *)_endiannessTest == 1/*Little Endian*/) && (!bigEndian))
 	{
-		return &_endianNoSwap;
+		convu16 = noSwapUInt16;
+		convu32 = noSwapUInt32;
+		convu64 = noSwapUInt64;
+		convi16 = noSwapInt16;
+		convi32 = noSwapInt32;
+		convi64 = noSwapInt64;
+		convf = noSwapFloat;
+		convd = noSwapDouble;
 	}
 	else {
-		return &_endianSwap;
+		convu16 = swapUInt16;
+		convu32 = swapUInt32;
+		convu64 = swapUInt64;
+		convi16 = swapInt16;
+		convi32 = swapInt32;
+		convi64 = swapInt64;
+		convf = swapFloat;
+		convd = swapDouble;
 	}
 }
 
-int isHostLittleEndian()
+bool Endian::isHostLittleEndian()
 {
-	return (*(short *) _endiannessTest == 1/*Little Endian*/);
+	return (*(short *)_endiannessTest == 1/*Little Endian*/);
 }
+
+const Endian * Endian::getSingleton(bool bigEndian)
+{
+	return bigEndian ? &_BEConv : &_LEConv;
+}
+
+Endian Endian::_BEConv(true);
+Endian Endian::_LEConv(false);
