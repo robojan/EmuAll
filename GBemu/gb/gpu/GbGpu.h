@@ -10,6 +10,7 @@
 #include "../../util/log.h"
 #include <stdint.h>
 #include <vector>
+#include <emuall/graphics/shader.h>
 
 typedef union
 {
@@ -140,7 +141,7 @@ private:
 	unsigned int _surfaceVBO;
 	unsigned int _surfaceUVBO;
 	unsigned int _vao;
-	unsigned int _shaderProgram;
+	Shader		_shader;
 	gbColor		*_screen;
 	gbColor		*_screen_buffer1;
 	gbColor		*_screen_buffer2;
@@ -152,7 +153,7 @@ private:
 	unsigned int _BGVBO;
 	unsigned int _BGUVBO;
 	unsigned int _BGVAO;
-	unsigned int _BGShaderProgram;
+	Shader		_BGShader;
 
 	// Tiles
 	TilesDebuggerData _TiDebug;
@@ -160,7 +161,7 @@ private:
 	unsigned int _TiVBO;
 	unsigned int _TiUVBO;
 	unsigned int _TiVAO;
-	unsigned int _TiShaderProgram;
+	Shader		_TiShader;
 
 	// OAM
 	OAMDebuggerData _OAMDebug;
@@ -168,7 +169,7 @@ private:
 	unsigned int _OAMVBO;
 	unsigned int _OAMUVBO;
 	unsigned int _OAMVAO;
-	unsigned int _OAMShaderProgram;
+	Shader		_OAMShader;
 
 
 };

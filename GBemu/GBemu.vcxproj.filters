@@ -78,9 +78,6 @@
     <ClCompile Include="util\file.cpp">
       <Filter>Source Files\util</Filter>
     </ClCompile>
-    <ClCompile Include="util\shaders.cpp">
-      <Filter>Source Files\util</Filter>
-    </ClCompile>
     <ClCompile Include="util\wavaudiofile.cpp">
       <Filter>Source Files\util</Filter>
     </ClCompile>
@@ -186,9 +183,6 @@
       <Filter>Header Files\util</Filter>
     </ClInclude>
     <ClInclude Include="util\memDbg.h">
-      <Filter>Header Files\util</Filter>
-    </ClInclude>
-    <ClInclude Include="util\shaders.h">
       <Filter>Header Files\util</Filter>
     </ClInclude>
     <ClInclude Include="util\wavaudiofile.h">

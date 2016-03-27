@@ -3,6 +3,7 @@
 
 #include <emuall/support.h>
 #include <GL/glew.h>
+#include <assert.h>
 
 BOOL WINAPI DLLMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
 	switch (fdwReason) {
@@ -19,5 +20,5 @@ BOOL WINAPI DLLMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
 }
 
 void emuallSupportInit() {
-	glewInit();
+	assert(glewInit() == GLEW_OK);
 }

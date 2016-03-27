@@ -9,6 +9,7 @@
 #include <wx/filename.h>
 
 #include "../resources/icon.xpm"
+#include <emuall/support.h>
 
 BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_MENU(ID_Main_File_quit, MainFrame::OnQuit)
@@ -71,6 +72,9 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
 
 	// Set the current context
 	_display->SetCurrentContext();
+
+	// Initialize support library
+	emuallSupportInit();
 
 	// load plugins
 	_emulators = new EmulatorList("plugins");

@@ -231,7 +231,6 @@
     <ClCompile Include="types\tree.cpp" />
     <ClCompile Include="util\Endian.c" />
     <ClCompile Include="util\file.cpp" />
-    <ClCompile Include="util\shaders.cpp" />
     <ClCompile Include="util\wavaudiofile.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -258,7 +257,6 @@
     <ClInclude Include="util\file.h" />
     <ClInclude Include="util\log.h" />
     <ClInclude Include="util\memDbg.h" />
-    <ClInclude Include="util\shaders.h" />
     <ClInclude Include="util\wavaudiofile.h" />
   </ItemGroup>
   <ItemGroup>
@@ -296,6 +294,11 @@
     <Xml Include="resources\gbemu.xml">
       <SubType>Designer</SubType>
     </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Support\Support.vcxproj">
+      <Project>{999c80be-1f93-4f09-ac30-3144524018b2}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

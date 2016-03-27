@@ -10,7 +10,8 @@ public:
 	enum Type {
 		Vertex,
 		Fragment,
-		Tesselation,
+		TesselationCtrl,
+		TesselationEval,
 		Geometry,
 		Compute
 	};
@@ -18,7 +19,7 @@ public:
 	Shader();
 	~Shader();
 	
-	bool AddShader(Type type, const char *src, size_t len);
+	bool AddShader(Type type, const char *src, int len);
 	bool AddShader(Type type, const std::string &path);
 	bool Link();
 	void Clean();
@@ -28,7 +29,7 @@ public:
 	void End() const;
 	bool IsLinked() const;
 protected:
-	bool Compile(unsigned int shader, const char *source, size_t len);
+	bool Compile(unsigned int shader, const char *source, int len);
 
 private:
 	std::string *_log;
