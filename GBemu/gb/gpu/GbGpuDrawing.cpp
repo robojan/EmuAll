@@ -41,12 +41,6 @@ bool GbGpu::InitGL(int user)
 		1.0f, 1.0f,
 	};
 
-	// Initialize GLEW
-	GLenum result = glewInit();
-	if (result != GLEW_OK) {
-		Log(Error, "GLEW could not be initialized: %s", glewGetErrorString(result));
-	}
-
 	Log(Message, "OpenGL information: \n\tVersion: %s\n\tVendor: %s\n\tRenderer: %s",
 		glGetString(GL_VERSION), glGetString(GL_VENDOR), glGetString(GL_RENDERER));
 

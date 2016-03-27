@@ -46,6 +46,11 @@ void GLPane::SetClearColour(float r, float g, float b, float a)
 	_clearColourChanged=true;
 }
 
+void GLPane::SetCurrentContext()
+{
+	SetCurrent(*_context);
+}
+
 void GLPane::DestroyGL()
 {
 	if (IsShownOnScreen())

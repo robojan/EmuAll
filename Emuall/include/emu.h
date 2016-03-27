@@ -7,10 +7,13 @@
 extern "C"
 {
 #endif
+
+#ifndef EMUEXPORT
 #ifdef EMUDLL
 #	define EMUEXPORT __declspec(dllexport) 
 #else
 #	define EMUEXPORT __declspec(dllimport)
+#endif
 #endif
 
 #define INTERFACEVERSION 100
@@ -32,6 +35,8 @@ typedef struct
 } SaveData_t;
 
 #ifdef EMUDLL
+
+EMUEXPORT void __stdcall InitPlugin();
 
 // General functions
 EMUEXPORT EMUHANDLE __stdcall CreateEmulator();

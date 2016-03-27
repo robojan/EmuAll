@@ -68,7 +68,10 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
 
 	// create Options frames
 	_inputOptionsFrame = new InputOptionsFrame(this);
-	
+
+	// Set the current context
+	_display->SetCurrentContext();
+
 	// load plugins
 	_emulators = new EmulatorList("plugins");
 	std::list<EmulatorInterface *>::iterator it;
@@ -108,7 +111,6 @@ void MainFrame::CreateLayout()
 
 	// Create the opengl screen
 	wxGLAttributes glAttr;
-	glAttr.Reset();
 	glAttr.PlatformDefaults();
 	glAttr.DoubleBuffer();
 	glAttr.RGBA();
@@ -116,10 +118,9 @@ void MainFrame::CreateLayout()
 	glAttr.Stencil(8);
 	glAttr.EndList();
 	wxGLContextAttrs ctxAttr;
-	ctxAttr.Reset();
 	ctxAttr.CoreProfile();
 	//ctxAttr.OGLVersion(3, 2);
-	ctxAttr.ForwardCompatible();
+	//ctxAttr.ForwardCompatible();
 	ctxAttr.EndList();
 	_display = new GLPane(this, this, 0, ID_Main_display, wxDefaultPosition,
 		wxDefaultSize, wxFULL_REPAINT_ON_RESIZE, glAttr, ctxAttr);

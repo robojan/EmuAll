@@ -13,7 +13,7 @@
 EmulatorInterface::EmulatorInterface(const std::string &dllName) :
 	_hDLL(NULL), _valid(false), _getInterfaceVersion(NULL), _createEmulator(NULL), _releaseEmulator(NULL),
 	_init(NULL), _load(NULL), _getDescription(NULL), _isCompatible(NULL), _initGL(NULL), _destroyGL(NULL),
-	_run(NULL), _isRunning(NULL), _tick(NULL), _input(NULL), 
+	_run(NULL), _isRunning(NULL), _tick(NULL), _input(NULL), _initPlugin(NULL),
 	_draw(NULL), _reshape(NULL), _save(NULL), _step(NULL), _saveState(NULL), _loadState(NULL),
 	_disassemble(NULL), _addBreakpoint(NULL), _removeBreakpoint(NULL), _isBreakpoint(NULL),
 	_getMemoryData(NULL), _getValI(NULL), _getValU(NULL), _getString(NULL)
@@ -26,6 +26,10 @@ EmulatorInterface::EmulatorInterface(const std::string &dllName) :
 	}
 	_getInterfaceVersion = (int32_t(__stdcall*)())GetStdcallFunc(_hDLL, "GetInterfaceVersion");
 	_getDescription = (const uint8_t *(__stdcall*)(uint32_t *))GetStdcallFunc<uint32_t *>(_hDLL, "GetDescription");
+	_initPlugin = (void(__stdcall*)())GetStdcallFunc(_hDLL, "InitPlugin");
+	if (_initPlugin) {
+		_initPlugin();
+	}
 	if (!_getInterfaceVersion)
 	{
 		// Not valid emulator

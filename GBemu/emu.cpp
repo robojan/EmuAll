@@ -10,10 +10,18 @@
 #include "gb/cpu/GbCpu.h"
 #include "gb/gpu/GbGpu.h"
 #include "resources/resources.h"
-
-
+#include <GL/glew.h>
 
 void(*Log)(enum loglevel, char *, ...);
+
+void __stdcall InitPlugin()
+{
+	// Initialize GLEW
+	GLenum result = glewInit();
+	if (result != GLEW_OK) {
+		Log(Error, "GLEW could not be initialized: %s", glewGetErrorString(result));
+	}
+}
 
 int32_t __stdcall GetValI(EMUHANDLE handle, int32_t id)
 {

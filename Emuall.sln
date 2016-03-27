@@ -6,6 +6,8 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Emuall", "Emuall\Emuall.vcxproj", "{34675B79-540F-4BEC-B031-F058B8188BEA}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E29E3611-350B-4E8B-AE45-87428B26D7DE} = {E29E3611-350B-4E8B-AE45-87428B26D7DE}
+		{A122A494-9AC9-4D75-8CA4-5A6835329F52} = {A122A494-9AC9-4D75-8CA4-5A6835329F52}
+		{999C80BE-1F93-4F09-AC30-3144524018B2} = {999C80BE-1F93-4F09-AC30-3144524018B2}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gamu", "..\gamu\gamu\gamu.vcxproj", "{EB3B157A-60C5-44B8-B47A-D6A0D2120A84}"
@@ -13,9 +15,12 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GBemu", "GBemu\GBemu.vcxproj", "{E29E3611-350B-4E8B-AE45-87428B26D7DE}"
 	ProjectSection(ProjectDependencies) = postProject
 		{A122A494-9AC9-4D75-8CA4-5A6835329F52} = {A122A494-9AC9-4D75-8CA4-5A6835329F52}
+		{999C80BE-1F93-4F09-AC30-3144524018B2} = {999C80BE-1F93-4F09-AC30-3144524018B2}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "resourceCompiler", "resourceCompiler\resourceCompiler.vcxproj", "{A122A494-9AC9-4D75-8CA4-5A6835329F52}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Support", "Support\Support.vcxproj", "{999C80BE-1F93-4F09-AC30-3144524018B2}"
 EndProject
 Global
 	GlobalSection(Performance) = preSolution
@@ -71,6 +76,18 @@ Global
 		{A122A494-9AC9-4D75-8CA4-5A6835329F52}.Release|Win32.ActiveCfg = Release|Win32
 		{A122A494-9AC9-4D75-8CA4-5A6835329F52}.Release|Win32.Build.0 = Release|Win32
 		{A122A494-9AC9-4D75-8CA4-5A6835329F52}.Release|x64.ActiveCfg = Release|Win32
+		{999C80BE-1F93-4F09-AC30-3144524018B2}.Debug inline|Win32.ActiveCfg = Debug|Win32
+		{999C80BE-1F93-4F09-AC30-3144524018B2}.Debug inline|Win32.Build.0 = Debug|Win32
+		{999C80BE-1F93-4F09-AC30-3144524018B2}.Debug inline|x64.ActiveCfg = Debug|x64
+		{999C80BE-1F93-4F09-AC30-3144524018B2}.Debug inline|x64.Build.0 = Debug|x64
+		{999C80BE-1F93-4F09-AC30-3144524018B2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{999C80BE-1F93-4F09-AC30-3144524018B2}.Debug|Win32.Build.0 = Debug|Win32
+		{999C80BE-1F93-4F09-AC30-3144524018B2}.Debug|x64.ActiveCfg = Debug|x64
+		{999C80BE-1F93-4F09-AC30-3144524018B2}.Debug|x64.Build.0 = Debug|x64
+		{999C80BE-1F93-4F09-AC30-3144524018B2}.Release|Win32.ActiveCfg = Release|Win32
+		{999C80BE-1F93-4F09-AC30-3144524018B2}.Release|Win32.Build.0 = Release|Win32
+		{999C80BE-1F93-4F09-AC30-3144524018B2}.Release|x64.ActiveCfg = Release|x64
+		{999C80BE-1F93-4F09-AC30-3144524018B2}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

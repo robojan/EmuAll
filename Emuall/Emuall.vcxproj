@@ -21,6 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{34675B79-540F-4BEC-B031-F058B8188BEA}</ProjectGuid>
     <RootNamespace>Emuall</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -28,19 +29,22 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -48,6 +52,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -69,22 +74,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LibraryPath>$(LIBDIR)\glew-1.13.0\lib\Release\$(PlatformName);$(LIBDIR)\openal-soft-1.17.2-bin\libs\$(PlatformName);$(LIBDIR)\wxWidgets-3.1.0\lib\vc_lib;$(LIBDIR)\SFML-2.3.2\lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(LIBDIR)\SFML-2.3.2\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Support\include;$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(LIBDIR)\SFML-2.3.2\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">
     <LibraryPath>$(LIBDIR)\glew-1.13.0\lib\Release\$(PlatformName);$(LIBDIR)\openal-soft-1.17.2-bin\libs\$(PlatformName);$(LIBDIR)\wxWidgets-3.1.0\lib\vc_lib;$(LIBDIR)\SFML-2.3.2\lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(LIBDIR)\SFML-2.3.2\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Support\include;$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(LIBDIR)\SFML-2.3.2\include;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">
-    <IncludePath>$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(LIBDIR)\SFML-2.3.2\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Support\include;$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(LIBDIR)\SFML-2.3.2\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">
     <LibraryPath>$(LIBDIR)\glew-1.13.0\lib\Release\$(PlatformName);$(LIBDIR)\openal-soft-1.17.2-bin\libs\$(PlatformName);$(LIBDIR)\wxWidgets-3.1.0\lib\vc_lib;$(LIBDIR)\SFML-2.3.2\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(LIBDIR)\SFML-2.3.2\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Support\include;$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(LIBDIR)\SFML-2.3.2\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LibraryPath>$(LIBDIR)\glew-1.13.0\lib\Release\$(PlatformName);$(LIBDIR)\openal-soft-1.17.2-bin\libs\$(PlatformName);$(LIBDIR)\wxWidgets-3.1.0\lib\vc_lib;$(LIBDIR)\SFML-2.3.2\lib;$(LibraryPath)</LibraryPath>
@@ -224,6 +229,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\icon.xpm" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Support\Support.vcxproj">
+      <Project>{999c80be-1f93-4f09-ac30-3144524018b2}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

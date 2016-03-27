@@ -146,6 +146,8 @@ private:
 
 
 	// DLL functions
+	void(__stdcall *_initPlugin)();
+
 	// Initialization functions
 	EMUHANDLE( __stdcall *_createEmulator)();
 	void(__stdcall *_releaseEmulator)(EMUHANDLE);

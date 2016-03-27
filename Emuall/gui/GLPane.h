@@ -24,6 +24,8 @@ public:
 	void SetUserData(int user) { _user = user; }
 	int GetUserData() const { return _user; }
 
+	void SetCurrentContext();
+
 	void DestroyGL();
 
 	void SetClearColour(float r, float g, float b, float a);
