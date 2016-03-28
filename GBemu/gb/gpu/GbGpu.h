@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <vector>
 #include <emuall/graphics/shader.h>
+#include <emuall/graphics/texture.h>
 
 typedef union
 {
@@ -137,7 +138,7 @@ private:
 	gbPallete	_oPaletteData[PALETTE_SIZE];
 
 	// Main screen
-	unsigned int _texture;
+	Texture		_texture;
 	unsigned int _surfaceVBO;
 	unsigned int _surfaceUVBO;
 	unsigned int _vao;
@@ -149,7 +150,7 @@ private:
 	
 	// Background
 	BackgroundDebuggerData _BGDebug;
-	unsigned int _BGTexture;
+	Texture		_BGTexture;
 	unsigned int _BGVBO;
 	unsigned int _BGUVBO;
 	unsigned int _BGVAO;
@@ -157,7 +158,7 @@ private:
 
 	// Tiles
 	TilesDebuggerData _TiDebug;
-	unsigned int _TiTexture;
+	Texture		_TiTexture;
 	unsigned int _TiVBO;
 	unsigned int _TiUVBO;
 	unsigned int _TiVAO;
@@ -165,13 +166,11 @@ private:
 
 	// OAM
 	OAMDebuggerData _OAMDebug;
-	unsigned int _OAMTexture;
+	Texture		_OAMTexture;
 	unsigned int _OAMVBO;
 	unsigned int _OAMUVBO;
 	unsigned int _OAMVAO;
 	Shader		_OAMShader;
-
-
 };
 
 inline void GbGpu::tick(void)

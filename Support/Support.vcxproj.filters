@@ -42,6 +42,9 @@
     <ClCompile Include="util\Endian.cpp">
       <Filter>Source Files\util</Filter>
     </ClCompile>
+    <ClCompile Include="include\emuall\graphics\texture.cpp">
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\emuall\common.h">
@@ -61,6 +64,9 @@
     </ClInclude>
     <ClInclude Include="include\emuall\util\endian.h">
       <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\emuall\graphics\texture.h">
+      <Filter>Header Files\graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

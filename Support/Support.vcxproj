@@ -154,6 +154,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="graphics\shader.cpp" />
+    <ClCompile Include="include\emuall\graphics\texture.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="util\Endian.cpp" />
     <ClCompile Include="util\file.cpp" />
@@ -162,6 +163,7 @@
   <ItemGroup>
     <ClInclude Include="include\emuall\common.h" />
     <ClInclude Include="include\emuall\graphics\shader.h" />
+    <ClInclude Include="include\emuall\graphics\texture.h" />
     <ClInclude Include="include\emuall\support.h" />
     <ClInclude Include="include\emuall\util\endian.h" />
     <ClInclude Include="include\emuall\util\file.h" />

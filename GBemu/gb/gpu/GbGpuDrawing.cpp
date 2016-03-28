@@ -48,9 +48,8 @@ bool GbGpu::InitGL(int user)
 	case 0: {// main screen
 		// Generate texture for drawing
 		glEnable(GL_TEXTURE_2D);
-		glGenTextures(1, &_texture);
-		glBindTexture(GL_TEXTURE_2D, _texture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 256, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		_texture.LoadTexture(256, 256, NULL, Texture::RGB);
+		_texture.Begin();
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -91,9 +90,8 @@ bool GbGpu::InitGL(int user)
 		break;
 	}
 	case 1: {// Background screen
-		glGenTextures(1, &_BGTexture);
-		glBindTexture(GL_TEXTURE_2D, _BGTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 256, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		_BGTexture.LoadTexture(256, 256, NULL, Texture::RGB);
+		_BGTexture.Begin();
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glGenVertexArrays(1, &_BGVAO);
@@ -123,9 +121,8 @@ bool GbGpu::InitGL(int user)
 		break;
 	}
 	case 2: {// Tiles screen
-		glGenTextures(1, &_TiTexture);
-		glBindTexture(GL_TEXTURE_2D, _TiTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 512, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		_TiTexture.LoadTexture(512, 512, NULL, Texture::RGB);
+		_TiTexture.Begin();
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glGenVertexArrays(1, &_TiVAO);
@@ -156,9 +153,8 @@ bool GbGpu::InitGL(int user)
 		break;
 	}
 	case 3: {// OAM screen
-		glGenTextures(1, &_OAMTexture);
-		glBindTexture(GL_TEXTURE_2D, _OAMTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 128, 128, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		_OAMTexture.LoadTexture(128, 128, NULL, Texture::RGB);
+		_OAMTexture.Begin();
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glGenVertexArrays(1, &_OAMVAO);
@@ -202,7 +198,7 @@ void GbGpu::DestroyGL(int user)
 	switch (user)
 	{
 	case 0: {// main screen
-		glDeleteTextures(1, &_texture);
+		_texture.Clean();
 		glDeleteVertexArrays(1, &_vao);
 		glDeleteBuffers(1, &_surfaceVBO);
 		glDeleteBuffers(1, &_surfaceUVBO);
@@ -210,7 +206,7 @@ void GbGpu::DestroyGL(int user)
 		break;
 	}
 	case 1: {// BG screen
-		glDeleteTextures(1, &_BGTexture);
+		_BGTexture.Clean();
 		glDeleteVertexArrays(1, &_BGVAO);
 		glDeleteBuffers(1, &_BGVBO);
 		glDeleteBuffers(1, &_BGUVBO);
@@ -218,7 +214,7 @@ void GbGpu::DestroyGL(int user)
 		break;
 	}
 	case 2: {// Tiles screen
-		glDeleteTextures(1, &_TiTexture);
+		_TiTexture.Clean();
 		glDeleteVertexArrays(1, &_TiVAO);
 		glDeleteBuffers(1, &_TiVBO);
 		glDeleteBuffers(1, &_TiUVBO);
@@ -226,7 +222,7 @@ void GbGpu::DestroyGL(int user)
 		break;
 	}
 	case 3: {// OAM screen
-		glDeleteTextures(1, &_OAMTexture);
+		_OAMTexture.Clean();
 		glDeleteVertexArrays(1, &_OAMVAO);
 		glDeleteBuffers(1, &_OAMVBO);
 		glDeleteBuffers(1, &_OAMUVBO);
@@ -244,16 +240,8 @@ void GbGpu::drawGL(int user)
 	switch (user)
 	{
 	case 0: {// main screen		
-		glBindTexture(GL_TEXTURE_2D, _texture);
-		if (_screen == _screen_buffer1)
-		{
-			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, _screen_buffer2);
-		}
-		else {
-			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, _screen_buffer1);
-		}
-
-		glBindTexture(GL_TEXTURE_2D, 0);
+		const char *data = (const char *)((_screen == _screen_buffer1) ? _screen_buffer2 : _screen_buffer1);
+		_texture.UpdateData(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, data, Texture::RGBA);
 
 		// Enable shader and load buffers
 		_shader.Begin();
@@ -263,10 +251,11 @@ void GbGpu::drawGL(int user)
 		glEnableVertexAttribArray(1);
 		glBindBuffer(GL_ARRAY_BUFFER, _surfaceUVBO);
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
-		glBindTexture(GL_TEXTURE_2D, _texture);
+		_texture.Begin();
 
 		// Draw the screen
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		_texture.End();
 
 		// Unload the buffers
 		glDisableVertexAttribArray(0);
@@ -339,8 +328,7 @@ void GbGpu::DrawDebugBackground()
 	}
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glBindTexture(GL_TEXTURE_2D, _BGTexture);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_BYTE, _debugDrawBuffer);
+	_BGTexture.UpdateData(0, 0, 256, 256, (const char *)_debugDrawBuffer, Texture::RGBA);
 
 	// Enable shader and load buffers
 	_BGShader.Begin();
@@ -396,8 +384,7 @@ void GbGpu::DrawDebugTiles()
 		}
 	}
 
-	glBindTexture(GL_TEXTURE_2D, _TiTexture);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 289, 217, GL_RGBA, GL_UNSIGNED_BYTE, _debugDrawBuffer);
+	_TiTexture.UpdateData(0, 0, 289, 217, (const char *)_debugDrawBuffer, Texture::RGBA);
 
 	// Enable shader and load buffers
 	_TiShader.Begin();
@@ -407,14 +394,15 @@ void GbGpu::DrawDebugTiles()
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, _TiUVBO);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0);
+	_TiTexture.Begin();
 
 	// Draw the screen
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	_TiTexture.End();
 
 	// Unload the buffers
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
-	glBindTexture(GL_TEXTURE_2D, 0);
 	_TiShader.End();
 }
 
@@ -480,8 +468,7 @@ void GbGpu::DrawDebugOAM()
 			}
 		}
 	}
-	glBindTexture(GL_TEXTURE_2D, _OAMTexture);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 73, 86, GL_RGBA, GL_UNSIGNED_BYTE, _debugDrawBuffer);
+	_OAMTexture.UpdateData(0, 0, 73, 86, (const char *)_debugDrawBuffer, Texture::RGBA);
 
 	// Enable shader and load buffers
 	_OAMShader.Begin();
