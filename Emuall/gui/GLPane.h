@@ -19,21 +19,23 @@ class GLPane : public wxGLCanvas
 public:
 	GLPane(wxWindow *parent, GLPaneI *callback, int user, wxWindowID id, const wxPoint &pos, 
 		const wxSize &size, long style, const wxGLAttributes &attr, const wxGLContextAttrs &ctxAttr);
-	~GLPane();
+	virtual ~GLPane();
 
 	void SetUserData(int user) { _user = user; }
 	int GetUserData() const { return _user; }
 
 	void SetCurrentContext();
 
-	void DestroyGL();
+	virtual void InitGL();
+	virtual void DestroyGL();
 
 	void SetClearColour(float r, float g, float b, float a);
 	void SetClearColour(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 	void SetClearColour(wxColour colour);
 
-private:
-	void Render(wxPaintEvent &evt);
+protected:
+	virtual void Render(wxPaintEvent &evt);
+
 	wxGLContext	*_context;
 	GLPaneI		*_callback;
 	int			_user;

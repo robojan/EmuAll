@@ -51,6 +51,12 @@ void GLPane::SetCurrentContext()
 	SetCurrent(*_context);
 }
 
+void GLPane::InitGL()
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+	_initialized = _callback->InitGL(_user);
+}
+
 void GLPane::DestroyGL()
 {
 	if (IsShownOnScreen())
@@ -65,7 +71,7 @@ void GLPane::Render( wxPaintEvent &evt)
 {
 	if (!IsShownOnScreen())
 		return;
-	SetCurrent(*_context);
+	SetCurrentContext();
 	wxPaintDC(this);
 
 	if (_clearColourChanged)
@@ -76,8 +82,7 @@ void GLPane::Render( wxPaintEvent &evt)
 
 	if (!_initialized)
 	{
-		glClear(GL_COLOR_BUFFER_BIT);
-		_initialized = _callback->InitGL(_user);
+		InitGL();
 	}
 	else {
 		_callback->DrawGL(_user);

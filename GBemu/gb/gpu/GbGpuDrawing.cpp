@@ -50,10 +50,7 @@ bool GbGpu::InitGL(int user)
 		glEnable(GL_TEXTURE_2D);
 		_texture.LoadTexture(256, 256, NULL, Texture::RGB);
 		_texture.Begin();
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
+		_texture.SetFilter(Texture::Nearest, Texture::Nearest);
 
 		glGenVertexArrays(1, &_vao);
 		glBindVertexArray(_vao);
@@ -92,8 +89,7 @@ bool GbGpu::InitGL(int user)
 	case 1: {// Background screen
 		_BGTexture.LoadTexture(256, 256, NULL, Texture::RGB);
 		_BGTexture.Begin();
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		_BGTexture.SetFilter(Texture::Nearest, Texture::Nearest);
 		glGenVertexArrays(1, &_BGVAO);
 		glBindVertexArray(_BGVAO);
 		glGenBuffers(1, &_BGVBO);
@@ -123,8 +119,7 @@ bool GbGpu::InitGL(int user)
 	case 2: {// Tiles screen
 		_TiTexture.LoadTexture(512, 512, NULL, Texture::RGB);
 		_TiTexture.Begin();
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		_TiTexture.SetFilter(Texture::Nearest, Texture::Nearest);
 		glGenVertexArrays(1, &_TiVAO);
 		glBindVertexArray(_TiVAO);
 		glGenBuffers(1, &_TiVBO);
@@ -155,8 +150,7 @@ bool GbGpu::InitGL(int user)
 	case 3: {// OAM screen
 		_OAMTexture.LoadTexture(128, 128, NULL, Texture::RGB);
 		_OAMTexture.Begin();
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		_OAMTexture.SetFilter(Texture::Nearest, Texture::Nearest);
 		glGenVertexArrays(1, &_OAMVAO);
 		glBindVertexArray(_OAMVAO);
 		glGenBuffers(1, &_OAMVBO);
@@ -240,6 +234,9 @@ void GbGpu::drawGL(int user)
 	switch (user)
 	{
 	case 0: {// main screen		
+		// Setup viewport
+		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
 		const char *data = (const char *)((_screen == _screen_buffer1) ? _screen_buffer2 : _screen_buffer1);
 		_texture.UpdateData(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, data, Texture::RGBA);
 
@@ -326,6 +323,11 @@ void GbGpu::DrawDebugBackground()
 		_debugDrawBuffer[(scx + (y % 256) * 256)].g ^= 0xFF;
 		_debugDrawBuffer[(((scx + SCREEN_WIDTH) % 256) + (y % 256) * 256)].g ^= 0xFF;
 	}
+
+
+	// Setup viewport
+	glViewport(0, 0, 256, 256);
+
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	_BGTexture.UpdateData(0, 0, 256, 256, (const char *)_debugDrawBuffer, Texture::RGBA);
@@ -383,6 +385,9 @@ void GbGpu::DrawDebugTiles()
 			}
 		}
 	}
+	// Setup viewport
+	glViewport(0, 0, 289, 217);
+
 
 	_TiTexture.UpdateData(0, 0, 289, 217, (const char *)_debugDrawBuffer, Texture::RGBA);
 
@@ -468,6 +473,9 @@ void GbGpu::DrawDebugOAM()
 			}
 		}
 	}
+	// Setup viewport
+	glViewport(0, 0, 73, 86);
+
 	_OAMTexture.UpdateData(0, 0, 73, 86, (const char *)_debugDrawBuffer, Texture::RGBA);
 
 	// Enable shader and load buffers
@@ -491,6 +499,8 @@ void GbGpu::DrawDebugOAM()
 
 void GbGpu::Reshape(int width, int height, bool keepAspect)
 {
+	// Let the host do the sizing
+	/*
 	if (keepAspect)
 	{
 		if (((float) width) / height > ((float) SCREEN_WIDTH) / SCREEN_HEIGHT)
@@ -506,6 +516,7 @@ void GbGpu::Reshape(int width, int height, bool keepAspect)
 	else {
 		glViewport(0, 0, width, height);
 	}
+	*/
 }
 
 

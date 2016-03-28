@@ -45,6 +45,9 @@
     <ClCompile Include="include\emuall\graphics\texture.cpp">
       <Filter>Source Files\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="include\emuall\graphics\framebuffer.cpp">
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\emuall\common.h">
@@ -66,6 +69,9 @@
       <Filter>Header Files\util</Filter>
     </ClInclude>
     <ClInclude Include="include\emuall\graphics\texture.h">
+      <Filter>Header Files\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\emuall\graphics\frameBuffer.h">
       <Filter>Header Files\graphics</Filter>
     </ClInclude>
   </ItemGroup>

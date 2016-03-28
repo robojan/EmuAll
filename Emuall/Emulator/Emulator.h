@@ -81,6 +81,22 @@ typedef struct {
 } MemDebuggerInfo_t;
 
 typedef struct {
+	int id;
+	int width;
+	int height;
+	int mouseXvarID;
+	int mouseYvarID;
+} EmulatorScreen_t;
+
+typedef struct {
+	std::string name;
+	std::string fileFilterString;
+	std::string description;
+	std::string aboutInfo;
+	std::vector <EmulatorScreen_t> screens;
+} EmulatorInfo_t;
+
+typedef struct {
 	int audioSources;
 } EmulatorSettings_t;
 
@@ -92,6 +108,7 @@ public:
 
 	bool IsValid() {return _valid;}
 
+	EmulatorInfo_t GetInfo() const;
 	std::string GetFileFilterEntry() const;
 	std::string GetName() const;
 	std::list<EmulatorInput_t> GetEmulatorInputs() const;

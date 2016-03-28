@@ -1,3 +1,5 @@
+
+#include <GL/glew.h>
 #include "MainFrame.h"
 #include "../util/memDbg.h"
 #include "IdList.h"
@@ -75,6 +77,10 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
 
 	// Initialize support library
 	emuallSupportInit();
+	GLenum result;
+	if ((result = glewInit()) != GLEW_OK) {
+		Log(Error, "glewInit failed: %s", glewGetErrorString(result));
+	}
 
 	// load plugins
 	_emulators = new EmulatorList("plugins");
@@ -126,7 +132,7 @@ void MainFrame::CreateLayout()
 	//ctxAttr.OGLVersion(3, 2);
 	//ctxAttr.ForwardCompatible();
 	ctxAttr.EndList();
-	_display = new GLPane(this, this, 0, ID_Main_display, wxDefaultPosition,
+	_display = new EmulatorScreen(this, this, 0, ID_Main_display, wxDefaultPosition,
 		wxDefaultSize, wxFULL_REPAINT_ON_RESIZE, glAttr, ctxAttr);
 
 	//mDisplay->Connect(ID_Main_display, wxEVT_KEY_UP, wxKeyEventHandler(InputMaster::OnKeyboard), (wxObject *) NULL, &mInputHandler);
@@ -238,6 +244,9 @@ void MainFrame::LoadEmulator(std::string &fileName)
 	callBackfunctions_t callback;
 	callback.Log = Log;
 	
+	// set current context
+	_display->SetCurrentContext();
+
 	// Initializing the emulator
 	if (!emu->Init(handle, callback))
 	{
@@ -246,9 +255,17 @@ void MainFrame::LoadEmulator(std::string &fileName)
 		return;
 	}
 
-	int w, h;
-	_display->GetSize(&w, &h);
-	emu->Reshape(handle, w, h, Options::GetInstance().videoOptions.keepAspect);
+	EmulatorInfo_t info = emu->GetInfo();
+	assert(info.screens.size() <= 1);
+	if (info.screens.size() != 0 && info.screens[0].width > 0 && info.screens[0].height > 0) {
+		_display->SetFrameBufferSize(info.screens[0].width, info.screens[0].height);
+	}
+	else {
+		int w, h;
+		_display->GetSize(&w, &h);
+		_display->SetFrameBufferSize(w, h);
+		emu->Reshape(handle, w, h, Options::GetInstance().videoOptions.keepAspect);
+	}
 
 	// Loading the rom in memory
 	Log(Message, "Loading the ROM in memory");

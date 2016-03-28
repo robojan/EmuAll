@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <string>
 
-#include "GLPane.h"
+#include "EmulatorScreen.h"
 #include "../audio.h"
 #include "../Emulator/Emulator.h"
 #include "../util/Options.h"
@@ -35,7 +35,7 @@ private:
 	wxMenu		*_menDebugLevel;
 	wxMenu		*_menSaveState;
 	wxMenu		*_menLoadState;
-	GLPane		*_display;
+	EmulatorScreen *_display;
 	wxLogWindow *_logger;
 	wxTimer		*_timer;
 	LogWx		_logDst;

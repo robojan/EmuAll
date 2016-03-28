@@ -101,6 +101,30 @@ EmulatorInterface::~EmulatorInterface()
 
 }
 
+EmulatorInfo_t EmulatorInterface::GetInfo() const
+{
+	EmulatorInfo_t info;
+	info.name = _root.child_value("name");
+	info.description = _root.child_value("description");
+	info.fileFilterString = _root.child_value("fileFilter");
+	info.aboutInfo = _root.child_value("about");
+	for (pugi::xml_node screen = _root.child("screen"); screen; screen = screen.next_sibling("screen")) {
+		EmulatorScreen_t screenInfo;
+		const char *temp;
+		screenInfo.id = screen.attribute("id").as_int(-1);
+		temp = screen.child_value("width");
+		screenInfo.width = *temp == '\0' ? -1 : strtol(temp, NULL, 0);
+		temp = screen.child_value("height");
+		screenInfo.height = *temp == '\0' ? -1 : strtol(temp, NULL, 0);
+		temp = screen.child_value("mousex");
+		screenInfo.mouseXvarID = *temp == '\0' ? -1 : strtol(temp, NULL, 0);
+		temp = screen.child_value("mousey");
+		screenInfo.mouseYvarID = *temp == '\0' ? -1 : strtol(temp, NULL, 0);
+		info.screens.push_back(screenInfo);
+	}
+	return info;
+}
+
 std::string EmulatorInterface::GetFileFilterEntry() const
 {
 	std::string entry = GetName();
