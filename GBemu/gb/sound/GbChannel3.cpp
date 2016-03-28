@@ -38,6 +38,9 @@ void GbChannel3::MemEvent(address_t address, gbByte val)
 	case NR30:
 		_playing = (val & 0x80) != 0;
 		_gb->_mem->write(address, val | 0x7F, false);
+		_enabled = _playing;
+		temp = _gb->_mem->read(NR52);
+		_gb->_mem->write(NR52, (temp & 0xF0) | _gb->_sound->GetEnabledFlags(), false);
 		break;
 	case NR31:
 		_soundLength = 255 - val;
