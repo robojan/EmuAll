@@ -248,6 +248,9 @@
     <ClInclude Include="resources\resources.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
+    <ClInclude Include="emuAll.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\icon.xpm">

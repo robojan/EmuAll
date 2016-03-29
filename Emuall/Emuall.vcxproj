@@ -191,6 +191,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="audio.h" />
+    <ClInclude Include="emuAll.h" />
     <ClInclude Include="Emulator\Emulator.h" />
     <ClInclude Include="Emulator\SaveFile.h" />
     <ClInclude Include="gui\cpuDebugger.h" />
