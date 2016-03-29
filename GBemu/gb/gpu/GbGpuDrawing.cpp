@@ -48,25 +48,38 @@ bool GbGpu::InitGL(int user)
 	case 0: {// main screen
 		// Generate texture for drawing
 		glEnable(GL_TEXTURE_2D);
+		if (glGetError() != GL_NO_ERROR) __debugbreak();
 		_texture.LoadTexture(256, 256, NULL, Texture::RGB);
+		if (glGetError() != GL_NO_ERROR) __debugbreak();
 		_texture.Begin();
+		if (glGetError() != GL_NO_ERROR) __debugbreak();
 		_texture.SetFilter(Texture::Nearest, Texture::Nearest);
+		if (glGetError() != GL_NO_ERROR) __debugbreak();
 
 		glGenVertexArrays(1, &_vao);
+		if (glGetError() != GL_NO_ERROR) __debugbreak();
 		glBindVertexArray(_vao);
+		if (glGetError() != GL_NO_ERROR) __debugbreak();
 
 		// Generate vertex buffer
 		glGenBuffers(1, &_surfaceVBO);
+		if (glGetError() != GL_NO_ERROR) __debugbreak();
 		glBindBuffer(GL_ARRAY_BUFFER, _surfaceVBO);
+		if (glGetError() != GL_NO_ERROR) __debugbreak();
 		glBufferData(GL_ARRAY_BUFFER, sizeof(square), square, GL_STATIC_DRAW);
+		if (glGetError() != GL_NO_ERROR) __debugbreak();
 
 		// Generate UV buffer
 		glGenBuffers(1, &_surfaceUVBO);
+		if (glGetError() != GL_NO_ERROR) __debugbreak();
 		glBindBuffer(GL_ARRAY_BUFFER, _surfaceUVBO);
+		if (glGetError() != GL_NO_ERROR) __debugbreak();
 		glBufferData(GL_ARRAY_BUFFER, sizeof(screenUVData), screenUVData, GL_STATIC_DRAW);
+		if (glGetError() != GL_NO_ERROR) __debugbreak();
 
 		// Initialize viewport
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		if (glGetError() != GL_NO_ERROR) __debugbreak();
 
 		// Load shaders
 		bool result = _shader.AddShader(ShaderProgram::Vertex, (char *)resource_gb_vert, sizeof(resource_gb_vert));

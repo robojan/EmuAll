@@ -262,6 +262,12 @@
     <None Include="resources\post.vert.glsl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="resources\bilinear.frag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\nearest.frag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="resources\resources.rlst">

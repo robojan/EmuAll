@@ -5,23 +5,25 @@
 Texture::Texture() :
 	_id(0)
 {
-
+	SetGLType(Texture::Texture2D);
 }
 
-Texture::Texture(const char *filename) :
+Texture::Texture(const char *filename, Type type) :
 	_id(0)
 {
+	SetGLType(type);
 	LoadTexture(filename);
 }
 
-Texture::Texture(int width, int height, const char *data, Format format, int stride /*= -1*/) :
+Texture::Texture(int width, int height, const char *data, Format format, int stride /*= -1*/, Type type) :
 	_id(0)
 {
+	SetGLType(type);
 	LoadTexture(width, height, data, format, stride);
 }
 
 Texture::Texture(Texture &other) :
-	_id(other._id)
+	_id(other._id), _type(other._type)
 {
 	other._id = 0;
 }
@@ -34,6 +36,7 @@ Texture::~Texture()
 Texture & Texture::operator=(Texture &other)
 {
 	Clean();
+	_type = other._type;
 	_id = other._id;
 	other._id = 0;
 	return *this;
@@ -46,7 +49,6 @@ void Texture::LoadTexture(const char *fileName)
 
 void Texture::LoadTexture(int width, int height, const char *data, Format format, int stride /*= -1*/)
 {
-	GLenum result;
 	GLint glFormat;
 	int elementSize = 0;
 	switch (format) {
@@ -67,17 +69,17 @@ void Texture::LoadTexture(int width, int height, const char *data, Format format
 	}
 
 	// Generate an texture
-	glGetError();
+	if (glGetError() != GL_NO_ERROR) __debugbreak();
 	glGenTextures(1, &_id);
-	if ((result = glGetError()) != GL_NO_ERROR) {
-		assert(result == GL_NO_ERROR);
-		return;
-	}
+	if (glGetError() != GL_NO_ERROR) __debugbreak();
 
 	Begin();
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, stride);
-	glTexImage2D(GL_TEXTURE_2D, 0, glFormat, width, height, 0, glFormat, GL_UNSIGNED_BYTE, data);
+	if (glGetError() != GL_NO_ERROR) __debugbreak();
+	glTexImage2D(_type, 0, glFormat, width, height, 0, glFormat, GL_UNSIGNED_BYTE, data);
+	if (glGetError() != GL_NO_ERROR) __debugbreak();
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+	if (glGetError() != GL_NO_ERROR) __debugbreak();
 	End();
 }
 
@@ -120,39 +122,39 @@ static GLenum GetGLWrap(Texture::Wrap wrap) {
 
 Texture & Texture::SetMinFilter(Filter filter)
 {
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetGLFilter(filter));
+	glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GetGLFilter(filter));
 	return *this;
 }
 
 Texture & Texture::SetMagFilter(Filter filter)
 {
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetGLFilter(filter));
+	glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GetGLFilter(filter));
 	return *this;
 }
 
 Texture & Texture::SetFilter(Filter min, Filter mag)
 {
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GetGLFilter(min));
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GetGLFilter(mag));
+	glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GetGLFilter(min));
+	glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GetGLFilter(mag));
 	return *this;
 }
 
 Texture & Texture::SetWrapS(Wrap wrap)
 {
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GetGLWrap(wrap));
+	glTexParameteri(_type, GL_TEXTURE_WRAP_S, GetGLWrap(wrap));
 	return *this;
 }
 
 Texture & Texture::SetWrapT(Wrap wrap)
 {
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GetGLWrap(wrap));
+	glTexParameteri(_type, GL_TEXTURE_WRAP_T, GetGLWrap(wrap));
 	return *this;
 }
 
 Texture & Texture::SetWrap(Wrap wrapS, Wrap wrapT)
 {
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GetGLWrap(wrapS));
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GetGLWrap(wrapT));
+	glTexParameteri(_type, GL_TEXTURE_WRAP_S, GetGLWrap(wrapS));
+	glTexParameteri(_type, GL_TEXTURE_WRAP_T, GetGLWrap(wrapT));
 	return *this;
 }
 
@@ -163,12 +165,14 @@ bool Texture::IsValid() const
 
 void Texture::Begin()
 {
-	glBindTexture(GL_TEXTURE_2D, _id);
+	glBindTexture(_type, _id);
+	if (glGetError() != GL_NO_ERROR) __debugbreak();
 }
 
 void Texture::End()
 {
-	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(_type, 0);
+	if (glGetError() != GL_NO_ERROR) __debugbreak();
 }
 
 void Texture::UpdateData(int x, int y, int width, int height, const char *data, Format format, int stride /*= -1*/)
@@ -191,7 +195,20 @@ void Texture::UpdateData(int x, int y, int width, int height, const char *data, 
 
 	Begin();
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, stride);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height,glFormat, GL_UNSIGNED_BYTE, data);
+	glTexSubImage2D(_type, 0, x, y, width, height,glFormat, GL_UNSIGNED_BYTE, data);
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 	End();
+}
+
+void Texture::SetGLType(Type type)
+{
+	switch (type) {
+	default:
+	case Texture2D:
+		_type = GL_TEXTURE_2D;
+		break;
+	case TextureRectangle:
+		_type = GL_TEXTURE_RECTANGLE;
+		break;
+	}
 }

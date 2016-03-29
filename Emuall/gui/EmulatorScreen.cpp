@@ -39,20 +39,7 @@ void EmulatorScreen::InitGL()
 		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(fboData), fboData, GL_STATIC_DRAW);
 
-		// load shader
-		if (!_shader.AddShader(ShaderProgram::Vertex, (char *)resource_post_vert_glsl, sizeof(resource_post_vert_glsl)))
-		{
-			Log(Error, "%s", _shader.GetLog());
-			return;
-		}
-		if (!_shader.AddShader(ShaderProgram::Fragment, (char *)resource_post_frag_glsl, sizeof(resource_post_frag_glsl))) {
-			Log(Error, "%s", _shader.GetLog());
-			return;
-		}
-		if (!_shader.Link()) {
-			Log(Error, "%s", _shader.GetLog());
-			return;
-		}
+		SetPostProcessingFilter(BiLinear);
 		_initialized = true;
 	}
 	if (!GLPane::_initialized) {
@@ -76,6 +63,51 @@ void EmulatorScreen::SetFrameBufferSize(int width, int height)
 	_fbo = new FrameBuffer(width, height);
 	_fbo->AttachColorBuffer(0);
 	_fbo->AttachDepthBuffer();
+	_fbo->GetColorBuffer(0).SetWrap(Texture::ClampToEdge, Texture::ClampToEdge);
+}
+
+void EmulatorScreen::SetPostProcessingFilter(Filter filter)
+{
+	char *filterSrc;
+	int filterSrcLen;
+	switch (filter) {
+	default:
+	case Nearest:
+		filterSrc = (char *)resource_nearest_frag_glsl;
+		filterSrcLen = sizeof(resource_nearest_frag_glsl);
+		break;
+	case BiLinear:
+		filterSrc = (char *)resource_bilinear_frag_glsl;
+		filterSrcLen = sizeof(resource_bilinear_frag_glsl);
+		break;
+	case Bicubic:
+		// TODO
+		filterSrc = (char *)resource_nearest_frag_glsl;
+		filterSrcLen = sizeof(resource_nearest_frag_glsl);
+		break;
+	}
+	if (_shader.IsLinked()) {
+		_shader.Clean();
+	}
+	// load shader
+	if (!_shader.AddShader(ShaderProgram::Vertex, (char *)resource_post_vert_glsl, sizeof(resource_post_vert_glsl)))
+	{
+		Log(Error, "%s", _shader.GetLog());
+		return;
+	}
+	if (!_shader.AddShader(ShaderProgram::Fragment, (char *)resource_post_frag_glsl, sizeof(resource_post_frag_glsl))) {
+		Log(Error, "%s", _shader.GetLog());
+		return;
+	}
+	if (!_shader.AddShader(ShaderProgram::Fragment, filterSrc, filterSrcLen)) {
+		Log(Error, "%s", _shader.GetLog());
+		return;
+	}
+	if (!_shader.Link()) {
+		Log(Error, "%s", _shader.GetLog());
+		return;
+	}
+
 }
 
 void EmulatorScreen::Render(wxPaintEvent &evt)
@@ -132,19 +164,29 @@ void EmulatorScreen::Render(wxPaintEvent &evt)
 	// Enable shader and load buffers
 	_shader.Begin();
 	glEnableVertexAttribArray(0);
+	if (glGetError() != GL_NO_ERROR) __debugbreak();
 	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+	if (glGetError() != GL_NO_ERROR) __debugbreak();
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid *)0);
+	if (glGetError() != GL_NO_ERROR) __debugbreak();
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid *)(3 *  sizeof(GLfloat)));
-	_fbo->GetColorBuffer(0).Begin();
+	if (glGetError() != GL_NO_ERROR) __debugbreak();
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
+	if (glGetError() != GL_NO_ERROR) __debugbreak();
+	Texture &frame = _fbo->GetColorBuffer(0);
+	_shader.SetUniform("textureSampler", 0, frame);
+	if (glGetError() != GL_NO_ERROR) __debugbreak();
 
 	// Draw the screen
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	_fbo->GetColorBuffer(0).End();
+	if (glGetError() != GL_NO_ERROR) __debugbreak();
 
 	// Unload the buffers
 	glDisableVertexAttribArray(0);
+	if (glGetError() != GL_NO_ERROR) __debugbreak();
 	glDisableVertexAttribArray(1);
+	if (glGetError() != GL_NO_ERROR) __debugbreak();
+	frame.End();
 	_shader.End();
 
 	SwapBuffers();

@@ -39,13 +39,13 @@
     <ClCompile Include="util\Endian.cpp">
       <Filter>Source Files\util</Filter>
     </ClCompile>
-    <ClCompile Include="include\emuall\graphics\texture.cpp">
-      <Filter>Source Files\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="include\emuall\graphics\framebuffer.cpp">
-      <Filter>Source Files\graphics</Filter>
-    </ClCompile>
     <ClCompile Include="graphics\ShaderProgram.cpp">
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\framebuffer.cpp">
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\texture.cpp">
       <Filter>Source Files\graphics</Filter>
     </ClCompile>
   </ItemGroup>

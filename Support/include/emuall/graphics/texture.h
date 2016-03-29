@@ -25,11 +25,15 @@ public:
 		MirroredRepeat,
 		Repeat,
 	};
+	enum Type {
+		Texture2D,
+		TextureRectangle
+	};
 
 	Texture();
 	Texture(Texture &other);
-	Texture(const char *filename);
-	Texture(int width, int height, const char *data, Format format, int stride = -1);
+	Texture(const char *filename, Type type = Texture2D);
+	Texture(int width, int height, const char *data, Format format, int stride = -1, Type type = Texture2D);
 	~Texture();
 
 	Texture &operator=(Texture &other);
@@ -53,8 +57,10 @@ public:
 	void UpdateData(int x, int y, int width, int height, const char *data, Format format, int stride = -1);
 
 private:
+	void SetGLType(Type type);
 
 	unsigned int _id;
+	unsigned int _type;
 };
 
 #endif

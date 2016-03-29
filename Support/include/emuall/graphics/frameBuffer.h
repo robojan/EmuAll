@@ -19,8 +19,10 @@ public:
 	void Begin() const;
 	void End() const;
 
-	void AttachColorBuffer(int level);
+	void AttachColorBuffer(int level, bool rectangle = false);
 	void AttachDepthBuffer();
+	int GetWidth() const;
+	int GetHeight() const;
 
 	void Clean();
 

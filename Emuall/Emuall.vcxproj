@@ -230,7 +230,9 @@
     <ClInclude Include="util\xml\pugixml.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="resources\bilinear.frag.glsl" />
     <None Include="resources\icon.xpm" />
+    <None Include="resources\nearest.frag.glsl" />
     <None Include="resources\post.frag.glsl" />
     <None Include="resources\post.vert.glsl" />
     <CustomBuild Include="resources\resources.rlst">

@@ -7,6 +7,11 @@
 
 class EmulatorScreen : public GLPane {
 public:
+	enum Filter {
+		Nearest,
+		BiLinear,
+		Bicubic
+	};
 	EmulatorScreen(wxWindow *parent, GLPaneI *callback, int user, wxWindowID id, const wxPoint &pos,
 		const wxSize &size, long style, const wxGLAttributes &attr, const wxGLContextAttrs &ctxAttr);
 	virtual ~EmulatorScreen();
@@ -14,6 +19,7 @@ public:
 	virtual void InitGL();
 	virtual void DestroyGL();
 	void SetFrameBufferSize(int width, int height);
+	void SetPostProcessingFilter(Filter filter);
 
 protected:
 	virtual void Render(wxPaintEvent &evt);

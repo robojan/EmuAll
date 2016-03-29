@@ -55,13 +55,14 @@ void FrameBuffer::End() const
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void FrameBuffer::AttachColorBuffer(int level)
+void FrameBuffer::AttachColorBuffer(int level, bool rectangle /*= false*/)
 {
 	GLint maxColorAttachments;
 	glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &maxColorAttachments);
 	assert(level >= 0 && level < maxColorAttachments);
 
-	Texture texture(_width, _height, NULL, Texture::RGBA);
+	Texture texture(_width, _height, NULL, Texture::RGBA, -1, 
+		rectangle ? Texture::TextureRectangle : Texture::Texture2D);
 	assert(texture.IsValid());
 	texture.Begin();
 	texture.SetFilter(Texture::Nearest, Texture::Nearest);
@@ -92,6 +93,16 @@ void FrameBuffer::AttachDepthBuffer()
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, _width, _height);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthBuffer);
 	End();
+}
+
+int FrameBuffer::GetWidth() const
+{
+	return _width;
+}
+
+int FrameBuffer::GetHeight() const
+{
+	return _height;
 }
 
 void FrameBuffer::Clean()

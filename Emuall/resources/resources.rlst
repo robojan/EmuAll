@@ -1,2 +1,4 @@
 post.frag.glsl
 post.vert.glsl
+nearest.frag.glsl
+bilinear.frag.glsl

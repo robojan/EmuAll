@@ -9,6 +9,9 @@ out vec3 color;
 // values that stay constant for the whole mesh
 uniform sampler2D textureSampler;
 
+// Texture sampling function
+vec4 GetTextureColor(sampler2D textureSampler, vec2 textureCoord);
+
 void main() {
-	color = texture(textureSampler, UV).rgb;
+	color = GetTextureColor(textureSampler, UV).rgb;
 }

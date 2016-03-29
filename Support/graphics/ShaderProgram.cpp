@@ -1,5 +1,6 @@
 
 #include <emuall/graphics/ShaderProgram.h>
+#include <emuall/graphics/texture.h>
 
 #include <GL/glew.h>
 #include <GL/GL.h>
@@ -191,14 +192,122 @@ void ShaderProgram::End() const
 bool ShaderProgram::IsLinked() const
 {
 	GLint status;
+	if (glIsProgram(_program) == GL_FALSE) return false;
 	glGetProgramiv(_program, GL_LINK_STATUS, &status);
 	return status == GL_TRUE;
+}
+
+void ShaderProgram::SetUniform(const char *name, int val)
+{
+	int loc = GetUniformLocation(name);
+	if (loc != -1) {
+		glUniform1i(loc, val);
+	}
+}
+
+void ShaderProgram::SetUniform(const char *name, float val)
+{
+	int loc = GetUniformLocation(name);
+	if (loc != -1) {
+		glUniform1f(loc, val);
+	}
+}
+
+void ShaderProgram::SetUniform(const char *name, double val)
+{
+	int loc = GetUniformLocation(name);
+	if (loc != -1) {
+		glUniform1d(loc, val);
+	}
+}
+
+void ShaderProgram::SetUniform(const char *name, int pos, Texture &texture)
+{
+	int loc = GetUniformLocation(name);
+	if (loc != -1) {
+		glUniform1i(loc, pos);
+		glActiveTexture(GL_TEXTURE0 + pos);
+		texture.Begin();
+	}
+}
+
+void ShaderProgram::SetUniform(const char *name, int val0, int val1)
+{
+	int loc = GetUniformLocation(name);
+	if (loc != -1) {
+		glUniform2i(loc, val0, val1);
+	}
+}
+
+void ShaderProgram::SetUniform(const char *name, int val0, int val1, int val2)
+{
+	int loc = GetUniformLocation(name);
+	if (loc != -1) {
+		glUniform3i(loc, val0, val1, val2);
+	}
+}
+
+void ShaderProgram::SetUniform(const char *name, int val0, int val1, int val2, int val3)
+{
+	int loc = GetUniformLocation(name);
+	if (loc != -1) {
+		glUniform4i(loc, val0, val1, val2, val3);
+	}
+}
+
+void ShaderProgram::SetUniform(const char *name, float val0, float val1)
+{
+	int loc = GetUniformLocation(name);
+	if (loc != -1) {
+		glUniform2f(loc, val0, val1);
+	}
+}
+
+void ShaderProgram::SetUniform(const char *name, float val0, float val1, float val2)
+{
+	int loc = GetUniformLocation(name);
+	if (loc != -1) {
+		glUniform3f(loc, val0, val1, val2);
+	}
+}
+
+void ShaderProgram::SetUniform(const char *name, float val0, float val1, float val2, float val3)
+{
+	int loc = GetUniformLocation(name);
+	if (loc != -1) {
+		glUniform4f(loc, val0, val1, val2, val3);
+	}
+}
+
+void ShaderProgram::SetUniform(const char *name, double val0, double val1)
+{
+	int loc = GetUniformLocation(name);
+	if (loc != -1) {
+		glUniform2d(loc, val0, val1);
+	}
+}
+
+void ShaderProgram::SetUniform(const char *name, double val0, double val1, double val2)
+{
+	int loc = GetUniformLocation(name);
+	if (loc != -1) {
+		glUniform3d(loc, val0, val1, val2);
+	}
+}
+
+void ShaderProgram::SetUniform(const char *name, double val0, double val1, double val2, double val3)
+{
+	int loc = GetUniformLocation(name);
+	if (loc != -1) {
+		glUniform4d(loc, val0, val1, val2, val3);
+	}
 }
 
 bool ShaderProgram::Compile(unsigned int shader, const char *source, int len)
 {
 	GLenum error; 
 	assert(glIsShader(shader) == GL_TRUE);
+
 
 	// Assign the source code to the shader
 	glShaderSource(shader, 1, &source, &len);
@@ -236,4 +345,9 @@ bool ShaderProgram::Compile(unsigned int shader, const char *source, int len)
 	}
 
 	return true;
+}
+
+int ShaderProgram::GetUniformLocation(const char *name)
+{
+	return glGetUniformLocation(_program, name);
 }

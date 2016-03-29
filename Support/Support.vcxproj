@@ -153,9 +153,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="graphics\framebuffer.cpp" />
     <ClCompile Include="graphics\ShaderProgram.cpp" />
-    <ClCompile Include="include\emuall\graphics\framebuffer.cpp" />
-    <ClCompile Include="include\emuall\graphics\texture.cpp" />
+    <ClCompile Include="graphics\texture.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="util\Endian.cpp" />
     <ClCompile Include="util\file.cpp" />
