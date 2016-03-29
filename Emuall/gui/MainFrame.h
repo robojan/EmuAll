@@ -16,8 +16,6 @@
 #include "memDebugger.h"
 #include "gpuDebugger.h"
 
-#define FPS		1000/30
-
 class MainFrame: public wxFrame, GLPaneI
 {
 	DECLARE_EVENT_TABLE()
@@ -61,6 +59,7 @@ private:
 
 	void UpdateSaveStateLabels();
 	void UpdateRecentFiles();
+	void RunEmulator();
 
 	void OnClose(wxCloseEvent &evt);
 	void OnQuit(wxCommandEvent &evt);

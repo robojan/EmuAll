@@ -69,12 +69,12 @@ bool GbGpu::InitGL(int user)
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 		// Load shaders
-		bool result = _shader.AddShader(Shader::Vertex, (char *)resource_gb_vert, sizeof(resource_gb_vert));
+		bool result = _shader.AddShader(ShaderProgram::Vertex, (char *)resource_gb_vert, sizeof(resource_gb_vert));
 		if (!result) {
 			Log(Error, "%s", _shader.GetLog());
 			return false;
 		}			
-		result = _shader.AddShader(Shader::Fragment, (char *)resource_gb_frag, sizeof(resource_gb_frag));
+		result = _shader.AddShader(ShaderProgram::Fragment, (char *)resource_gb_frag, sizeof(resource_gb_frag));
 		if (!result) {
 			Log(Error, "%s", _shader.GetLog());
 			return false;
@@ -99,12 +99,12 @@ bool GbGpu::InitGL(int user)
 		glBindBuffer(GL_ARRAY_BUFFER, _BGUVBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(totalUVData), totalUVData, GL_STATIC_DRAW);
 		// Load shaders
-		bool result = _BGShader.AddShader(Shader::Vertex, (char *)resource_gb_vert, sizeof(resource_gb_vert));
+		bool result = _BGShader.AddShader(ShaderProgram::Vertex, (char *)resource_gb_vert, sizeof(resource_gb_vert));
 		if (!result) {
 			Log(Error, "%s", _BGShader.GetLog());
 			return false;
 		}
-		result = _BGShader.AddShader(Shader::Fragment, (char *)resource_gb_frag, sizeof(resource_gb_frag));
+		result = _BGShader.AddShader(ShaderProgram::Fragment, (char *)resource_gb_frag, sizeof(resource_gb_frag));
 		if (!result) {
 			Log(Error, "%s", _BGShader.GetLog());
 			return false;
@@ -130,12 +130,12 @@ bool GbGpu::InitGL(int user)
 		glBufferData(GL_ARRAY_BUFFER, sizeof(tilesUVData), tilesUVData, GL_STATIC_DRAW);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		// Load shaders
-		bool result = _TiShader.AddShader(Shader::Vertex, (char *)resource_gb_vert, sizeof(resource_gb_vert));
+		bool result = _TiShader.AddShader(ShaderProgram::Vertex, (char *)resource_gb_vert, sizeof(resource_gb_vert));
 		if (!result) {
 			Log(Error, "%s", _TiShader.GetLog());
 			return false;
 		}
-		result = _TiShader.AddShader(Shader::Fragment, (char *)resource_gb_frag, sizeof(resource_gb_frag));
+		result = _TiShader.AddShader(ShaderProgram::Fragment, (char *)resource_gb_frag, sizeof(resource_gb_frag));
 		if (!result) {
 			Log(Error, "%s", _TiShader.GetLog());
 			return false;
@@ -161,12 +161,12 @@ bool GbGpu::InitGL(int user)
 		glBufferData(GL_ARRAY_BUFFER, sizeof(oamUVData), oamUVData, GL_STATIC_DRAW);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		// Load shaders
-		bool result = _OAMShader.AddShader(Shader::Vertex, (char *)resource_gb_vert, sizeof(resource_gb_vert));
+		bool result = _OAMShader.AddShader(ShaderProgram::Vertex, (char *)resource_gb_vert, sizeof(resource_gb_vert));
 		if (!result) {
 			Log(Error, "%s", _OAMShader.GetLog());
 			return false;
 		}
-		result = _OAMShader.AddShader(Shader::Fragment, (char *)resource_gb_frag, sizeof(resource_gb_frag));
+		result = _OAMShader.AddShader(ShaderProgram::Fragment, (char *)resource_gb_frag, sizeof(resource_gb_frag));
 		if (!result) {
 			Log(Error, "%s", _OAMShader.GetLog());
 			return false;

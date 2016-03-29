@@ -30,9 +30,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="graphics\shader.cpp">
-      <Filter>Source Files\graphics</Filter>
-    </ClCompile>
     <ClCompile Include="util\file.cpp">
       <Filter>Source Files\util</Filter>
     </ClCompile>
@@ -48,13 +45,13 @@
     <ClCompile Include="include\emuall\graphics\framebuffer.cpp">
       <Filter>Source Files\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\ShaderProgram.cpp">
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\emuall\common.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\emuall\graphics\shader.h">
-      <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\emuall\support.h">
       <Filter>Header Files</Filter>
@@ -72,6 +69,9 @@
       <Filter>Header Files\graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\emuall\graphics\frameBuffer.h">
+      <Filter>Header Files\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\emuall\graphics\ShaderProgram.h">
       <Filter>Header Files\graphics</Filter>
     </ClInclude>
   </ItemGroup>

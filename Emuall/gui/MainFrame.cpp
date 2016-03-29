@@ -32,9 +32,9 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	// Options
 	EVT_MENU(ID_Main_Options_KeepAspect, MainFrame::OnOptions)
 	EVT_MENU(ID_Main_Options_input, MainFrame::OnOptions)
-
+	
+	// General events
 	EVT_TIMER(ID_Timer, MainFrame::OnTimer)
-
 	EVT_CLOSE(MainFrame::OnClose)
 END_EVENT_TABLE()
 
@@ -97,7 +97,7 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
 
 	_filePath.clear();
 	_timer = new wxTimer(this, ID_Timer);
-	_timer->Start(FPS, false);
+	_timer->Start(16, false);
 	Log(Message,"EmuAll started");
 	_audio = new Audio();
 	_audio->Init();
@@ -405,6 +405,23 @@ void MainFrame::UpdateRecentFiles()
 	}
 }
 
+void MainFrame::RunEmulator()
+{
+	static wxStopWatch sw;
+	uint32_t time = sw.TimeInMicro().GetLo(); // Calculate the actual simulation time needed
+	//if (time > FPS * 2000) 
+	//	time = FPS*2000;
+	sw.Start(0);
+	if (_emulator.emu != NULL)
+	{
+		if (_emulator.emu->Tick(_emulator.handle, time)) // GUI update necessary
+		{
+			Update();
+		}
+	}
+	_display->Refresh();
+}
+
 void MainFrame::Update()
 {
 	if (_cpuDebugger != NULL)
@@ -572,20 +589,7 @@ void MainFrame::OnLogLevel(wxCommandEvent &evt)
 
 void MainFrame::OnTimer(wxTimerEvent &evt)
 {
-	static wxStopWatch sw;
-	uint32_t time = sw.TimeInMicro().GetLo(); // Calculate the actual simulation time needed
-	if (time > FPS * 2000) 
-		time = FPS*2000;
-	sw.Start(0);
-	if(_emulator.emu != NULL)
-	{
-		if (_emulator.emu->Tick(_emulator.handle, time)) // GUI update necessary
-		{
-			Update();
-		}
-	}
-	_display->Refresh();
-	
+	RunEmulator();
 }
 
 void MainFrame::OnReset(wxCommandEvent &evt)

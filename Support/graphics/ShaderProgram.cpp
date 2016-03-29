@@ -1,5 +1,5 @@
 
-#include <emuall/graphics/shader.h>
+#include <emuall/graphics/ShaderProgram.h>
 
 #include <GL/glew.h>
 #include <GL/GL.h>
@@ -7,41 +7,41 @@
 #include <sstream>
 #include <assert.h>
 
-Shader::Shader() : 
+ShaderProgram::ShaderProgram() : 
 	_program(0)
 {
 	_log = new std::string;
 	_shaders = new std::vector<unsigned int>;
 }
 
-Shader::~Shader()
+ShaderProgram::~ShaderProgram()
 {
 	Clean();
 	delete _log;
 	delete _shaders;
 }
 
-bool Shader::AddShader(Type type, const char *src, int len)
+bool ShaderProgram::AddShader(Type type, const char *src, int len)
 {
 	bool result = false;
 	GLenum shaderType;
 	switch (type) {
-	case Shader::Vertex:
+	case ShaderProgram::Vertex:
 		shaderType = GL_VERTEX_SHADER;
 		break;
-	case Shader::Fragment:
+	case ShaderProgram::Fragment:
 		shaderType = GL_FRAGMENT_SHADER;
 		break;
-	case Shader::Geometry:
+	case ShaderProgram::Geometry:
 		shaderType = GL_GEOMETRY_SHADER;
 		break;
-	case Shader::TesselationCtrl:
+	case ShaderProgram::TesselationCtrl:
 		shaderType = GL_TESS_CONTROL_SHADER;
 		break;
-	case Shader::TesselationEval:
+	case ShaderProgram::TesselationEval:
 		shaderType = GL_TESS_EVALUATION_SHADER;
 		break;
-	case Shader::Compute:
+	case ShaderProgram::Compute:
 		shaderType = GL_COMPUTE_SHADER;
 		break;
 	}
@@ -64,7 +64,7 @@ bool Shader::AddShader(Type type, const char *src, int len)
 	return true;
 }
 
-bool Shader::AddShader(Type type, const std::string &path)
+bool ShaderProgram::AddShader(Type type, const std::string &path)
 {
 	char *src = nullptr;
 	bool result = false;
@@ -114,7 +114,7 @@ bool Shader::AddShader(Type type, const std::string &path)
 	return result;
 }
 
-bool Shader::Link()
+bool ShaderProgram::Link()
 {
 	GLenum error;
 	// Create an new program
@@ -156,7 +156,7 @@ bool Shader::Link()
 	return true;
 }
 
-void Shader::Clean()
+void ShaderProgram::Clean()
 {
 	// Delete all the shaders
 	for (auto &shader : *_shaders) {
@@ -171,31 +171,31 @@ void Shader::Clean()
 	}
 }
 
-const char *Shader::GetLog() const
+const char *ShaderProgram::GetLog() const
 {
 	return _log->c_str();
 }
 
-void Shader::Begin() const
+void ShaderProgram::Begin() const
 {
 	assert(glIsProgram(_program) == GL_TRUE);
 	assert(IsLinked());
 	glUseProgram(_program);
 }
 
-void Shader::End() const
+void ShaderProgram::End() const
 {
 	glUseProgram(0);
 }
 
-bool Shader::IsLinked() const
+bool ShaderProgram::IsLinked() const
 {
 	GLint status;
 	glGetProgramiv(_program, GL_LINK_STATUS, &status);
 	return status == GL_TRUE;
 }
 
-bool Shader::Compile(unsigned int shader, const char *source, int len)
+bool ShaderProgram::Compile(unsigned int shader, const char *source, int len)
 {
 	GLenum error; 
 	assert(glIsShader(shader) == GL_TRUE);

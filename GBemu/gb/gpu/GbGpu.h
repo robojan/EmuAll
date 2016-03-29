@@ -10,7 +10,7 @@
 #include "../../util/log.h"
 #include <stdint.h>
 #include <vector>
-#include <emuall/graphics/shader.h>
+#include <emuall/graphics/ShaderProgram.h>
 #include <emuall/graphics/texture.h>
 
 typedef union
@@ -142,7 +142,7 @@ private:
 	unsigned int _surfaceVBO;
 	unsigned int _surfaceUVBO;
 	unsigned int _vao;
-	Shader		_shader;
+	ShaderProgram _shader;
 	gbColor		*_screen;
 	gbColor		*_screen_buffer1;
 	gbColor		*_screen_buffer2;
@@ -154,7 +154,7 @@ private:
 	unsigned int _BGVBO;
 	unsigned int _BGUVBO;
 	unsigned int _BGVAO;
-	Shader		_BGShader;
+	ShaderProgram _BGShader;
 
 	// Tiles
 	TilesDebuggerData _TiDebug;
@@ -162,7 +162,7 @@ private:
 	unsigned int _TiVBO;
 	unsigned int _TiUVBO;
 	unsigned int _TiVAO;
-	Shader		_TiShader;
+	ShaderProgram _TiShader;
 
 	// OAM
 	OAMDebuggerData _OAMDebug;
@@ -170,7 +170,7 @@ private:
 	unsigned int _OAMVBO;
 	unsigned int _OAMUVBO;
 	unsigned int _OAMVAO;
-	Shader		_OAMShader;
+	ShaderProgram _OAMShader;
 };
 
 inline void GbGpu::tick(void)

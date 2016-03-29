@@ -40,12 +40,12 @@ void EmulatorScreen::InitGL()
 		glBufferData(GL_ARRAY_BUFFER, sizeof(fboData), fboData, GL_STATIC_DRAW);
 
 		// load shader
-		if (!_shader.AddShader(Shader::Vertex, (char *)resource_post_vert_glsl, sizeof(resource_post_vert_glsl)))
+		if (!_shader.AddShader(ShaderProgram::Vertex, (char *)resource_post_vert_glsl, sizeof(resource_post_vert_glsl)))
 		{
 			Log(Error, "%s", _shader.GetLog());
 			return;
 		}
-		if (!_shader.AddShader(Shader::Fragment, (char *)resource_post_frag_glsl, sizeof(resource_post_frag_glsl))) {
+		if (!_shader.AddShader(ShaderProgram::Fragment, (char *)resource_post_frag_glsl, sizeof(resource_post_frag_glsl))) {
 			Log(Error, "%s", _shader.GetLog());
 			return;
 		}

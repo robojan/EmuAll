@@ -2,7 +2,7 @@
 #define EMULATORSCREEN_H_
 
 #include "GLPane.h"
-#include <emuall/graphics/shader.h>
+#include <emuall/graphics/ShaderProgram.h>
 #include <emuall/graphics/frameBuffer.h>
 
 class EmulatorScreen : public GLPane {
@@ -26,7 +26,7 @@ private:
 	unsigned int _vbo;
 	int _width;
 	int _height;
-	Shader _shader;
+	ShaderProgram _shader;
 	FrameBuffer *_fbo;
 };
 

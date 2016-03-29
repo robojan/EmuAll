@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-class EMUEXPORT Shader {
+class EMUEXPORT ShaderProgram {
 public:
 	enum Type {
 		Vertex,
@@ -16,8 +16,8 @@ public:
 		Compute
 	};
 
-	Shader();
-	~Shader();
+	ShaderProgram();
+	~ShaderProgram();
 	
 	bool AddShader(Type type, const char *src, int len);
 	bool AddShader(Type type, const std::string &path);
