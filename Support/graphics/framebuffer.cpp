@@ -1,4 +1,5 @@
 #include <emuall/graphics/framebuffer.h>
+#include <emuall/graphics/graphicsException.h>
 
 #include <GL/glew.h>
 #include <cassert>
@@ -9,7 +10,7 @@ FrameBuffer::FrameBuffer(int width, int height) :
 	_textures = new std::map<int, Texture>;
 	_drawBuffers = new std::vector<unsigned int>;
 
-	glGenFramebuffers(1, &_fbo);
+	GL_CHECKED(glGenFramebuffers(1, &_fbo));
 }
 
 FrameBuffer::FrameBuffer(FrameBuffer &buffer)
@@ -47,12 +48,12 @@ bool FrameBuffer::IsValid() const
 
 void FrameBuffer::Begin() const
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
+	GL_CHECKED(glBindFramebuffer(GL_FRAMEBUFFER, _fbo));
 }
 
 void FrameBuffer::End() const
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	GL_CHECKED(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 }
 
 void FrameBuffer::AttachColorBuffer(int level, bool rectangle /*= false*/)
@@ -69,12 +70,12 @@ void FrameBuffer::AttachColorBuffer(int level, bool rectangle /*= false*/)
 
 	Begin();
 
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + level, texture._id, 0);
+	GL_CHECKED(glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + level, texture._id, 0));
 
 	if (_textures->find(level) == _textures->end()) {
 		_drawBuffers->push_back(GL_COLOR_ATTACHMENT0 + level);
 
-		glDrawBuffers(_drawBuffers->size(), _drawBuffers->data());
+		GL_CHECKED(glDrawBuffers(_drawBuffers->size(), _drawBuffers->data()));
 	}
 	(*_textures)[level] = texture;
 
@@ -88,10 +89,10 @@ void FrameBuffer::AttachDepthBuffer()
 		return;
 	}
 	Begin();
-	glGenRenderbuffers(1, &_depthBuffer);
-	glBindRenderbuffer(GL_RENDERBUFFER, _depthBuffer);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, _width, _height);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthBuffer);
+	GL_CHECKED(glGenRenderbuffers(1, &_depthBuffer));
+	GL_CHECKED(glBindRenderbuffer(GL_RENDERBUFFER, _depthBuffer));
+	GL_CHECKED(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, _width, _height));
+	GL_CHECKED(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthBuffer));
 	End();
 }
 
@@ -108,11 +109,11 @@ int FrameBuffer::GetHeight() const
 void FrameBuffer::Clean()
 {
 	if (_depthBuffer) {
-		glDeleteRenderbuffers(1, &_depthBuffer);
+		GL_CHECKED(glDeleteRenderbuffers(1, &_depthBuffer));
 		_depthBuffer = 0;
 	}
 	if (_fbo) {
-		glDeleteFramebuffers(1, &_fbo);
+		GL_CHECKED(glDeleteFramebuffers(1, &_fbo));
 		_fbo = 0;
 	}
 	_textures->clear();
@@ -123,7 +124,7 @@ Texture & FrameBuffer::GetColorBuffer(int level)
 {
 	auto &it = _textures->find(level);
 	if (it == _textures->end()) {
-		return Texture();
+		throw BaseException("Color buffer not found in frameBuffer object");
 	}
 	return it->second;
 }

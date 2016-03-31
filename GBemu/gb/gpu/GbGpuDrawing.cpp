@@ -3,6 +3,8 @@
 #include <GL/glew.h>
 #include <gl/wglew.h>
 
+#include <emuall/graphics/graphicsException.h>
+
 #include "../../resources/resources.h"
 #include "../../util/log.h"
 
@@ -43,247 +45,247 @@ bool GbGpu::InitGL(int user)
 	Log(Message, "OpenGL information: \n\tVersion: %s\n\tVendor: %s\n\tRenderer: %s",
 		glGetString(GL_VERSION), glGetString(GL_VENDOR), glGetString(GL_RENDERER));
 
-	switch (user)
-	{
-	case 0: {// main screen
-		// Generate texture for drawing
-		glEnable(GL_TEXTURE_2D);
-		if (glGetError() != GL_NO_ERROR) __debugbreak();
-		_texture.LoadTexture(256, 256, NULL, Texture::RGB);
-		if (glGetError() != GL_NO_ERROR) __debugbreak();
-		_texture.Begin();
-		if (glGetError() != GL_NO_ERROR) __debugbreak();
-		_texture.SetFilter(Texture::Nearest, Texture::Nearest);
-		if (glGetError() != GL_NO_ERROR) __debugbreak();
+	try {
+		switch (user)
+		{
+		case 0: {// main screen
+				 // Generate texture for drawing
+			_texture.LoadTexture(256, 256, NULL, Texture::RGB);
+			_texture.Begin();
+			_texture.SetFilter(Texture::Nearest, Texture::Nearest);
 
-		glGenVertexArrays(1, &_vao);
-		if (glGetError() != GL_NO_ERROR) __debugbreak();
-		glBindVertexArray(_vao);
-		if (glGetError() != GL_NO_ERROR) __debugbreak();
+			GL_CHECKED(glGenVertexArrays(1, &_vao));
+			GL_CHECKED(glBindVertexArray(_vao));
 
-		// Generate vertex buffer
-		glGenBuffers(1, &_surfaceVBO);
-		if (glGetError() != GL_NO_ERROR) __debugbreak();
-		glBindBuffer(GL_ARRAY_BUFFER, _surfaceVBO);
-		if (glGetError() != GL_NO_ERROR) __debugbreak();
-		glBufferData(GL_ARRAY_BUFFER, sizeof(square), square, GL_STATIC_DRAW);
-		if (glGetError() != GL_NO_ERROR) __debugbreak();
+			// Generate vertex buffer
+			GL_CHECKED(glGenBuffers(1, &_surfaceVBO));
+			GL_CHECKED(glBindBuffer(GL_ARRAY_BUFFER, _surfaceVBO));
+			GL_CHECKED(glBufferData(GL_ARRAY_BUFFER, sizeof(square), square, GL_STATIC_DRAW));
 
-		// Generate UV buffer
-		glGenBuffers(1, &_surfaceUVBO);
-		if (glGetError() != GL_NO_ERROR) __debugbreak();
-		glBindBuffer(GL_ARRAY_BUFFER, _surfaceUVBO);
-		if (glGetError() != GL_NO_ERROR) __debugbreak();
-		glBufferData(GL_ARRAY_BUFFER, sizeof(screenUVData), screenUVData, GL_STATIC_DRAW);
-		if (glGetError() != GL_NO_ERROR) __debugbreak();
+			// Generate UV buffer
+			GL_CHECKED(glGenBuffers(1, &_surfaceUVBO));
+			GL_CHECKED(glBindBuffer(GL_ARRAY_BUFFER, _surfaceUVBO));
+			GL_CHECKED(glBufferData(GL_ARRAY_BUFFER, sizeof(screenUVData), screenUVData, GL_STATIC_DRAW));
 
-		// Initialize viewport
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-		if (glGetError() != GL_NO_ERROR) __debugbreak();
+			// Initialize viewport
+			GL_CHECKED(glClearColor(0.0f, 0.0f, 0.0f, 0.0f));
 
-		// Load shaders
-		bool result = _shader.AddShader(ShaderProgram::Vertex, (char *)resource_gb_vert, sizeof(resource_gb_vert));
-		if (!result) {
-			Log(Error, "%s", _shader.GetLog());
-			return false;
-		}			
-		result = _shader.AddShader(ShaderProgram::Fragment, (char *)resource_gb_frag, sizeof(resource_gb_frag));
-		if (!result) {
-			Log(Error, "%s", _shader.GetLog());
+			// Load shaders
+			bool result = _shader.AddShader(ShaderProgram::Vertex, (char *)resource_gb_vert, sizeof(resource_gb_vert));
+			if (!result) {
+				Log(Error, "%s", _shader.GetLog());
+				return false;
+			}
+			result = _shader.AddShader(ShaderProgram::Fragment, (char *)resource_gb_frag, sizeof(resource_gb_frag));
+			if (!result) {
+				Log(Error, "%s", _shader.GetLog());
+				return false;
+			}
+			result = _shader.Link();
+			if (!result) {
+				Log(Error, "%s", _shader.GetLog());
+				return false;
+			}
+			break;
+		}
+		case 1: {// Background screen
+			_BGTexture.LoadTexture(256, 256, NULL, Texture::RGB);
+			_BGTexture.Begin();
+			_BGTexture.SetFilter(Texture::Nearest, Texture::Nearest);
+			GL_CHECKED(glGenVertexArrays(1, &_BGVAO));
+			GL_CHECKED(glBindVertexArray(_BGVAO));
+			GL_CHECKED(glGenBuffers(1, &_BGVBO));
+			GL_CHECKED(glBindBuffer(GL_ARRAY_BUFFER, _BGVBO));
+			GL_CHECKED(glBufferData(GL_ARRAY_BUFFER, sizeof(square), square, GL_STATIC_DRAW));
+			GL_CHECKED(glGenBuffers(1, &_BGUVBO));
+			GL_CHECKED(glBindBuffer(GL_ARRAY_BUFFER, _BGUVBO));
+			GL_CHECKED(glBufferData(GL_ARRAY_BUFFER, sizeof(totalUVData), totalUVData, GL_STATIC_DRAW));
+			// Load shaders
+			bool result = _BGShader.AddShader(ShaderProgram::Vertex, (char *)resource_gb_vert, sizeof(resource_gb_vert));
+			if (!result) {
+				Log(Error, "%s", _BGShader.GetLog());
+				return false;
+			}
+			result = _BGShader.AddShader(ShaderProgram::Fragment, (char *)resource_gb_frag, sizeof(resource_gb_frag));
+			if (!result) {
+				Log(Error, "%s", _BGShader.GetLog());
+				return false;
+			}
+			result = _BGShader.Link();
+			if (!result) {
+				Log(Error, "%s", _BGShader.GetLog());
+				return false;
+			}
+			break;
+		}
+		case 2: {// Tiles screen
+			_TiTexture.LoadTexture(512, 512, NULL, Texture::RGB);
+			_TiTexture.Begin();
+			_TiTexture.SetFilter(Texture::Nearest, Texture::Nearest);
+			GL_CHECKED(glGenVertexArrays(1, &_TiVAO));
+			GL_CHECKED(glBindVertexArray(_TiVAO));
+			GL_CHECKED(glGenBuffers(1, &_TiVBO));
+			GL_CHECKED(glBindBuffer(GL_ARRAY_BUFFER, _TiVBO));
+			GL_CHECKED(glBufferData(GL_ARRAY_BUFFER, sizeof(square), square, GL_STATIC_DRAW));
+			GL_CHECKED(glGenBuffers(1, &_TiUVBO));
+			GL_CHECKED(glBindBuffer(GL_ARRAY_BUFFER, _TiUVBO));
+			GL_CHECKED(glBufferData(GL_ARRAY_BUFFER, sizeof(tilesUVData), tilesUVData, GL_STATIC_DRAW));
+			GL_CHECKED(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
+			// Load shaders
+			bool result = _TiShader.AddShader(ShaderProgram::Vertex, (char *)resource_gb_vert, sizeof(resource_gb_vert));
+			if (!result) {
+				Log(Error, "%s", _TiShader.GetLog());
+				return false;
+			}
+			result = _TiShader.AddShader(ShaderProgram::Fragment, (char *)resource_gb_frag, sizeof(resource_gb_frag));
+			if (!result) {
+				Log(Error, "%s", _TiShader.GetLog());
+				return false;
+			}
+			result = _TiShader.Link();
+			if (!result) {
+				Log(Error, "%s", _TiShader.GetLog());
+				return false;
+			}
+			break;
+		}
+		case 3: {// OAM screen
+			_OAMTexture.LoadTexture(128, 128, NULL, Texture::RGB);
+			_OAMTexture.Begin();
+			_OAMTexture.SetFilter(Texture::Nearest, Texture::Nearest);
+			GL_CHECKED(glGenVertexArrays(1, &_OAMVAO));
+			GL_CHECKED(glBindVertexArray(_OAMVAO));
+			GL_CHECKED(glGenBuffers(1, &_OAMVBO));
+			GL_CHECKED(glBindBuffer(GL_ARRAY_BUFFER, _OAMVBO));
+			GL_CHECKED(glBufferData(GL_ARRAY_BUFFER, sizeof(square), square, GL_STATIC_DRAW));
+			GL_CHECKED(glGenBuffers(1, &_OAMUVBO));
+			GL_CHECKED(glBindBuffer(GL_ARRAY_BUFFER, _OAMUVBO));
+			GL_CHECKED(glBufferData(GL_ARRAY_BUFFER, sizeof(oamUVData), oamUVData, GL_STATIC_DRAW));
+			GL_CHECKED(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
+			// Load shaders
+			bool result = _OAMShader.AddShader(ShaderProgram::Vertex, (char *)resource_gb_vert, sizeof(resource_gb_vert));
+			if (!result) {
+				Log(Error, "%s", _OAMShader.GetLog());
+				return false;
+			}
+			result = _OAMShader.AddShader(ShaderProgram::Fragment, (char *)resource_gb_frag, sizeof(resource_gb_frag));
+			if (!result) {
+				Log(Error, "%s", _OAMShader.GetLog());
+				return false;
+			}
+			result = _OAMShader.Link();
+			if (!result) {
+				Log(Error, "%s", _OAMShader.GetLog());
+				return false;
+			}
+			break;
+		}
+		default: {
+			Log(Warn, "Initializing unknown screen");
 			return false;
 		}
-		result = _shader.Link();
-		if (!result) {
-			Log(Error, "%s", _shader.GetLog());
-			return false;
 		}
-		break;
 	}
-	case 1: {// Background screen
-		_BGTexture.LoadTexture(256, 256, NULL, Texture::RGB);
-		_BGTexture.Begin();
-		_BGTexture.SetFilter(Texture::Nearest, Texture::Nearest);
-		glGenVertexArrays(1, &_BGVAO);
-		glBindVertexArray(_BGVAO);
-		glGenBuffers(1, &_BGVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, _BGVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(square), square, GL_STATIC_DRAW);
-		glGenBuffers(1, &_BGUVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, _BGUVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(totalUVData), totalUVData, GL_STATIC_DRAW);
-		// Load shaders
-		bool result = _BGShader.AddShader(ShaderProgram::Vertex, (char *)resource_gb_vert, sizeof(resource_gb_vert));
-		if (!result) {
-			Log(Error, "%s", _BGShader.GetLog());
-			return false;
-		}
-		result = _BGShader.AddShader(ShaderProgram::Fragment, (char *)resource_gb_frag, sizeof(resource_gb_frag));
-		if (!result) {
-			Log(Error, "%s", _BGShader.GetLog());
-			return false;
-		}
-		result = _BGShader.Link();
-		if (!result) {
-			Log(Error, "%s", _BGShader.GetLog());
-			return false;
-		}
-		break;
-	}
-	case 2: {// Tiles screen
-		_TiTexture.LoadTexture(512, 512, NULL, Texture::RGB);
-		_TiTexture.Begin();
-		_TiTexture.SetFilter(Texture::Nearest, Texture::Nearest);
-		glGenVertexArrays(1, &_TiVAO);
-		glBindVertexArray(_TiVAO);
-		glGenBuffers(1, &_TiVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, _TiVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(square), square, GL_STATIC_DRAW);
-		glGenBuffers(1, &_TiUVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, _TiUVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(tilesUVData), tilesUVData, GL_STATIC_DRAW);
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		// Load shaders
-		bool result = _TiShader.AddShader(ShaderProgram::Vertex, (char *)resource_gb_vert, sizeof(resource_gb_vert));
-		if (!result) {
-			Log(Error, "%s", _TiShader.GetLog());
-			return false;
-		}
-		result = _TiShader.AddShader(ShaderProgram::Fragment, (char *)resource_gb_frag, sizeof(resource_gb_frag));
-		if (!result) {
-			Log(Error, "%s", _TiShader.GetLog());
-			return false;
-		}
-		result = _TiShader.Link();
-		if (!result) {
-			Log(Error, "%s", _TiShader.GetLog());
-			return false;
-		}
-		break;
-	}
-	case 3: {// OAM screen
-		_OAMTexture.LoadTexture(128, 128, NULL, Texture::RGB);
-		_OAMTexture.Begin();
-		_OAMTexture.SetFilter(Texture::Nearest, Texture::Nearest);
-		glGenVertexArrays(1, &_OAMVAO);
-		glBindVertexArray(_OAMVAO);
-		glGenBuffers(1, &_OAMVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, _OAMVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(square), square, GL_STATIC_DRAW);
-		glGenBuffers(1, &_OAMUVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, _OAMUVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(oamUVData), oamUVData, GL_STATIC_DRAW);
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		// Load shaders
-		bool result = _OAMShader.AddShader(ShaderProgram::Vertex, (char *)resource_gb_vert, sizeof(resource_gb_vert));
-		if (!result) {
-			Log(Error, "%s", _OAMShader.GetLog());
-			return false;
-		}
-		result = _OAMShader.AddShader(ShaderProgram::Fragment, (char *)resource_gb_frag, sizeof(resource_gb_frag));
-		if (!result) {
-			Log(Error, "%s", _OAMShader.GetLog());
-			return false;
-		}
-		result = _OAMShader.Link();
-		if (!result) {
-			Log(Error, "%s", _OAMShader.GetLog());
-			return false;
-		}
-		break;
-	}
-	default: {
-		Log(Warn, "Initializing unknown screen");
-		return false;
-	}
-			
+	catch (GraphicsException &e) {
+		Log(Error, "GLerror during emulator initGL(%d): %s\n%s", user, e.GetMsg(), e.GetStacktrace());
 	}
 	return true;
 }
 
 void GbGpu::DestroyGL(int user)
 {
-	switch (user)
-	{
-	case 0: {// main screen
-		_texture.Clean();
-		glDeleteVertexArrays(1, &_vao);
-		glDeleteBuffers(1, &_surfaceVBO);
-		glDeleteBuffers(1, &_surfaceUVBO);
-		_shader.Clean();
-		break;
+	try {
+		switch (user)
+		{
+		case 0: {// main screen
+			_texture.Clean();
+			GL_CHECKED(glDeleteVertexArrays(1, &_vao));
+			GL_CHECKED(glDeleteBuffers(1, &_surfaceVBO));
+			GL_CHECKED(glDeleteBuffers(1, &_surfaceUVBO));
+			_shader.Clean();
+			break;
+		}
+		case 1: {// BG screen
+			_BGTexture.Clean();
+			GL_CHECKED(glDeleteVertexArrays(1, &_BGVAO));
+			GL_CHECKED(glDeleteBuffers(1, &_BGVBO));
+			GL_CHECKED(glDeleteBuffers(1, &_BGUVBO));
+			_BGShader.Clean();
+			break;
+		}
+		case 2: {// Tiles screen
+			_TiTexture.Clean();
+			GL_CHECKED(glDeleteVertexArrays(1, &_TiVAO));
+			GL_CHECKED(glDeleteBuffers(1, &_TiVBO));
+			GL_CHECKED(glDeleteBuffers(1, &_TiUVBO));
+			_TiShader.Clean();
+			break;
+		}
+		case 3: {// OAM screen
+			_OAMTexture.Clean();
+			GL_CHECKED(glDeleteVertexArrays(1, &_OAMVAO));
+			GL_CHECKED(glDeleteBuffers(1, &_OAMVBO));
+			GL_CHECKED(glDeleteBuffers(1, &_OAMUVBO));
+			_OAMShader.Clean();
+			break;
+		}
+		}
 	}
-	case 1: {// BG screen
-		_BGTexture.Clean();
-		glDeleteVertexArrays(1, &_BGVAO);
-		glDeleteBuffers(1, &_BGVBO);
-		glDeleteBuffers(1, &_BGUVBO);
-		_BGShader.Clean();
-		break;
-	}
-	case 2: {// Tiles screen
-		_TiTexture.Clean();
-		glDeleteVertexArrays(1, &_TiVAO);
-		glDeleteBuffers(1, &_TiVBO);
-		glDeleteBuffers(1, &_TiUVBO);
-		_TiShader.Clean();
-		break;
-	}
-	case 3: {// OAM screen
-		_OAMTexture.Clean();
-		glDeleteVertexArrays(1, &_OAMVAO);
-		glDeleteBuffers(1, &_OAMVBO);
-		glDeleteBuffers(1, &_OAMUVBO);
-		_OAMShader.Clean();
-		break;
-	}
+	catch (GraphicsException &e) {
+		Log(Error, "GLerror during emulator destroyGL(%d): %s\n%s", user, e.GetMsg(), e.GetStacktrace());
 	}
 }
 
 void GbGpu::drawGL(int user)
 {
-	// Clear screen
-	glClear(GL_COLOR_BUFFER_BIT);
+	try {
+		// Clear screen
+		GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT));
 
-	switch (user)
-	{
-	case 0: {// main screen		
-		// Setup viewport
-		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+		switch (user)
+		{
+		case 0: {// main screen		
+				 // Setup viewport
+			GL_CHECKED(glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT));
 
-		const char *data = (const char *)((_screen == _screen_buffer1) ? _screen_buffer2 : _screen_buffer1);
-		_texture.UpdateData(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, data, Texture::RGBA);
+			const char *data = (const char *)((_screen == _screen_buffer1) ? _screen_buffer2 : _screen_buffer1);
+			_texture.UpdateData(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, data, Texture::RGBA);
 
-		// Enable shader and load buffers
-		_shader.Begin();
-		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, _surfaceVBO);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
-		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, _surfaceUVBO);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
-		_texture.Begin();
+			// Enable shader and load buffers
+			_shader.Begin();
+			GL_CHECKED(glEnableVertexAttribArray(0));
+			GL_CHECKED(glBindBuffer(GL_ARRAY_BUFFER, _surfaceVBO));
+			GL_CHECKED(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0));
+			GL_CHECKED(glEnableVertexAttribArray(1));
+			GL_CHECKED(glBindBuffer(GL_ARRAY_BUFFER, _surfaceUVBO));
+			GL_CHECKED(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0));
+			_texture.Begin();
 
-		// Draw the screen
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		_texture.End();
+			// Draw the screen
+			GL_CHECKED(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
+			_texture.End();
 
-		// Unload the buffers
-		glDisableVertexAttribArray(0);
-		glDisableVertexAttribArray(1);
-		_shader.End();
-		break;
+			// Unload the buffers
+			GL_CHECKED(glDisableVertexAttribArray(0));
+			GL_CHECKED(glDisableVertexAttribArray(1));
+			_shader.End();
+			break;
+		}
+		case 1: // BG screen
+			DrawDebugBackground();
+			break;
+		case 2: // Tiles screen
+			DrawDebugTiles();
+			break;
+		case 3: // Oam screen
+			DrawDebugOAM();
+			break;
+		default:
+			Log(Warn, "Drawing unknown screen %d", user);
+		}
 	}
-	case 1: // BG screen
-		DrawDebugBackground();
-		break;
-	case 2: // Tiles screen
-		DrawDebugTiles();
-		break;
-	case 3: // Oam screen
-		DrawDebugOAM();
-		break;
-	default:
-		Log(Warn, "Drawing unknown screen %d", user);
+	catch (GraphicsException &e) {
+		Log(Error, "GLerror during emulator drawGL(%d): %s\n%s", user, e.GetMsg(), e.GetStacktrace());
 	}
 }
 
@@ -339,28 +341,28 @@ void GbGpu::DrawDebugBackground()
 
 
 	// Setup viewport
-	glViewport(0, 0, 256, 256);
+	GL_CHECKED(glViewport(0, 0, 256, 256));
 
-	glClear(GL_COLOR_BUFFER_BIT);
+	GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT));
 
 	_BGTexture.UpdateData(0, 0, 256, 256, (const char *)_debugDrawBuffer, Texture::RGBA);
 
 	// Enable shader and load buffers
 	_BGShader.Begin();
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, _BGVBO);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0);
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, _BGUVBO);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0);
+	GL_CHECKED(glEnableVertexAttribArray(0));
+	GL_CHECKED(glBindBuffer(GL_ARRAY_BUFFER, _BGVBO));
+	GL_CHECKED(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0));
+	GL_CHECKED(glEnableVertexAttribArray(1));
+	GL_CHECKED(glBindBuffer(GL_ARRAY_BUFFER, _BGUVBO));
+	GL_CHECKED(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0));
 
 	// Draw the screen
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	GL_CHECKED(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
 
 	// Unload the buffers
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
-	glBindTexture(GL_TEXTURE_2D, 0);
+	GL_CHECKED(glDisableVertexAttribArray(0));
+	GL_CHECKED(glDisableVertexAttribArray(1));
+	GL_CHECKED(glBindTexture(GL_TEXTURE_2D, 0));
 	_BGShader.End();
 }
 
@@ -399,28 +401,28 @@ void GbGpu::DrawDebugTiles()
 		}
 	}
 	// Setup viewport
-	glViewport(0, 0, 289, 217);
+	GL_CHECKED(glViewport(0, 0, 289, 217));
 
 
 	_TiTexture.UpdateData(0, 0, 289, 217, (const char *)_debugDrawBuffer, Texture::RGBA);
 
 	// Enable shader and load buffers
 	_TiShader.Begin();
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, _TiVBO);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0);
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, _TiUVBO);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0);
+	GL_CHECKED(glEnableVertexAttribArray(0));
+	GL_CHECKED(glBindBuffer(GL_ARRAY_BUFFER, _TiVBO));
+	GL_CHECKED(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0));
+	GL_CHECKED(glEnableVertexAttribArray(1));
+	GL_CHECKED(glBindBuffer(GL_ARRAY_BUFFER, _TiUVBO));
+	GL_CHECKED(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0));
 	_TiTexture.Begin();
 
 	// Draw the screen
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	GL_CHECKED(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
 	_TiTexture.End();
 
 	// Unload the buffers
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
+	GL_CHECKED(glDisableVertexAttribArray(0));
+	GL_CHECKED(glDisableVertexAttribArray(1));
 	_TiShader.End();
 }
 
@@ -487,26 +489,26 @@ void GbGpu::DrawDebugOAM()
 		}
 	}
 	// Setup viewport
-	glViewport(0, 0, 73, 86);
+	GL_CHECKED(glViewport(0, 0, 73, 86));
 
 	_OAMTexture.UpdateData(0, 0, 73, 86, (const char *)_debugDrawBuffer, Texture::RGBA);
 
 	// Enable shader and load buffers
 	_OAMShader.Begin();
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, _OAMVBO);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0);
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, _OAMUVBO);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0);
+	GL_CHECKED(glEnableVertexAttribArray(0));
+	GL_CHECKED(glBindBuffer(GL_ARRAY_BUFFER, _OAMVBO));
+	GL_CHECKED(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0));
+	GL_CHECKED(glEnableVertexAttribArray(1));
+	GL_CHECKED(glBindBuffer(GL_ARRAY_BUFFER, _OAMUVBO));
+	GL_CHECKED(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0));
 
 	// Draw the screen
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	GL_CHECKED(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
 
 	// Unload the buffers
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
-	glBindTexture(GL_TEXTURE_2D, 0);
+	GL_CHECKED(glDisableVertexAttribArray(0));
+	GL_CHECKED(glDisableVertexAttribArray(1));
+	_OAMTexture.End();
 	_OAMShader.End();
 }
 

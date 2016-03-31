@@ -3,6 +3,7 @@
 #include "../util/memDbg.h"
 #include <limits.h>
 #include "../util/log.h"
+#include <GL/glu.h>
 
 IMPLEMENT_CLASS(GLPane, wxGLCanvas);
 BEGIN_EVENT_TABLE(GLPane, wxGLCanvas)
@@ -49,6 +50,10 @@ void GLPane::SetClearColour(float r, float g, float b, float a)
 void GLPane::SetCurrentContext()
 {
 	SetCurrent(*_context);
+	GLenum error;
+	while ((error = glGetError()) != GL_NO_ERROR) {
+		Log(Warn, "Standing GL errors on context switch: %s", gluErrorString(error));
+	}
 }
 
 void GLPane::InitGL()

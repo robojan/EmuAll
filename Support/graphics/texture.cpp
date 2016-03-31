@@ -1,4 +1,5 @@
 #include <emuall/graphics/texture.h>
+#include <emuall/graphics/graphicsexception.h>
 #include <GL/glew.h>
 #include <cassert>
 
@@ -68,25 +69,20 @@ void Texture::LoadTexture(int width, int height, const char *data, Format format
 		stride = width * elementSize;
 	}
 
-	// Generate an texture
-	if (glGetError() != GL_NO_ERROR) __debugbreak();
-	glGenTextures(1, &_id);
-	if (glGetError() != GL_NO_ERROR) __debugbreak();
+	// Generate an texture	
+	GL_CHECKED(glGenTextures(1, &_id));
 
 	Begin();
-	glPixelStorei(GL_UNPACK_ROW_LENGTH, stride);
-	if (glGetError() != GL_NO_ERROR) __debugbreak();
-	glTexImage2D(_type, 0, glFormat, width, height, 0, glFormat, GL_UNSIGNED_BYTE, data);
-	if (glGetError() != GL_NO_ERROR) __debugbreak();
-	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-	if (glGetError() != GL_NO_ERROR) __debugbreak();
+	GL_CHECKED(glPixelStorei(GL_UNPACK_ROW_LENGTH, stride));
+	GL_CHECKED(glTexImage2D(_type, 0, glFormat, width, height, 0, glFormat, GL_UNSIGNED_BYTE, data));
+	GL_CHECKED(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
 	End();
 }
 
 void Texture::Clean()
 {
 	if (glIsTexture(_id)) {
-		glDeleteTextures(1, &_id);
+		GL_CHECKED(glDeleteTextures(1, &_id));
 	}
 }
 
@@ -122,39 +118,39 @@ static GLenum GetGLWrap(Texture::Wrap wrap) {
 
 Texture & Texture::SetMinFilter(Filter filter)
 {
-	glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GetGLFilter(filter));
+	GL_CHECKED(glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GetGLFilter(filter)));
 	return *this;
 }
 
 Texture & Texture::SetMagFilter(Filter filter)
 {
-	glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GetGLFilter(filter));
+	GL_CHECKED(glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GetGLFilter(filter)));
 	return *this;
 }
 
 Texture & Texture::SetFilter(Filter min, Filter mag)
 {
-	glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GetGLFilter(min));
-	glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GetGLFilter(mag));
+	GL_CHECKED(glTexParameteri(_type, GL_TEXTURE_MIN_FILTER, GetGLFilter(min)));
+	GL_CHECKED(glTexParameteri(_type, GL_TEXTURE_MAG_FILTER, GetGLFilter(mag)));
 	return *this;
 }
 
 Texture & Texture::SetWrapS(Wrap wrap)
 {
-	glTexParameteri(_type, GL_TEXTURE_WRAP_S, GetGLWrap(wrap));
+	GL_CHECKED(glTexParameteri(_type, GL_TEXTURE_WRAP_S, GetGLWrap(wrap)));
 	return *this;
 }
 
 Texture & Texture::SetWrapT(Wrap wrap)
 {
-	glTexParameteri(_type, GL_TEXTURE_WRAP_T, GetGLWrap(wrap));
+	GL_CHECKED(glTexParameteri(_type, GL_TEXTURE_WRAP_T, GetGLWrap(wrap)));
 	return *this;
 }
 
 Texture & Texture::SetWrap(Wrap wrapS, Wrap wrapT)
 {
-	glTexParameteri(_type, GL_TEXTURE_WRAP_S, GetGLWrap(wrapS));
-	glTexParameteri(_type, GL_TEXTURE_WRAP_T, GetGLWrap(wrapT));
+	GL_CHECKED(glTexParameteri(_type, GL_TEXTURE_WRAP_S, GetGLWrap(wrapS)));
+	GL_CHECKED(glTexParameteri(_type, GL_TEXTURE_WRAP_T, GetGLWrap(wrapT)));
 	return *this;
 }
 
@@ -165,14 +161,12 @@ bool Texture::IsValid() const
 
 void Texture::Begin()
 {
-	glBindTexture(_type, _id);
-	if (glGetError() != GL_NO_ERROR) __debugbreak();
+	GL_CHECKED(glBindTexture(_type, _id));
 }
 
 void Texture::End()
 {
-	glBindTexture(_type, 0);
-	if (glGetError() != GL_NO_ERROR) __debugbreak();
+	GL_CHECKED(glBindTexture(_type, 0));
 }
 
 void Texture::UpdateData(int x, int y, int width, int height, const char *data, Format format, int stride /*= -1*/)
@@ -194,9 +188,9 @@ void Texture::UpdateData(int x, int y, int width, int height, const char *data, 
 	}
 
 	Begin();
-	glPixelStorei(GL_UNPACK_ROW_LENGTH, stride);
-	glTexSubImage2D(_type, 0, x, y, width, height,glFormat, GL_UNSIGNED_BYTE, data);
-	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+	GL_CHECKED(glPixelStorei(GL_UNPACK_ROW_LENGTH, stride));
+	GL_CHECKED(glTexSubImage2D(_type, 0, x, y, width, height,glFormat, GL_UNSIGNED_BYTE, data));
+	GL_CHECKED(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
 	End();
 }
 

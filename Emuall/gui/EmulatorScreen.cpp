@@ -4,6 +4,7 @@
 #include "../resources/resources.h"
 #include "../util/log.h"
 #include "../util/Options.h"
+#include <emuall/graphics/graphicsException.h>
 
 static GLfloat fboData[] = {
 	// X    Y     Z      U    V
@@ -31,13 +32,13 @@ void EmulatorScreen::InitGL()
 	if (!_initialized) {
 
 		// Create vao
-		glGenVertexArrays(1, &_vao);
-		glBindVertexArray(_vao);
+		GL_CHECKED(glGenVertexArrays(1, &_vao));
+		GL_CHECKED(glBindVertexArray(_vao));
 
 		// Generate vertex buffer
-		glGenBuffers(1, &_vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(fboData), fboData, GL_STATIC_DRAW);
+		GL_CHECKED(glGenBuffers(1, &_vbo));
+		GL_CHECKED(glBindBuffer(GL_ARRAY_BUFFER, _vbo));
+		GL_CHECKED(glBufferData(GL_ARRAY_BUFFER, sizeof(fboData), fboData, GL_STATIC_DRAW));
 
 		SetPostProcessingFilter(BiLinear);
 		_initialized = true;
@@ -64,6 +65,7 @@ void EmulatorScreen::SetFrameBufferSize(int width, int height)
 	_fbo->AttachColorBuffer(0);
 	_fbo->AttachDepthBuffer();
 	_fbo->GetColorBuffer(0).SetWrap(Texture::ClampToEdge, Texture::ClampToEdge);
+
 }
 
 void EmulatorScreen::SetPostProcessingFilter(Filter filter)
@@ -117,77 +119,73 @@ void EmulatorScreen::Render(wxPaintEvent &evt)
 	SetCurrentContext();
 	wxPaintDC(this);
 
-	glClear(GL_COLOR_BUFFER_BIT);
 
-	if (_fbo == nullptr) {
-		wxSize size = GetSize();
-		SetFrameBufferSize(size.GetWidth(), size.GetHeight());
-		SwapBuffers();
-		return;
-	}
+	try {
+		GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT));
 
-	_fbo->Begin();
-	if (_clearColourChanged)
-	{
-		glClearColor(_clearR, _clearG, _clearB, _clearA);
-		_clearColourChanged = false;
-	}
+		if (_fbo == nullptr) {
+			wxSize size = GetSize();
+			SetFrameBufferSize(size.GetWidth(), size.GetHeight());
+			SwapBuffers();
+			return;
+		}
 
-	InitGL();
-	if (GLPane::_initialized) {
-		_callback->DrawGL(_user);
-	}
-	else {
-		glClear(GL_COLOR_BUFFER_BIT);
-	}
-	_fbo->End();
-
-	// Setup viewport
-	wxSize size = GetClientSize();
-	if (Options::GetInstance().videoOptions.keepAspect)
-	{
-		if (((float)size.GetWidth()) / size.GetHeight() > ((float)_width) / _height)
+		_fbo->Begin();
+		if (_clearColourChanged)
 		{
-			int newWidth = static_cast<int>((((float)_width) / _height)*size.GetHeight());
-			glViewport((size.GetWidth() - newWidth) / 2, 0, newWidth, size.GetHeight());
+			GL_CHECKED(glClearColor(_clearR, _clearG, _clearB, _clearA));
+			_clearColourChanged = false;
+		}
+		InitGL();
+		if (GLPane::_initialized) {
+			_callback->DrawGL(_user);
 		}
 		else {
-			int newHeight = static_cast<int>((((float)_height) / _width)*size.GetWidth());
-			glViewport(0, (size.GetHeight() - newHeight) / 2, size.GetWidth(), newHeight);
+			GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT));
 		}
+		_fbo->End();
+
+		// Setup viewport
+		wxSize size = GetClientSize();
+		if (Options::GetInstance().videoOptions.keepAspect)
+		{
+			if (((float)size.GetWidth()) / size.GetHeight() > ((float)_width) / _height)
+			{
+				int newWidth = static_cast<int>((((float)_width) / _height)*size.GetHeight());
+				GL_CHECKED(glViewport((size.GetWidth() - newWidth) / 2, 0, newWidth, size.GetHeight()));
+			}
+			else {
+				int newHeight = static_cast<int>((((float)_height) / _width)*size.GetWidth());
+				GL_CHECKED(glViewport(0, (size.GetHeight() - newHeight) / 2, size.GetWidth(), newHeight));
+			}
+		}
+		else {
+			GL_CHECKED(glViewport(0, 0, size.GetWidth(), size.GetHeight()));
+		}
+
+		// Render the framebuffer
+		// Enable shader and load buffers
+		_shader.Begin();
+		GL_CHECKED(glEnableVertexAttribArray(0));
+		GL_CHECKED(glBindBuffer(GL_ARRAY_BUFFER, _vbo));
+		GL_CHECKED(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid *)0));
+		GL_CHECKED(glEnableVertexAttribArray(1));
+		GL_CHECKED(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat))));
+		Texture &frame = _fbo->GetColorBuffer(0);
+		_shader.SetUniform("textureSampler", 0, frame);
+
+		// Draw the screen
+		GL_CHECKED(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
+
+		// Unload the buffers
+		GL_CHECKED(glDisableVertexAttribArray(0));
+		GL_CHECKED(glDisableVertexAttribArray(1));
+		frame.End();
+		_shader.End();
 	}
-	else {
-		glViewport(0, 0, size.GetWidth(), size.GetHeight());
+	catch (GraphicsException & e) {
+		Log(Error, "GraphicsException caught: %s\nStacktrace:\n%s", e.GetMsg(), e.GetStacktrace());
 	}
-
-	// Render the framebuffer
-	// Enable shader and load buffers
-	_shader.Begin();
-	glEnableVertexAttribArray(0);
-	if (glGetError() != GL_NO_ERROR) __debugbreak();
-	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-	if (glGetError() != GL_NO_ERROR) __debugbreak();
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid *)0);
-	if (glGetError() != GL_NO_ERROR) __debugbreak();
-	glEnableVertexAttribArray(1);
-	if (glGetError() != GL_NO_ERROR) __debugbreak();
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
-	if (glGetError() != GL_NO_ERROR) __debugbreak();
-	Texture &frame = _fbo->GetColorBuffer(0);
-	_shader.SetUniform("textureSampler", 0, frame);
-	if (glGetError() != GL_NO_ERROR) __debugbreak();
-
-	// Draw the screen
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	if (glGetError() != GL_NO_ERROR) __debugbreak();
-
-	// Unload the buffers
-	glDisableVertexAttribArray(0);
-	if (glGetError() != GL_NO_ERROR) __debugbreak();
-	glDisableVertexAttribArray(1);
-	if (glGetError() != GL_NO_ERROR) __debugbreak();
-	frame.End();
-	_shader.End();
 
 	SwapBuffers();
 }

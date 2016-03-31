@@ -12,6 +12,7 @@
 
 #include "../resources/icon.xpm"
 #include <emuall/support.h>
+#include <emuall/exception.h>
 
 BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_MENU(ID_Main_File_quit, MainFrame::OnQuit)
@@ -78,6 +79,7 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
 	// Initialize support library
 	emuallSupportInit();
 	GLenum result;
+	glewExperimental = true;
 	if ((result = glewInit()) != GLEW_OK) {
 		Log(Error, "glewInit failed: %s", glewGetErrorString(result));
 	}
@@ -123,7 +125,7 @@ void MainFrame::CreateLayout()
 	wxGLAttributes glAttr;
 	glAttr.PlatformDefaults();
 	glAttr.DoubleBuffer();
-	glAttr.RGBA();
+	//glAttr.RGBA();
 	glAttr.Depth(24);
 	glAttr.Stencil(8);
 	glAttr.EndList();
@@ -419,7 +421,12 @@ void MainFrame::RunEmulator()
 			Update();
 		}
 	}
-	_display->Refresh();
+	try {
+		_display->Refresh();
+	}
+	catch (BaseException &e) {
+		Log(Error, "BaseException caught: %s\nStacktrace:\n%s", e.GetMsg(), e.GetStacktrace());
+	}
 }
 
 void MainFrame::Update()

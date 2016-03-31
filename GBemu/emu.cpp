@@ -17,6 +17,7 @@ void(*Log)(enum loglevel, char *, ...);
 void __stdcall InitPlugin()
 {
 	// Initialize GLEW
+	glewExperimental = true;
 	GLenum result = glewInit();
 	if (result != GLEW_OK) {
 		Log(Error, "GLEW could not be initialized: %s", glewGetErrorString(result));

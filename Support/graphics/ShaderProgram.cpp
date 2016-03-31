@@ -1,6 +1,7 @@
 
 #include <emuall/graphics/ShaderProgram.h>
 #include <emuall/graphics/texture.h>
+#include <emuall/graphics/graphicsException.h>
 
 #include <GL/glew.h>
 #include <GL/GL.h>
@@ -48,7 +49,8 @@ bool ShaderProgram::AddShader(Type type, const char *src, int len)
 	}
 
 	// Create an shader object
-	GLuint shader = glCreateShader(shaderType);
+	GLuint shader;
+	GL_CHECKED(shader = glCreateShader(shaderType));
 	if (shader == 0) {
 		*_log = "Could not create an GL shader object\n";
 		return result;
@@ -56,7 +58,7 @@ bool ShaderProgram::AddShader(Type type, const char *src, int len)
 
 	result = Compile(shader, src, len);
 	if (!result) {
-		glDeleteShader(shader);
+		GL_CHECKED(glDeleteShader(shader));
 		return result;
 	}
 
@@ -117,9 +119,8 @@ bool ShaderProgram::AddShader(Type type, const std::string &path)
 
 bool ShaderProgram::Link()
 {
-	GLenum error;
 	// Create an new program
-	_program = glCreateProgram();
+	GL_CHECKED(_program = glCreateProgram());
 	if (_program == 0) {
 		*_log = "Could not create an shader program\n";
 		return false;
@@ -127,17 +128,11 @@ bool ShaderProgram::Link()
 
 	// Attach all the shaders
 	for (auto &shader : *_shaders) {
-		glAttachShader(_program, shader);
-		if ((error = glGetError()) != GL_NO_ERROR) {
-			std::stringstream stringstream;
-			stringstream << "Error could attach shader to program: " <<
-				gluErrorString(error) << std::endl;
-			*_log = stringstream.str();
-		}
+		GL_CHECKED(glAttachShader(_program, shader));
 	}
 
 	// Link the program
-	glLinkProgram(_program);
+	GL_CHECKED(glLinkProgram(_program));
 
 	GLint status;
 	glGetProgramiv(_program, GL_LINK_STATUS, &status);
@@ -150,7 +145,7 @@ bool ShaderProgram::Link()
 		glGetProgramInfoLog(_program, logLength + 1, &logLength, log.data());
 		stringstream << log.data();
 		*_log = stringstream.str();
-		glDeleteProgram(_program);
+		GL_CHECKED(glDeleteProgram(_program));
 		_program = 0;
 		return false;
 	}
@@ -162,12 +157,12 @@ void ShaderProgram::Clean()
 	// Delete all the shaders
 	for (auto &shader : *_shaders) {
 		if (glIsShader(shader)) {
-			glDeleteShader(shader);
+			GL_CHECKED(glDeleteShader(shader));
 		}
 	}
 	_shaders->clear();
 	if (glIsProgram(_program)) {
-		glDeleteProgram(_program);
+		GL_CHECKED(glDeleteProgram(_program));
 		_program = 0;
 	}
 }
@@ -181,12 +176,12 @@ void ShaderProgram::Begin() const
 {
 	assert(glIsProgram(_program) == GL_TRUE);
 	assert(IsLinked());
-	glUseProgram(_program);
+	GL_CHECKED(glUseProgram(_program));
 }
 
 void ShaderProgram::End() const
 {
-	glUseProgram(0);
+	GL_CHECKED(glUseProgram(0));
 }
 
 bool ShaderProgram::IsLinked() const
@@ -201,7 +196,7 @@ void ShaderProgram::SetUniform(const char *name, int val)
 {
 	int loc = GetUniformLocation(name);
 	if (loc != -1) {
-		glUniform1i(loc, val);
+		GL_CHECKED(glUniform1i(loc, val));
 	}
 }
 
@@ -209,7 +204,7 @@ void ShaderProgram::SetUniform(const char *name, float val)
 {
 	int loc = GetUniformLocation(name);
 	if (loc != -1) {
-		glUniform1f(loc, val);
+		GL_CHECKED(glUniform1f(loc, val));
 	}
 }
 
@@ -217,7 +212,7 @@ void ShaderProgram::SetUniform(const char *name, double val)
 {
 	int loc = GetUniformLocation(name);
 	if (loc != -1) {
-		glUniform1d(loc, val);
+		GL_CHECKED(glUniform1d(loc, val));
 	}
 }
 
@@ -225,8 +220,8 @@ void ShaderProgram::SetUniform(const char *name, int pos, Texture &texture)
 {
 	int loc = GetUniformLocation(name);
 	if (loc != -1) {
-		glUniform1i(loc, pos);
-		glActiveTexture(GL_TEXTURE0 + pos);
+		GL_CHECKED(glUniform1i(loc, pos));
+		GL_CHECKED(glActiveTexture(GL_TEXTURE0 + pos));
 		texture.Begin();
 	}
 }
@@ -235,7 +230,7 @@ void ShaderProgram::SetUniform(const char *name, int val0, int val1)
 {
 	int loc = GetUniformLocation(name);
 	if (loc != -1) {
-		glUniform2i(loc, val0, val1);
+		GL_CHECKED(glUniform2i(loc, val0, val1));
 	}
 }
 
@@ -243,7 +238,7 @@ void ShaderProgram::SetUniform(const char *name, int val0, int val1, int val2)
 {
 	int loc = GetUniformLocation(name);
 	if (loc != -1) {
-		glUniform3i(loc, val0, val1, val2);
+		GL_CHECKED(glUniform3i(loc, val0, val1, val2));
 	}
 }
 
@@ -251,7 +246,7 @@ void ShaderProgram::SetUniform(const char *name, int val0, int val1, int val2, i
 {
 	int loc = GetUniformLocation(name);
 	if (loc != -1) {
-		glUniform4i(loc, val0, val1, val2, val3);
+		GL_CHECKED(glUniform4i(loc, val0, val1, val2, val3));
 	}
 }
 
@@ -259,7 +254,7 @@ void ShaderProgram::SetUniform(const char *name, float val0, float val1)
 {
 	int loc = GetUniformLocation(name);
 	if (loc != -1) {
-		glUniform2f(loc, val0, val1);
+		GL_CHECKED(glUniform2f(loc, val0, val1));
 	}
 }
 
@@ -267,7 +262,7 @@ void ShaderProgram::SetUniform(const char *name, float val0, float val1, float v
 {
 	int loc = GetUniformLocation(name);
 	if (loc != -1) {
-		glUniform3f(loc, val0, val1, val2);
+		GL_CHECKED(glUniform3f(loc, val0, val1, val2));
 	}
 }
 
@@ -275,7 +270,7 @@ void ShaderProgram::SetUniform(const char *name, float val0, float val1, float v
 {
 	int loc = GetUniformLocation(name);
 	if (loc != -1) {
-		glUniform4f(loc, val0, val1, val2, val3);
+		GL_CHECKED(glUniform4f(loc, val0, val1, val2, val3));
 	}
 }
 
@@ -283,7 +278,7 @@ void ShaderProgram::SetUniform(const char *name, double val0, double val1)
 {
 	int loc = GetUniformLocation(name);
 	if (loc != -1) {
-		glUniform2d(loc, val0, val1);
+		GL_CHECKED(glUniform2d(loc, val0, val1));
 	}
 }
 
@@ -291,7 +286,7 @@ void ShaderProgram::SetUniform(const char *name, double val0, double val1, doubl
 {
 	int loc = GetUniformLocation(name);
 	if (loc != -1) {
-		glUniform3d(loc, val0, val1, val2);
+		GL_CHECKED(glUniform3d(loc, val0, val1, val2));
 	}
 }
 
@@ -299,28 +294,20 @@ void ShaderProgram::SetUniform(const char *name, double val0, double val1, doubl
 {
 	int loc = GetUniformLocation(name);
 	if (loc != -1) {
-		glUniform4d(loc, val0, val1, val2, val3);
+		GL_CHECKED(glUniform4d(loc, val0, val1, val2, val3));
 	}
 }
 
 bool ShaderProgram::Compile(unsigned int shader, const char *source, int len)
 {
-	GLenum error; 
 	assert(glIsShader(shader) == GL_TRUE);
 
 
 	// Assign the source code to the shader
-	glShaderSource(shader, 1, &source, &len);
-	if ((error = glGetError()) != GL_NO_ERROR) {
-		std::stringstream stringstream;
-		stringstream << "Error could assign source to shader: " << 
-			gluErrorString(error) << std::endl;
-		*_log = stringstream.str();
-		return false;
-	}
+	GL_CHECKED(glShaderSource(shader, 1, &source, &len));
 
 	// Compile the shader
-	glCompileShader(shader);
+	GL_CHECKED(glCompileShader(shader));
 
 	GLint status;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
@@ -336,18 +323,12 @@ bool ShaderProgram::Compile(unsigned int shader, const char *source, int len)
 		return false;
 	}
 
-	if ((error = glGetError()) != GL_NO_ERROR) {
-		std::stringstream stringstream;
-		stringstream << "Unexpected error in shader compilation: " <<
-			gluErrorString(error) << std::endl;
-		*_log = stringstream.str();
-		return false;
-	}
-
 	return true;
 }
 
 int ShaderProgram::GetUniformLocation(const char *name)
 {
-	return glGetUniformLocation(_program, name);
+	int loc;
+	GL_CHECKED(loc = glGetUniformLocation(_program, name));
+	return loc;
 }

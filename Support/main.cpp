@@ -20,5 +20,6 @@ BOOL WINAPI DLLMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
 }
 
 void emuallSupportInit() {
+	glewExperimental = true;
 	assert(glewInit() == GLEW_OK);
 }

@@ -4,6 +4,8 @@
 #include "emuAll.h"
 #include "util/memDbg.h"
  
+#include <emuall/exception.h>
+
 IMPLEMENT_APP(EmuAll);
 
 bool EmuAll::OnInit()
