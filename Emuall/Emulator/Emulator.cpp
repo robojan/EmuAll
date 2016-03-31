@@ -79,7 +79,7 @@ EmulatorInterface::EmulatorInterface(const std::string &dllName) :
 		_tick					= (int32_t(__stdcall*)(EMUHANDLE, uint32_t))				GetStdcallFunc<EMUHANDLE, uint32_t>				(_hDLL, "Tick");
 		_input					= (void(__stdcall*)(EMUHANDLE, int32_t, int32_t))			GetStdcallFunc<EMUHANDLE, int32_t, int32_t>		(_hDLL, "Input");
 		_draw					= (void(__stdcall*)(EMUHANDLE, int32_t))					GetStdcallFunc<EMUHANDLE, int32_t>				(_hDLL, "Draw");
-		_reshape				= (void(__stdcall*)(EMUHANDLE, int32_t, int32_t, int32_t))	GetStdcallFunc<EMUHANDLE, int32_t, int32_t, int32_t>(_hDLL, "Reshape");
+		_reshape				= (void(__stdcall*)(EMUHANDLE, int32_t, int32_t, int32_t, int32_t))	GetStdcallFunc<EMUHANDLE, int32_t, int32_t, int32_t, int32_t>(_hDLL, "Reshape");
 		_save					= (int32_t(__stdcall*)(EMUHANDLE, SaveData_t *))			GetStdcallFunc<EMUHANDLE, SaveData_t *>			(_hDLL, "Save");
 		_saveState				= (int32_t(__stdcall*)(EMUHANDLE, SaveData_t *))			GetStdcallFunc<EMUHANDLE, SaveData_t *>			(_hDLL, "SaveState");
 		_disassemble			= (uint8_t(__stdcall*)(EMUHANDLE, uint32_t, const uint8_t **, const uint8_t **))GetStdcallFunc<EMUHANDLE, uint32_t, const uint8_t **, const uint8_t **>(_hDLL, "Disassemble");
@@ -470,11 +470,11 @@ void EmulatorInterface::Draw(EMUHANDLE handle, int id)
 	_draw(handle, id);
 }
 
-void EmulatorInterface::Reshape(EMUHANDLE handle, int width, int height, bool keepAspect)
+void EmulatorInterface::Reshape(EMUHANDLE handle,int id, int width, int height, bool keepAspect)
 {
 	if (_reshape == NULL)
 		return;
-	_reshape(handle, width, height, keepAspect);
+	_reshape(handle, id, width, height, keepAspect);
 }
 
 int EmulatorInterface::Save(EMUHANDLE handle, SaveData_t *data)

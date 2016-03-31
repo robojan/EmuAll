@@ -46,8 +46,6 @@ EMUEXPORT int32_t __stdcall Load(EMUHANDLE handle, const SaveData_t *data);
 EMUEXPORT int32_t  __stdcall Save(EMUHANDLE handle, SaveData_t *data);
 EMUEXPORT int32_t __stdcall SaveState(EMUHANDLE handle, SaveData_t *data);
 EMUEXPORT int32_t __stdcall LoadState(EMUHANDLE handle, const SaveData_t *data);
-EMUEXPORT uint32_t __stdcall InitGL(EMUHANDLE handle, int32_t id);
-EMUEXPORT void __stdcall DestroyGL(EMUHANDLE handle, int32_t id);
 
 // Misc functions
 EMUEXPORT int32_t __stdcall GetValI(EMUHANDLE handle, int32_t id);
@@ -65,9 +63,13 @@ EMUEXPORT int32_t __stdcall IsRunning(EMUHANDLE handle);
 EMUEXPORT void __stdcall Step(EMUHANDLE handle);
 EMUEXPORT int32_t __stdcall Tick(EMUHANDLE handle, uint32_t time);
 EMUEXPORT void __stdcall Input(EMUHANDLE handle, int32_t key, int32_t pressed);
-EMUEXPORT void __stdcall Draw(EMUHANDLE handle, int32_t id);
-EMUEXPORT void __stdcall Reshape(EMUHANDLE handle, int32_t width, int32_t height, int32_t keepAspect);
 EMUEXPORT void __stdcall GetAudio(EMUHANDLE handle, int32_t source, int16_t *buffer, int32_t samples, int32_t channels, uint32_t samplerate);
+
+// Graphics functions
+EMUEXPORT uint32_t __stdcall InitGL(EMUHANDLE handle, int32_t id);
+EMUEXPORT void __stdcall DestroyGL(EMUHANDLE handle, int32_t id);
+EMUEXPORT void __stdcall Reshape(EMUHANDLE handle, int32_t id, int32_t width, int32_t height, int32_t keepAspect);
+EMUEXPORT void __stdcall Draw(EMUHANDLE handle, int32_t id);
 
 // Debugging functions
 EMUEXPORT uint8_t __stdcall Disassemble(EMUHANDLE handle, uint32_t pos, const uint8_t **raw, const uint8_t **instr);

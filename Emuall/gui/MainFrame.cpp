@@ -266,7 +266,7 @@ void MainFrame::LoadEmulator(std::string &fileName)
 		int w, h;
 		_display->GetSize(&w, &h);
 		_display->SetFrameBufferSize(w, h);
-		emu->Reshape(handle, w, h, Options::GetInstance().videoOptions.keepAspect);
+		emu->Reshape(handle, _display->GetUserData(), w, h, Options::GetInstance().videoOptions.keepAspect);
 	}
 
 	// Loading the rom in memory
@@ -623,7 +623,7 @@ void MainFrame::OnOptions(wxCommandEvent &evt)
 		{
 			int width, height;
 			_display->GetSize(&width, &height);
-			_emulator.emu->Reshape(_emulator.handle, width, height, evt.IsChecked());
+			_emulator.emu->Reshape(_emulator.handle, _display->GetUserData(), width, height, evt.IsChecked());
 		}
 		break;
 	case ID_Main_Options_input:
@@ -653,7 +653,7 @@ void MainFrame::OnResize(wxSizeEvent &evt)
 	{
 		int width, height;
 		_display->GetSize(&width, &height);
-		_emulator.emu->Reshape(_emulator.handle, width, height, Options::GetInstance().videoOptions.keepAspect);
+		_emulator.emu->Reshape(_emulator.handle, _display->GetUserData(), width, height, Options::GetInstance().videoOptions.keepAspect);
 	}
 	if (_display != NULL && _emulator.emu == NULL)
 	{

@@ -48,7 +48,7 @@ public:
 	void Run(bool run = true);
 	inline bool IsRunning(void) const { return _running; }
 	bool Tick(uint32_t time);
-	void Reshape(int width, int height, bool keepAspect);
+	void Reshape(int id, int width, int height, bool keepAspect);
 	bool Input(int key, int pressed);
 	bool Load(const SaveData_t *data);
 	bool Save(SaveData_t *fileName);

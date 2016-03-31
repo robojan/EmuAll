@@ -94,7 +94,7 @@ public:
 	void drawGL(int user);
 	bool InitGL(int user);
 	void DestroyGL(int user);
-	void Reshape(int width, int height, bool keepAspect);
+	void Reshape(int id, int width, int height, bool keepAspect);
 
 	bool IsEnabled() const { return _enabled; }
 

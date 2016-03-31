@@ -355,6 +355,8 @@ void GbGpu::DrawDebugBackground()
 	GL_CHECKED(glEnableVertexAttribArray(1));
 	GL_CHECKED(glBindBuffer(GL_ARRAY_BUFFER, _BGUVBO));
 	GL_CHECKED(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0));
+	_BGTexture.Begin();
+
 
 	// Draw the screen
 	GL_CHECKED(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
@@ -363,6 +365,7 @@ void GbGpu::DrawDebugBackground()
 	GL_CHECKED(glDisableVertexAttribArray(0));
 	GL_CHECKED(glDisableVertexAttribArray(1));
 	GL_CHECKED(glBindTexture(GL_TEXTURE_2D, 0));
+	_BGTexture.End();
 	_BGShader.End();
 }
 
@@ -401,7 +404,7 @@ void GbGpu::DrawDebugTiles()
 		}
 	}
 	// Setup viewport
-	GL_CHECKED(glViewport(0, 0, 289, 217));
+	GL_CHECKED(glViewport(0, 0, 346, 260));
 
 
 	_TiTexture.UpdateData(0, 0, 289, 217, (const char *)_debugDrawBuffer, Texture::RGBA);
@@ -489,7 +492,7 @@ void GbGpu::DrawDebugOAM()
 		}
 	}
 	// Setup viewport
-	GL_CHECKED(glViewport(0, 0, 73, 86));
+	GL_CHECKED(glViewport(0, 0, 265, 326));
 
 	_OAMTexture.UpdateData(0, 0, 73, 86, (const char *)_debugDrawBuffer, Texture::RGBA);
 
@@ -502,6 +505,8 @@ void GbGpu::DrawDebugOAM()
 	GL_CHECKED(glBindBuffer(GL_ARRAY_BUFFER, _OAMUVBO));
 	GL_CHECKED(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0));
 
+	_OAMTexture.Begin();
+
 	// Draw the screen
 	GL_CHECKED(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
 
@@ -512,7 +517,7 @@ void GbGpu::DrawDebugOAM()
 	_OAMShader.End();
 }
 
-void GbGpu::Reshape(int width, int height, bool keepAspect)
+void GbGpu::Reshape(int id, int width, int height, bool keepAspect)
 {
 	// Let the host do the sizing
 	/*

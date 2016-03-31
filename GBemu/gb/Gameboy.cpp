@@ -181,9 +181,9 @@ bool Gameboy::Tick(uint32_t time)
 	return false;
 }
 
-void Gameboy::Reshape(int width, int height, bool keepAspect)
+void Gameboy::Reshape(int id, int width, int height, bool keepAspect)
 {
-	_gpu->Reshape(width, height, keepAspect);
+	_gpu->Reshape(id, width, height, keepAspect);
 }
 
 bool Gameboy::Input(int key, int pressed)

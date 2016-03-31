@@ -369,12 +369,12 @@ void __stdcall Draw(EMUHANDLE handle, int32_t id)
 	emulator->GetGpu()->drawGL(id);
 }
 
-void __stdcall Reshape(EMUHANDLE handle, int32_t width, int32_t height, int32_t keepAspect)
+void __stdcall Reshape(EMUHANDLE handle, int32_t id, int32_t width, int32_t height, int32_t keepAspect)
 {
 	Gameboy *emulator = (Gameboy *) handle;
 	if (handle == NULL)
 		return;
-	emulator->Reshape(width, height, keepAspect!=0);
+	emulator->Reshape(id, width, height, keepAspect!=0);
 }
 
 // stopping functions

@@ -141,7 +141,7 @@ public:
 	int Tick(EMUHANDLE handle, uint32_t time);
 	void Input(EMUHANDLE handle, int key, int pressed);
 	void Draw(EMUHANDLE handle, int id);
-	void Reshape(EMUHANDLE handle, int width, int height, bool keepAspect);
+	void Reshape(EMUHANDLE handle, int id, int width, int height, bool keepAspect);
 
 	int Save(EMUHANDLE handle, SaveData_t* data);
 	int SaveState(EMUHANDLE handle, SaveData_t *state);
@@ -193,7 +193,7 @@ private:
 	int32_t(__stdcall *_tick)(EMUHANDLE, uint32_t);
 	void(__stdcall *_input)(EMUHANDLE, int32_t, int32_t);
 	void(__stdcall *_draw)(EMUHANDLE, int32_t);
-	void(__stdcall *_reshape)(EMUHANDLE, int32_t, int32_t, int32_t);
+	void(__stdcall *_reshape)(EMUHANDLE, int32_t, int32_t, int32_t, int32_t);
 
 	// stopping functions
 	int32_t(__stdcall *_save)(EMUHANDLE, SaveData_t *);
