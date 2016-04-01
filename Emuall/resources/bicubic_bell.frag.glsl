@@ -1,20 +1,12 @@
 #version 330
 
-float bell(float x) {
-	float f = (x / 2.0) * 1.5; // Converting -2 to +2 to -1.5 to +1.5
-	if (f > -1.5 && f < -0.5)
-	{
-		return(0.5 * pow(f + 1.5, 2.0));
-	}
-	else if (f > -0.5 && f < 0.5)
-	{
-		return 3.0 / 4.0 - (f * f);
-	}
-	else if ((f > 0.5 && f < 1.5))
-	{
-		return(0.5 * pow(f - 1.5, 2.0));
-	}
-	return 0.0;
+// Constants
+const float PI = 3.14159265359;
+const float variance = 0.5;
+
+float gaussian(float x) {
+	float a = 1 / (variance * sqrt(2.0 * PI));
+	return a * exp(-x * x / (2.0 * variance * variance)); 
 }
 
 // Bi-linear texture filtering
@@ -39,8 +31,8 @@ vec4 GetTextureColor(sampler2D textureSampler, vec2 textureCoord) {
 		for (int n = -1; n <= 2; n++) {
 			ivec2 texelCoord = clamp(startCoord + ivec2(m, -n), ivec2(0, 0), size);
 			vec4 texelColor = texelFetch(textureSampler, texelCoord, 0);
-			float f1 = bell(float(m) - factors.x);
-			float f2 = bell(factors.y - float(n));
+			float f1 = gaussian(float(m) - factors.x);
+			float f2 = gaussian(factors.y - float(n));
 			sum = sum + texelColor * f1 * f2;
 			denom = denom + f1 * f2;
 		}

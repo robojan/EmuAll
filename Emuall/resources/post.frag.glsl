@@ -12,6 +12,7 @@ uniform sampler2D textureSampler;
 // Texture sampling function
 vec4 GetTextureColor(sampler2D textureSampler, vec2 textureCoord);
 
+
 void main() {
 	color = GetTextureColor(textureSampler, UV).rgb;
 }
