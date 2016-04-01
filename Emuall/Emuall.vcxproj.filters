@@ -135,6 +135,12 @@
     <ClCompile Include="gui\EmulatorScreen.cpp">
       <Filter>Source Files\gui</Filter>
     </ClCompile>
+    <ClCompile Include="gui\icon.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="resources\resources.c">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="audio.h">
@@ -251,11 +257,11 @@
     <ClInclude Include="emuAll.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="gui\icon.h">
+      <Filter>Header Files\gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\icon.xpm">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="resources\post.frag.glsl">
       <Filter>Resource Files</Filter>
     </None>
@@ -285,5 +291,10 @@
     <CustomBuild Include="resources\resources.rlst">
       <Filter>Resource Files</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\Emuall.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

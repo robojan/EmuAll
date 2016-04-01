@@ -52,7 +52,7 @@ void GLPane::SetCurrentContext()
 	SetCurrent(*_context);
 	GLenum error;
 	while ((error = glGetError()) != GL_NO_ERROR) {
-		Log(Warn, "Standing GL errors on context switch: %s", gluErrorString(error));
+		Log(Warn, "Outstanding GL errors on context switch: %s", gluErrorString(error));
 	}
 }
 

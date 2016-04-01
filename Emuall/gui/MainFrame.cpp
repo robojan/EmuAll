@@ -1,18 +1,19 @@
 
 #include <GL/glew.h>
-#include "MainFrame.h"
-#include "../util/memDbg.h"
-#include "IdList.h"
-#include "GLPane.h"
-#include "../Emulator/SaveFile.h"
 
 #include <errno.h>
 #include <wx/ffile.h>
 #include <wx/filename.h>
 
-#include "../resources/icon.xpm"
 #include <emuall/support.h>
 #include <emuall/exception.h>
+
+#include "icon.h"
+#include "MainFrame.h"
+#include "../util/memDbg.h"
+#include "IdList.h"
+#include "GLPane.h"
+#include "../Emulator/SaveFile.h"
 
 BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_MENU(ID_Main_File_quit, MainFrame::OnQuit)
@@ -117,7 +118,7 @@ MainFrame::~MainFrame()
 void MainFrame::CreateLayout()
 {
 	// Set the window icon
-	SetIcon(wxIcon(icon_xpm));
+	SetIcons(getIconBundle());
 
 	// Create the layout
 	CreateMenuBar();

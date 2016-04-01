@@ -301,7 +301,7 @@ const uint8_t *__stdcall GetDescription(uint32_t *size)
 {
 	if (size != NULL)
 	{
-		*size = sizeof(resource_gbemu_xml);
+		*size = resource_gbemu_xml_len;
 	}
 	return resource_gbemu_xml;
 }

@@ -179,11 +179,13 @@
     <ClCompile Include="gui\GLPane.cpp" />
     <ClCompile Include="gui\gpuDebugger.cpp" />
     <ClCompile Include="gui\HexView.cpp" />
+    <ClCompile Include="gui\icon.cpp" />
     <ClCompile Include="gui\InputOptionsFrame.cpp" />
     <ClCompile Include="gui\keyBindBox.cpp" />
     <ClCompile Include="gui\MainFrame.cpp" />
     <ClCompile Include="gui\memDebugger.cpp" />
     <ClCompile Include="keyhandler.cpp" />
+    <ClCompile Include="resources\resources.c" />
     <ClCompile Include="util\dir.cpp" />
     <ClCompile Include="util\Log.cpp" />
     <ClCompile Include="util\Options.cpp" />
@@ -212,6 +214,7 @@
     <ClInclude Include="gui\GLPane.h" />
     <ClInclude Include="gui\gpuDebugger.h" />
     <ClInclude Include="gui\HexView.h" />
+    <ClInclude Include="gui\icon.h" />
     <ClInclude Include="gui\IdList.h" />
     <ClInclude Include="gui\InputOptionsFrame.h" />
     <ClInclude Include="gui\keyBindBox.h" />
@@ -235,30 +238,29 @@
     <None Include="resources\bicubic_catmull.frag.glsl" />
     <None Include="resources\bicubic_triangular.frag.glsl" />
     <None Include="resources\bilinear.frag.glsl" />
-    <None Include="resources\icon.xpm" />
     <None Include="resources\nearest.frag.glsl" />
     <None Include="resources\post.frag.glsl" />
     <None Include="resources\post.vert.glsl" />
     <CustomBuild Include="resources\resources.rlst">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename).h</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename).h</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename).h</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename).h</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename)</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Preproces resources</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">Preproces resources</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">Preproces resources</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Preproces resources</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).h</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).h;%(FileName).c</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">post.frag.glsl; post.vert.glsl</AdditionalInputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">%(Filename).h</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">%(Filename).h;%(FileName).c</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">post.frag.glsl; post.vert.glsl</AdditionalInputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">false</LinkObjects>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">%(Filename).h</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">%(Filename).h;%(FileName).c</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">post.frag.glsl; post.vert.glsl</AdditionalInputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">false</LinkObjects>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).h</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).h;%(FileName).c</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">post.frag.glsl; post.vert.glsl</AdditionalInputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
     </CustomBuild>
@@ -267,6 +269,9 @@
     <ProjectReference Include="..\Support\Support.vcxproj">
       <Project>{999c80be-1f93-4f09-ac30-3144524018b2}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\Emuall.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

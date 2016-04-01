@@ -77,27 +77,27 @@ void EmulatorScreen::SetPostProcessingFilter(Filter filter)
 		filter = Nearest;
 	case Nearest:
 		filterSrc = (char *)resource_nearest_frag_glsl;
-		filterSrcLen = sizeof(resource_nearest_frag_glsl);
+		filterSrcLen = resource_nearest_frag_glsl_len;
 		break;
 	case BiLinear:
 		filterSrc = (char *)resource_bilinear_frag_glsl;
-		filterSrcLen = sizeof(resource_bilinear_frag_glsl);
+		filterSrcLen = resource_bilinear_frag_glsl_len;
 		break;
 	case BicubicTriangular:
 		filterSrc = (char *)resource_bicubic_triangular_frag_glsl;
-		filterSrcLen = sizeof(resource_bicubic_triangular_frag_glsl);
+		filterSrcLen = resource_bicubic_triangular_frag_glsl_len;
 		break;
 	case BicubicBell:
 		filterSrc = (char *)resource_bicubic_bell_frag_glsl;
-		filterSrcLen = sizeof(resource_bicubic_bell_frag_glsl);
+		filterSrcLen = resource_bicubic_bell_frag_glsl_len;
 		break;
 	case BicubicBSpline:
 		filterSrc = (char *)resource_bicubic_bspline_frag_glsl;
-		filterSrcLen = sizeof(resource_bicubic_bspline_frag_glsl);
+		filterSrcLen = resource_bicubic_bspline_frag_glsl_len;
 		break;
 	case BicubicCatMullRom:
 		filterSrc = (char *)resource_bicubic_catmull_frag_glsl;
-		filterSrcLen = sizeof(resource_bicubic_catmull_frag_glsl);
+		filterSrcLen = resource_bicubic_catmull_frag_glsl_len;
 		break;
 	}
 	Options::GetInstance().videoOptions.filter = (int)filter;
@@ -105,12 +105,12 @@ void EmulatorScreen::SetPostProcessingFilter(Filter filter)
 		_shader.Clean();
 	}
 	// load shader
-	if (!_shader.AddShader(ShaderProgram::Vertex, (char *)resource_post_vert_glsl, sizeof(resource_post_vert_glsl)))
+	if (!_shader.AddShader(ShaderProgram::Vertex, (char *)resource_post_vert_glsl, resource_post_vert_glsl_len))
 	{
 		Log(Error, "%s", _shader.GetLog());
 		return;
 	}
-	if (!_shader.AddShader(ShaderProgram::Fragment, (char *)resource_post_frag_glsl, sizeof(resource_post_frag_glsl))) {
+	if (!_shader.AddShader(ShaderProgram::Fragment, (char *)resource_post_frag_glsl, resource_post_frag_glsl_len)) {
 		Log(Error, "%s", _shader.GetLog());
 		return;
 	}

@@ -111,6 +111,9 @@
     <ClCompile Include="gb\sound\GbChannel12.cpp">
       <Filter>Source Files\gb\sound</Filter>
     </ClCompile>
+    <ClCompile Include="resources\resources.c">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gb\defines.h">

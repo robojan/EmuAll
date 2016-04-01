@@ -235,3 +235,5 @@ Emuall/resources/resources.h
 
 *.diagsession
 Emuall/resources/resources.h
+Emuall/resources/resources.c
+GBemu/resources/resources.c
