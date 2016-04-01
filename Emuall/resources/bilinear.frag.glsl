@@ -2,14 +2,6 @@
 
 // Bi-linear texture filtering
 vec4 GetTextureColor(sampler2D textureSampler, vec2 textureCoord) {
-	// Get texel size
-	/*vec2 texelSize = (1.0 / textureSize) * 0.98;
-	// Get Four color components
-	vec4 col11 = texture(textureSampler, textureCoord);
-	vec4 col21 = texture(textureSampler, textureCoord + vec2(texelSize.x, 0.0));
-	vec4 col12 = texture(textureSampler, textureCoord + vec2(0.0, texelSize.y));
-	vec4 col22 = texture(textureSampler, textureCoord + vec2(texelSize.x, texelSize.y));
-	*/
 	// Get the texturesize
 	ivec2 size = textureSize(textureSampler, 0);
 	// Normalize the coordinate

@@ -33,6 +33,7 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	// Options
 	EVT_MENU(ID_Main_Options_KeepAspect, MainFrame::OnOptions)
 	EVT_MENU(ID_Main_Options_input, MainFrame::OnOptions)
+	EVT_MENU_RANGE(ID_Main_Options_Filter, ID_Main_Options_Filter + 5, MainFrame::OnOptionVideoFilter)
 	
 	// General events
 	EVT_TIMER(ID_Timer, MainFrame::OnTimer)
@@ -137,11 +138,8 @@ void MainFrame::CreateLayout()
 	_display = new EmulatorScreen(this, this, 0, ID_Main_display, wxDefaultPosition,
 		wxDefaultSize, wxFULL_REPAINT_ON_RESIZE, glAttr, ctxAttr);
 
-	//mDisplay->Connect(ID_Main_display, wxEVT_KEY_UP, wxKeyEventHandler(InputMaster::OnKeyboard), (wxObject *) NULL, &mInputHandler);
-	//mDisplay->Connect(ID_Main_display, wxEVT_KEY_DOWN, wxKeyEventHandler(InputMaster::OnKeyboard), (wxObject *) NULL, &mInputHandler);
 	_display->Bind(wxEVT_KEY_UP, &InputMaster::OnKeyboard, &_inputHandler);
 	_display->Bind(wxEVT_KEY_DOWN, &InputMaster::OnKeyboard, &_inputHandler);
-	//Bind(wxEVT_CHAR_HOOK, &InputMaster::OnKeyboard, &mInputHandler);
 	_display->Connect(ID_Main_display, wxEVT_SIZE, wxSizeEventHandler(MainFrame::OnResize), (wxObject *) NULL, this);
 }
 
@@ -178,11 +176,27 @@ void MainFrame::CreateMenuBar()
 	_menFile->AppendSeparator();
 	_menFile->Append(ID_Main_File_quit, _("&Quit"));
 
+	// Create video filter menu
+	wxMenu *videoFilterMenu = new wxMenu;
+	videoFilterMenu->AppendRadioItem(ID_Main_Options_Filter + 0, _("Nearest"));
+	videoFilterMenu->AppendRadioItem(ID_Main_Options_Filter + 1, _("Bi-Linear"));
+	videoFilterMenu->AppendRadioItem(ID_Main_Options_Filter + 2, _("Bi-Cubic triangular"));
+	videoFilterMenu->AppendRadioItem(ID_Main_Options_Filter + 3, _("Bi-Cubic Bell"));
+	videoFilterMenu->AppendRadioItem(ID_Main_Options_Filter + 4, _("Bi-Cubic B-Spline"));
+	videoFilterMenu->AppendRadioItem(ID_Main_Options_Filter + 5, _("Bi-Cubic CatMull-Rom"));
+	int filterID = Options::GetInstance().videoOptions.filter;
+	if (filterID >= 5 || filterID < 0) {
+		filterID = 0;
+	}
+	videoFilterMenu->Check(ID_Main_Options_Filter + filterID, true);
+
 	// Create the options menu
 	_menOptions = new wxMenu;
 	_menOptions->AppendCheckItem(ID_Main_Options_KeepAspect, _("Keep aspect ratio"));
 	_menOptions->Check(ID_Main_Options_KeepAspect, Options::GetInstance().videoOptions.keepAspect);
+	_menOptions->AppendSubMenu(videoFilterMenu, _("Video &filter"));
 	_menOptions->Append(ID_Main_Options_input, _("&Input"));
+
 
 	// Create the debug level menu
 	_menDebugLevel = new wxMenu;
@@ -645,6 +659,33 @@ void MainFrame::OnDebugMEM(wxCommandEvent &evt)
 void MainFrame::OnDebugGPU(wxCommandEvent &evt)
 {
 	_gpuDebugger->Show();
+}
+
+void MainFrame::OnOptionVideoFilter(wxCommandEvent &evt)
+{
+	EmulatorScreen::Filter filter;
+	switch (evt.GetId()) {
+	default:
+	case ID_Main_Options_Filter + 0: // nearest
+		filter = EmulatorScreen::Nearest;
+		break;
+	case ID_Main_Options_Filter + 1: // Bilinear
+		filter = EmulatorScreen::BiLinear;
+		break;
+	case ID_Main_Options_Filter + 2: // bicubic triangular
+		filter = EmulatorScreen::BicubicTriangular;
+		break;
+	case ID_Main_Options_Filter + 3: // bicubic bell
+		filter = EmulatorScreen::BicubicBell;
+		break;
+	case ID_Main_Options_Filter + 4: // bicubic bspline
+		filter = EmulatorScreen::BicubicBSpline;
+		break;
+	case ID_Main_Options_Filter + 5: // bicubic catmull-rom
+		filter = EmulatorScreen::BicubicCatMullRom;
+		break;
+	}
+	_display->SetPostProcessingFilter(filter);
 }
 
 void MainFrame::OnResize(wxSizeEvent &evt)

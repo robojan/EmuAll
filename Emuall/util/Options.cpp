@@ -10,6 +10,7 @@
 Options::Options()
 {
 	videoOptions.keepAspect = DEFAULT_KEEPASPECT;
+	videoOptions.filter = DEFAULT_VIDEOFILTER;
 	audioOptions.sampleRate = DEFAULT_SAMPLERATE;
 	audioOptions.bufferSize = DEFAULT_BUFFERSIZE;
 
@@ -42,6 +43,7 @@ void Options::LoadOptions()
 
 	// Read Video
 	videoOptions.keepAspect = mFileConfig.ReadBool("Video/KeepAspectRatio", DEFAULT_KEEPASPECT);
+	videoOptions.filter = mFileConfig.ReadLong("Video/Filter", DEFAULT_VIDEOFILTER);
 
 	// Recent files
 	recentFiles[0] = mFileConfig.Read("RecentFiles/file0", "");
@@ -65,6 +67,7 @@ void Options::SaveOptions()
 
 	// Read Video
 	mFileConfig.Write("Video/KeepAspectRatio", videoOptions.keepAspect);
+	mFileConfig.Write("Video/Filter", videoOptions.filter);
 
 	// Recent files
 	mFileConfig.Write("RecentFiles/file0", wxString(recentFiles[0]));

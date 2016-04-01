@@ -40,7 +40,7 @@ void EmulatorScreen::InitGL()
 		GL_CHECKED(glBindBuffer(GL_ARRAY_BUFFER, _vbo));
 		GL_CHECKED(glBufferData(GL_ARRAY_BUFFER, sizeof(fboData), fboData, GL_STATIC_DRAW));
 
-		SetPostProcessingFilter(BiLinear);
+		SetPostProcessingFilter((EmulatorScreen::Filter)Options::GetInstance().videoOptions.filter);
 		_initialized = true;
 	}
 	if (!GLPane::_initialized) {
@@ -74,6 +74,7 @@ void EmulatorScreen::SetPostProcessingFilter(Filter filter)
 	int filterSrcLen;
 	switch (filter) {
 	default:
+		filter = Nearest;
 	case Nearest:
 		filterSrc = (char *)resource_nearest_frag_glsl;
 		filterSrcLen = sizeof(resource_nearest_frag_glsl);
@@ -82,12 +83,24 @@ void EmulatorScreen::SetPostProcessingFilter(Filter filter)
 		filterSrc = (char *)resource_bilinear_frag_glsl;
 		filterSrcLen = sizeof(resource_bilinear_frag_glsl);
 		break;
-	case Bicubic:
-		// TODO
-		filterSrc = (char *)resource_nearest_frag_glsl;
-		filterSrcLen = sizeof(resource_nearest_frag_glsl);
+	case BicubicTriangular:
+		filterSrc = (char *)resource_bicubic_triangular_frag_glsl;
+		filterSrcLen = sizeof(resource_bicubic_triangular_frag_glsl);
+		break;
+	case BicubicBell:
+		filterSrc = (char *)resource_bicubic_bell_frag_glsl;
+		filterSrcLen = sizeof(resource_bicubic_bell_frag_glsl);
+		break;
+	case BicubicBSpline:
+		filterSrc = (char *)resource_bicubic_bspline_frag_glsl;
+		filterSrcLen = sizeof(resource_bicubic_bspline_frag_glsl);
+		break;
+	case BicubicCatMullRom:
+		filterSrc = (char *)resource_bicubic_catmull_frag_glsl;
+		filterSrcLen = sizeof(resource_bicubic_catmull_frag_glsl);
 		break;
 	}
+	Options::GetInstance().videoOptions.filter = (int)filter;
 	if (_shader.IsLinked()) {
 		_shader.Clean();
 	}

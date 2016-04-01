@@ -10,7 +10,10 @@ public:
 	enum Filter {
 		Nearest,
 		BiLinear,
-		Bicubic
+		BicubicTriangular,
+		BicubicBell,
+		BicubicBSpline,
+		BicubicCatMullRom,
 	};
 	EmulatorScreen(wxWindow *parent, GLPaneI *callback, int user, wxWindowID id, const wxPoint &pos,
 		const wxSize &size, long style, const wxGLAttributes &attr, const wxGLContextAttrs &ctxAttr);

@@ -2,3 +2,7 @@ post.frag.glsl
 post.vert.glsl
 nearest.frag.glsl
 bilinear.frag.glsl
+bicubic_triangular.frag.glsl
+bicubic_bell.frag.glsl
+bicubic_bspline.frag.glsl
+bicubic_catmull.frag.glsl

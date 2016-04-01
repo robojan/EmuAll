@@ -77,6 +77,7 @@ private:
 	void OnDebugCPU(wxCommandEvent &evt);
 	void OnDebugMEM(wxCommandEvent &evt);
 	void OnDebugGPU(wxCommandEvent &evt);
+	void OnOptionVideoFilter(wxCommandEvent &evt);
 	void DrawGL(int user);
 	bool InitGL(int user);
 	void DestroyGL(int user);

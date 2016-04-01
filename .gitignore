@@ -230,6 +230,8 @@ TestROMs/*
 
 #generated files
 GBemu/resources/resources.h
+Emuall/resources/resources.h
 
 
 *.diagsession
+Emuall/resources/resources.h

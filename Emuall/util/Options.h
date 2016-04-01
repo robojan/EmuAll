@@ -4,6 +4,7 @@
 #define DEFAULT_SAMPLERATE 44100
 #define DEFAULT_BUFFERSIZE 4096
 #define DEFAULT_KEEPASPECT true
+#define DEFAULT_VIDEOFILTER 0
 
 
 #include <map>
@@ -12,6 +13,7 @@
 typedef struct
 {
 	bool keepAspect;
+	int filter;
 } OptionsVid_t;
 
 typedef struct

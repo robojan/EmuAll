@@ -31,7 +31,8 @@ enum
 	ID_Debug_Mem_goto,
 	ID_Debug_Gpu_timer,
 	ID_Main_Options_KeepAspect,
-	ID_Main_Options_input,
+	ID_Main_Options_Filter,
+	ID_Main_Options_input = ID_Main_Options_Filter + 6,
 	ID_Main_display
 };
 

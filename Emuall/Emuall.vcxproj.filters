@@ -268,6 +268,18 @@
     <None Include="resources\nearest.frag.glsl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="resources\bicubic_triangular.frag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\bicubic_bell.frag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\bicubic_bspline.frag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\bicubic_catmull.frag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="resources\resources.rlst">

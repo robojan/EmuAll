@@ -230,6 +230,10 @@
     <ClInclude Include="util\xml\pugixml.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="resources\bicubic_bell.frag.glsl" />
+    <None Include="resources\bicubic_bspline.frag.glsl" />
+    <None Include="resources\bicubic_catmull.frag.glsl" />
+    <None Include="resources\bicubic_triangular.frag.glsl" />
     <None Include="resources\bilinear.frag.glsl" />
     <None Include="resources\icon.xpm" />
     <None Include="resources\nearest.frag.glsl" />
