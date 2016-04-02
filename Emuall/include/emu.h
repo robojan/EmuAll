@@ -63,7 +63,10 @@ EMUEXPORT int32_t __stdcall IsRunning(EMUHANDLE handle);
 EMUEXPORT void __stdcall Step(EMUHANDLE handle);
 EMUEXPORT int32_t __stdcall Tick(EMUHANDLE handle, uint32_t time);
 EMUEXPORT void __stdcall Input(EMUHANDLE handle, int32_t key, int32_t pressed);
-EMUEXPORT void __stdcall GetAudio(EMUHANDLE handle, int32_t source, int16_t *buffer, int32_t samples, int32_t channels, uint32_t samplerate);
+
+// Audio functions
+EMUEXPORT void __stdcall InitAudio(EMUHANDLE handle, int32_t source, uint32_t sampleRate, int32_t channels);
+EMUEXPORT void __stdcall GetAudio(EMUHANDLE handle, int32_t source, int16_t *buffer, int32_t samples);
 
 // Graphics functions
 EMUEXPORT uint32_t __stdcall InitGL(EMUHANDLE handle, int32_t id);

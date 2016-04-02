@@ -456,3 +456,11 @@ uint8_t __stdcall GetMemoryData(EMUHANDLE handle, int32_t memory, uint32_t addre
 	return 0;
 }
 
+void __stdcall InitAudio(EMUHANDLE handle, int32_t source, uint32_t sampleRate, int32_t channels) {
+
+}
+
+void __stdcall GetAudio(EMUHANDLE handle, int32_t source, int16_t *buffer, int32_t samples){
+
+}
+
