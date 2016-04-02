@@ -41,6 +41,7 @@ private:
 	CPUDebugger *_cpuDebugger;
 	MemDebugger *_memDebugger;
 	GPUDebugger *_gpuDebugger;
+	wxStopWatch _deltaTimeTimer;
 
 	// other members
 	Emulator	_emulator;
@@ -59,8 +60,9 @@ private:
 
 	void UpdateSaveStateLabels();
 	void UpdateRecentFiles();
-	void RunEmulator();
+	void RunEmulator(uint32_t deltaTime);
 
+	void OnIdle(wxIdleEvent &evt);
 	void OnClose(wxCloseEvent &evt);
 	void OnQuit(wxCommandEvent &evt);
 	void OnOpen(wxCommandEvent &evt);

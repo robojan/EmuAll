@@ -1,5 +1,7 @@
 
 #include <wx/wx.h>
+#include <wx/evtloop.h>
+#include <wx/scopedptr.h>
 #include "gui/MainFrame.h"
 #include "emuAll.h"
 #include "util/memDbg.h"
@@ -7,6 +9,8 @@
 #include <emuall/exception.h>
 
 IMPLEMENT_APP(EmuAll);
+
+
 
 bool EmuAll::OnInit()
 {
@@ -32,3 +36,4 @@ int EmuAll::OnExit()
 #endif
 	return 0;
 }
+

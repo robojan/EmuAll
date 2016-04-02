@@ -37,7 +37,8 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_MENU_RANGE(ID_Main_Options_Filter, ID_Main_Options_Filter + 5, MainFrame::OnOptionVideoFilter)
 	
 	// General events
-	EVT_TIMER(ID_Timer, MainFrame::OnTimer)
+	//EVT_TIMER(ID_Timer, MainFrame::OnTimer)
+	EVT_IDLE(MainFrame::OnIdle)
 	EVT_CLOSE(MainFrame::OnClose)
 END_EVENT_TABLE()
 
@@ -100,8 +101,8 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
 	_gpuDebugger = new GPUDebugger(this, wxID_ANY, _("GPU debugger"));
 
 	_filePath.clear();
-	_timer = new wxTimer(this, ID_Timer);
-	_timer->Start(16, false);
+	//_timer = new wxTimer(this, ID_Timer);
+	//_timer->Start(16, false);
 	Log(Message,"EmuAll started");
 	_audio = new Audio();
 	_audio->Init();
@@ -422,16 +423,13 @@ void MainFrame::UpdateRecentFiles()
 	}
 }
 
-void MainFrame::RunEmulator()
+void MainFrame::RunEmulator(uint32_t deltaTime)
 {
 	static wxStopWatch sw;
-	uint32_t time = sw.TimeInMicro().GetLo(); // Calculate the actual simulation time needed
-	//if (time > FPS * 2000) 
-	//	time = FPS*2000;
 	sw.Start(0);
 	if (_emulator.emu != NULL)
 	{
-		if (_emulator.emu->Tick(_emulator.handle, time)) // GUI update necessary
+		if (_emulator.emu->Tick(_emulator.handle, deltaTime)) // GUI update necessary
 		{
 			Update();
 		}
@@ -442,6 +440,23 @@ void MainFrame::RunEmulator()
 	catch (BaseException &e) {
 		Log(Error, "BaseException caught: %s\nStacktrace:\n%s", e.GetMsg(), e.GetStacktrace());
 	}
+}
+
+void MainFrame::OnIdle(wxIdleEvent &evt)
+{
+	uint32_t deltaTime = _deltaTimeTimer.TimeInMicro().GetLo();
+	// Limit the amount of time simulated
+	if (deltaTime > 30000)
+		deltaTime = 30000;
+
+	_deltaTimeTimer.Start(0);
+	RunEmulator(deltaTime);
+	uint32_t emuTime = _deltaTimeTimer.TimeInMicro().GetLo();
+	if (emuTime < 16000) {
+		// Yield to reduce CPU usage
+		Sleep((16000-emuTime)/1000);
+	}
+	evt.RequestMore();
 }
 
 void MainFrame::Update()
@@ -611,7 +626,13 @@ void MainFrame::OnLogLevel(wxCommandEvent &evt)
 
 void MainFrame::OnTimer(wxTimerEvent &evt)
 {
-	RunEmulator();
+	uint32_t deltaTime = _deltaTimeTimer.TimeInMicro().GetLo();
+	// Limit the amount of time simulated
+	if (deltaTime > 30000)
+		deltaTime = 30000;
+
+	_deltaTimeTimer.Start(0);
+	RunEmulator(deltaTime);
 }
 
 void MainFrame::OnReset(wxCommandEvent &evt)
