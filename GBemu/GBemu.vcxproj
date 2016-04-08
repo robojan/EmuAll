@@ -268,17 +268,21 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename)</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename)</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Preproces resource %(FullPath) into %(RootDir)%(Directory)%(Filename).h</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(RootDir)%(Directory)%(Filename).h;%(RootDir)%(Directory)%(FileName).c</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(RootDir)%(Directory)%(Filename).c</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Preproces resource %(FullPath) into %(RootDir)%(Directory)%(Filename).h</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RootDir)%(Directory)%(Filename).h;%(RootDir)%(Directory)%(FileName).c</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RootDir)%(Directory)%(Filename).c</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">Preproces resource %(FullPath) into %(RootDir)%(Directory)%(Filename).h</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">%(RootDir)%(Directory)%(Filename).h;%(RootDir)%(Directory)%(FileName).c</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">%(RootDir)%(Directory)%(Filename).c</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">Preproces resource %(FullPath) into %(RootDir)%(Directory)%(Filename).h</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">%(RootDir)%(Directory)%(Filename).h;%(RootDir)%(Directory)%(FileName).c</Outputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gb.frag; gb.vert; gbemu.xml</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">gb.frag; gb.vert; gbemu.xml</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">gb.frag; gb.vert; gbemu.xml</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">gb.frag; gb.vert; gbemu.xml</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">%(RootDir)%(Directory)%(Filename).c</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">
+      </AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">
+      </AdditionalInputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">false</LinkObjects>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>

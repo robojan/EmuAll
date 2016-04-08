@@ -263,17 +263,21 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">Preproces resources</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">Preproces resources</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Preproces resources</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).h;%(FileName).c</Outputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">post.frag.glsl; post.vert.glsl</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(RootDir)%(Directory)%(FileName).c</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </AdditionalInputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">%(Filename).h;%(FileName).c</Outputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">post.frag.glsl; post.vert.glsl</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">%(RootDir)%(Directory)%(FileName).c</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">
+      </AdditionalInputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">false</LinkObjects>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">%(Filename).h;%(FileName).c</Outputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">post.frag.glsl; post.vert.glsl</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">%(RootDir)%(Directory)%(FileName).c</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">
+      </AdditionalInputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">false</LinkObjects>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).h;%(FileName).c</Outputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">post.frag.glsl; post.vert.glsl</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RootDir)%(Directory)%(FileName).c</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </AdditionalInputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
     </CustomBuild>
   </ItemGroup>
