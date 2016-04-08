@@ -3,6 +3,6 @@
 
 #include "common.h"
 
-void EMUEXPORT emuallSupportInit();
+void DLLEXPORT emuallSupportInit();
 
 #endif

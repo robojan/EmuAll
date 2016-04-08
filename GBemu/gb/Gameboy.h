@@ -20,7 +20,7 @@ typedef uint_fast16_t	address_t;
 
 typedef struct {
 	uint8_t *data;
-	uint32_t length;
+	size_t length;
 } rom_t;
 
 typedef struct {

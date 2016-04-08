@@ -32,7 +32,7 @@ void* LoadSharedLibrary(const char *pcDllname, int iMode = 2)
 	return handle;
 }
 
-void *GetFunction(void *Lib, char *Fnname)
+void *GetFunction(void *Lib, const char *Fnname)
 {
 #if defined(_MSC_VER) // Microsoft compiler
 	return (void*) GetProcAddress((HINSTANCE) Lib, Fnname);
@@ -43,10 +43,19 @@ void *GetFunction(void *Lib, char *Fnname)
 
 void *_GetStdcallFunc(void *lib, const char *name, int argSize)
 {
+#ifdef _WIN32
+#ifndef _WIN64
 	static char buffer[255];
 	sprintf(buffer, "_%s@%d", name, argSize);
 	printf("Function %s\n", buffer);
 	return GetFunction(lib, buffer);
+#endif
+	(void)argSize;
+	return GetFunction(lib, name);
+#else
+	(void)argSize;
+	return GetFunction(lib, name);
+#endif
 }
 
 void *GetStdcallFunc(void *lib, const char *name)

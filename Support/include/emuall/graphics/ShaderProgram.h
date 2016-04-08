@@ -7,7 +7,7 @@
 
 class Texture;
 
-class EMUEXPORT ShaderProgram {
+class DLLEXPORT ShaderProgram {
 public:
 	enum Type {
 		Vertex,

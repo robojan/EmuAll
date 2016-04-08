@@ -67,7 +67,7 @@ bool GbSound::LoadState(const SaveData_t *data)
 {
 	Endian conv(false);
 	uint8_t *ptr = (uint8_t *)data->miscData;
-	int miscLen = data->miscDataLen;
+	size_t miscLen = data->miscDataLen;
 	// Find cpu segment
 	while (miscLen >= 8) {
 		uint32_t id = conv.convu32(*(uint32_t *)(ptr + 0));
@@ -91,8 +91,8 @@ bool GbSound::LoadState(const SaveData_t *data)
 bool GbSound::SaveState(std::vector<uint8_t> &data)
 {
 	Endian conv(false);
-	int dataLen = 8;
-	int size = data.size();
+	size_t dataLen = 8;
+	size_t size = data.size();
 	data.resize(data.size() + dataLen);
 	uint8_t *ptr = data.data() + data.size() - dataLen;
 	*(uint32_t *)(ptr + 0) = conv.convu32(StateSNDid);
@@ -102,7 +102,7 @@ bool GbSound::SaveState(std::vector<uint8_t> &data)
 	_channel4.SaveState(data);
 
 	dataLen = data.size() - size;
-	*(uint32_t *)(ptr + 4) = conv.convu32(dataLen);
+	*(uint32_t *)(ptr + 4) = conv.convu32((uint32_t)dataLen);
 	return true;
 }
 

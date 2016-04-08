@@ -44,14 +44,14 @@ File::~File()
 	delete _prvt;
 }
 
-bool File::Seek(long int offset, File::seekOrigins origin)
+bool File::Seek(long offset, File::seekOrigins origin)
 {
 	if (_prvt->_file.get() == NULL)
 	{
 		_prvt->_lastErrno = errno = ENOSR;
 		return false;
 	}
-	long int pos = ftell(_prvt->_file.get());
+	size_t pos = ftell(_prvt->_file.get());
 	if ((origin == File::seekBeginning && offset == pos) || (origin == File::seekCurrent && offset == 0))
 		return true;
 	if (fseek(_prvt->_file.get(), offset, origin) != 0)
@@ -156,7 +156,7 @@ size_t File::Read(void *ptr, size_t size)
 		_prvt->_lastErrno = errno = ENOSR;
 		throw FileException(_prvt->_lastErrno, "File not opened: %s", strerror(_prvt->_lastErrno));
 	}
-	int result = fread(ptr, 1, size, _prvt->_file.get());
+	size_t result = fread(ptr, 1, size, _prvt->_file.get());
 	if (result != size)
 	{
 		if (IsEOF())
@@ -176,7 +176,7 @@ size_t File::Write(const void *ptr, size_t size)
 		_prvt->_lastErrno = errno = ENOSR;
 		throw FileException(_prvt->_lastErrno, "File not opened: %s", strerror(_prvt->_lastErrno));
 	}
-	int result = fwrite(ptr, 1, size, _prvt->_file.get());
+	size_t result = fwrite(ptr, 1, size, _prvt->_file.get());
 	if (result != size)
 	{
 		_prvt->_lastErrno = errno;

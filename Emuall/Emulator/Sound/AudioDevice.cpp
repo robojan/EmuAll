@@ -67,7 +67,7 @@ std::vector<std::string> AudioDevice::GetDevices()
 		return devices;
 	}
 	do {
-		int len = strlen(devicesList);
+		size_t len = strlen(devicesList);
 		if (len > 0) {
 			devices.emplace_back(devicesList);
 		}

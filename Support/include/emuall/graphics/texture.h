@@ -2,7 +2,7 @@
 
 #include <emuall/common.h>
 
-class EMUEXPORT Texture {
+class DLLEXPORT Texture {
 	friend class FrameBuffer;
 public:
 	enum Format {

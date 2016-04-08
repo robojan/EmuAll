@@ -356,7 +356,7 @@ bool GbGpu::LoadState(const SaveData_t *data)
 {
 	Endian conv(false);
 	uint8_t *ptr = (uint8_t *)data->miscData;
-	int miscLen = data->miscDataLen;
+	size_t miscLen = data->miscDataLen;
 	// Find gpu segment
 	while (miscLen >= 8) {
 		uint32_t id = conv.convu32(*(uint32_t *)(ptr + 0));

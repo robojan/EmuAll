@@ -9,7 +9,7 @@
 #include <cstdarg>
 #include <emuall/common.h>
 
-class EMUEXPORT WavChunk
+class DLLEXPORT WavChunk
 {
 public:
 	WavChunk(RawFile &file);
@@ -31,7 +31,7 @@ protected:
 	long int _location;
 };
 
-class EMUEXPORT WavUnkChunk : public WavChunk
+class DLLEXPORT WavUnkChunk : public WavChunk
 {
 public:
 	WavUnkChunk(RawFile &file);
@@ -43,7 +43,7 @@ private:
 	void *_payload;
 };
 
-class EMUEXPORT WavFactChunk : public WavChunk
+class DLLEXPORT WavFactChunk : public WavChunk
 {
 public:
 	WavFactChunk(RawFile &file);
@@ -57,7 +57,7 @@ private:
 	uint32_t _samplesPerChannel;
 };
 
-class EMUEXPORT WavFmtChunk : public WavChunk
+class DLLEXPORT WavFmtChunk : public WavChunk
 {
 public:
 	enum CompressionCode
@@ -97,7 +97,7 @@ private:
 	uint16_t _bitsPerSample;
 };
 	
-class EMUEXPORT WavDataChunk : public WavChunk
+class DLLEXPORT WavDataChunk : public WavChunk
 {
 public:
 	WavDataChunk(RawFile &file, WavFmtChunk *format = NULL);
@@ -123,7 +123,7 @@ private:
 	std::vector<int16_t *> *_audioSamples;
 };
 	
-class EMUEXPORT WavException : public std::exception
+class DLLEXPORT WavException : public std::exception
 {
 public:
 	WavException(const char *format, ...);
@@ -133,7 +133,7 @@ private:
 	char errorMsg[256];
 };
 
-class EMUEXPORT WavFile: private WavChunk
+class DLLEXPORT WavFile: private WavChunk
 {
 public:
 
@@ -163,7 +163,7 @@ private:
 	RawFile _file;
 };
 
-class EMUEXPORT WavFileInStream : private WavChunk
+class DLLEXPORT WavFileInStream : private WavChunk
 {
 public:
 	WavFileInStream(const char *path);
@@ -182,14 +182,14 @@ private:
 	void OpenWavFile(const char *path);
 	void ReadChunks();
 
-	unsigned int _position;
+	size_t _position;
 	size_t _dataOffset;
-	unsigned int _dataSize;
+	size_t _dataSize;
 	WavFmtChunk *_waveFormatInfo;
 	RawFile _file;
 };
 
-class EMUEXPORT WavFileOutStream
+class DLLEXPORT WavFileOutStream
 {
 public:
 	enum OutFormat{

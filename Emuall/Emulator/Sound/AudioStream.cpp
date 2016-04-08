@@ -28,6 +28,7 @@ AudioStream::AudioStream(AudioBuffer::Format format, int freq, int bufferSize, i
 		size *= sizeof(short);
 		_workingBuffer.resize(size);
 		memset(_workingBuffer.data(), 0, size);
+		dataPtr = _workingBuffer.data();
 		break;
 	}
 	}
@@ -89,13 +90,13 @@ void AudioStream::Tick()
 			case AudioBuffer::Mono8:
 			case AudioBuffer::Stereo8: 
 				memset(_workingBuffer.data(), 128, _workingBuffer.size());
-				buffer->BufferData(_format, _workingBuffer.data(), _workingBuffer.size(), _sampFreq);
+				buffer->BufferData(_format, _workingBuffer.data(), (int)_workingBuffer.size(), _sampFreq);
 				break;
 			default:
 			case AudioBuffer::Mono16:
 			case AudioBuffer::Stereo16: 
 				memset(_workingBuffer.data(), 0, _workingBuffer.size());
-				buffer->BufferData(_format, _workingBuffer.data(), _workingBuffer.size(), _sampFreq);
+				buffer->BufferData(_format, _workingBuffer.data(), (int)_workingBuffer.size(), _sampFreq);
 				break;
 			}
 		}

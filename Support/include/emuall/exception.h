@@ -4,7 +4,7 @@
 #include <emuall/common.h>
 #include <string>
 
-class EMUEXPORT BaseException {
+class DLLEXPORT BaseException {
 public:
 	explicit BaseException(const char *msg);
 	explicit BaseException(const std::string &msg);

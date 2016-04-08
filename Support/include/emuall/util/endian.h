@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <emuall/common.h>
 
-class EMUEXPORT Endian
+class DLLEXPORT Endian
 {
 public:
 	Endian(bool bigEndian);

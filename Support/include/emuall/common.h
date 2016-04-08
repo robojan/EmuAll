@@ -1,10 +1,10 @@
 #ifndef EMUALL_COMMON_H_
 #define EMUALL_COMMON_H_
 
-#ifdef EMUDLL
-#	define EMUEXPORT __declspec(dllexport) 
+#ifdef EMULIBRARYDLL
+#	define DLLEXPORT __declspec(dllexport) 
 #else
-#	define EMUEXPORT __declspec(dllimport)
+#	define DLLEXPORT __declspec(dllimport)
 #endif
 
 #endif

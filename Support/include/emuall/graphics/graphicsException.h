@@ -14,7 +14,7 @@
 #define GL_CHECKED(x) x
 #endif
 
-class EMUEXPORT GraphicsException : public BaseException
+class DLLEXPORT GraphicsException : public BaseException
 {
 public:
 	GraphicsException(unsigned int error, const std::string &msg);

@@ -75,7 +75,7 @@ void FrameBuffer::AttachColorBuffer(int level, bool rectangle /*= false*/)
 	if (_textures->find(level) == _textures->end()) {
 		_drawBuffers->push_back(GL_COLOR_ATTACHMENT0 + level);
 
-		GL_CHECKED(glDrawBuffers(_drawBuffers->size(), _drawBuffers->data()));
+		GL_CHECKED(glDrawBuffers((GLsizei)_drawBuffers->size(), _drawBuffers->data()));
 	}
 	(*_textures)[level] = texture;
 

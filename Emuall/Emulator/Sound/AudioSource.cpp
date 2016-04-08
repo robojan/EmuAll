@@ -303,7 +303,7 @@ void AudioSource::QueueBuffers(std::vector<AudioBuffer> &buffers)
 		bufferIDs[i] = buffers[i]._buffer;
 		_queuedBuffers[bufferIDs[i]] = &buffers[i];
 	}
-	alSourceQueueBuffers(_source, bufferIDs.size(), bufferIDs.data());
+	alSourceQueueBuffers(_source, (int)bufferIDs.size(), bufferIDs.data());
 	ALenum error = alGetError();
 	if (error != AL_NO_ERROR) {
 		throw AudioException(error, "Could not queue the buffers");

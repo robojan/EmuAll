@@ -102,17 +102,17 @@ uint32_t GbMem::GetUnbankedAddress(address_t address) const
 
 int GbMem::GetROMSize() const
 {
-	return _rom->length;
+	return (uint32_t)_rom->length;
 }
 
 int GbMem::GetRAMSize() const
 {
-	return _eramSize*ERAM_BANK_SIZE;
+	return _eramSize * ERAM_BANK_SIZE;
 }
 
 uint8_t GbMem::GetROMData(unsigned int address) const
 {
-	if (address >= _rom->length)
+	if (address >= (uint32_t)_rom->length)
 		return 0xFF;
 	return _rom->data[address];
 }
@@ -163,7 +163,7 @@ bool GbMem::LoadState(const SaveData_t *data)
 {
 	Endian conv(false);
 	uint8_t *ptr = (uint8_t *)data->miscData;
-	int miscLen = data->miscDataLen;
+	size_t miscLen = data->miscDataLen;
 	int expectedDataLen = 42 + VRAM_BANKS * VRAM_BANK_SIZE + WRAM_BANKS * WRAM_BANK_SIZE + REGS_BANK_SIZE;
 	// Find cpu segment
 	while (miscLen >= 8) {

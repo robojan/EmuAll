@@ -6,7 +6,7 @@
 #include <vector>
 #include <map>
 
-class EMUEXPORT FrameBuffer {
+class DLLEXPORT FrameBuffer {
 public:
 	FrameBuffer(int width, int height);
 	FrameBuffer(FrameBuffer &buffer);

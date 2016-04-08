@@ -592,7 +592,7 @@ void WavFile::WriteToFile(const char *path)
 	file.PutC('I');
 	file.PutC('F');
 	file.PutC('F');
-	file.PutU32(size);
+	file.PutU32((uint32_t)size);
 	file.PutC('W');
 	file.PutC('A');
 	file.PutC('V');
@@ -633,11 +633,11 @@ unsigned int WavFileInStream::Read(void* buffer, unsigned int samples)
 		
 	if (_position + samples > _dataSize / _waveFormatInfo->GetBlockAlign())
 	{
-		samples = _dataSize / _waveFormatInfo->GetBlockAlign() - _position;
+		samples = (unsigned int)(_dataSize / _waveFormatInfo->GetBlockAlign() - _position);
 	}
 
-	_file.Seek(_dataOffset + _position*_waveFormatInfo->GetBlockAlign(), File::seekBeginning); // Goto data
-	size_t read =  _file.Read(buffer, samples * _waveFormatInfo->GetBlockAlign());
+	_file.Seek((long)(_dataOffset + _position*_waveFormatInfo->GetBlockAlign()), File::seekBeginning); // Goto data
+	unsigned int read =  (unsigned int)_file.Read(buffer, samples * _waveFormatInfo->GetBlockAlign());
 	_position += read / _waveFormatInfo->GetBlockAlign();
 	return read;
 }
@@ -652,13 +652,13 @@ unsigned int WavFileInStream::ReadFloat(float *buffer, unsigned int samples)
 		
 	if (_position + samples > _dataSize / _waveFormatInfo->GetBlockAlign())
 	{
-		samples = _dataSize / _waveFormatInfo->GetBlockAlign() - _position;
+		samples = (unsigned int)(_dataSize / _waveFormatInfo->GetBlockAlign() - _position);
 	}
 
 	if (_waveFormatInfo->GetCompression() != WavFmtChunk::PCM && _waveFormatInfo->GetCompression() != WavFmtChunk::IEEE_FLOAT)
 		throw WavException("Unsupported audio format");
 
-	_file.Seek(_position*_waveFormatInfo->GetBlockAlign() + _dataOffset, File::seekBeginning);
+	_file.Seek((long)(_position*_waveFormatInfo->GetBlockAlign() + _dataOffset), File::seekBeginning);
 
 	unsigned int read;
 	float *ptr = buffer;
@@ -723,10 +723,10 @@ unsigned int WavFileInStream::ReadPCM16(int16_t *buffer, unsigned int samples)
 
 	if (_position + samples > _dataSize / _waveFormatInfo->GetBlockAlign())
 	{
-		samples = _dataSize / _waveFormatInfo->GetBlockAlign() - _position;
+		samples = (unsigned int)(_dataSize / _waveFormatInfo->GetBlockAlign() - _position);
 	}
 
-	_file.Seek(_position*_waveFormatInfo->GetBlockAlign()+ _dataOffset, File::seekBeginning);
+	_file.Seek((long)(_position*_waveFormatInfo->GetBlockAlign()+ _dataOffset), File::seekBeginning);
 
 	unsigned int read;
 	int16_t *ptr = buffer;
@@ -803,7 +803,7 @@ unsigned int WavFileInStream::Count() const
 {
 	if (_waveFormatInfo == NULL)
 		return 0;
-	return _dataSize/_waveFormatInfo->GetBlockAlign();
+	return (unsigned int)(_dataSize/_waveFormatInfo->GetBlockAlign());
 }
 
 void WavFileInStream::Release()
@@ -857,7 +857,7 @@ void WavFileInStream::ReadChunks()
 					throw WavException("Multiple data segments not supported");
 				_dataOffset = chunkHeader.GetLocation()+8;
 				_dataSize = chunkHeader.ContentSize();
-				_file.Seek(_dataSize+8+_dataOffset, File::seekBeginning);
+				_file.Seek((long)(_dataSize+8+_dataOffset), File::seekBeginning);
 			}
 			else {
 				chunkHeader.Skip(_file);
@@ -930,7 +930,7 @@ unsigned int WavFileOutStream::Write(void* buffer, unsigned int samples)
 		_file.Seek(_dataOffset + _dataSize, File::seekBeginning);
 	*/
 	// Possible big endian error
-	unsigned int written = _file.Write(buffer, samples * _waveFormatInfo->GetBlockAlign());
+	unsigned int written = (unsigned int)_file.Write(buffer, samples * _waveFormatInfo->GetBlockAlign());
 	_dataSize += written;
 	return written;
 }
@@ -1167,7 +1167,7 @@ void WavFileOutStream::Release()
 		if ((_dataSize & 1) != 0)
 		{
 			// Need to word align
-			_file.Seek(_dataOffset+_dataSize, File::seekBeginning);
+			_file.Seek((long)(_dataOffset+_dataSize), File::seekBeginning);
 			_file.PutU8(0);
 		}
 		// File is open so finish writing
@@ -1179,13 +1179,13 @@ void WavFileOutStream::Release()
 			delete *it;
 		}
 		// Write datasize
-		_file.Seek(_dataOffset-4, File::seekBeginning);
+		_file.Seek((long)(_dataOffset-4), File::seekBeginning);
 		_file.PutU32(_dataSize);
 
 		// Write number of samples per channel if there is a fact chunk
 		if (_factOffset != 0 && _waveFormatInfo != NULL)
 		{
-			_file.Seek(_factOffset, File::seekBeginning);
+			_file.Seek((long)(_factOffset), File::seekBeginning);
 			_file.PutU32(_dataSize/_waveFormatInfo->GetBlockAlign());
 		}
 

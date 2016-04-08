@@ -10,9 +10,9 @@
 #include <emuall/common.h>
 #include <emuall/util/endian.h>
 
-class EMUEXPORT std::exception;
+class DLLEXPORT std::exception;
 
-class EMUEXPORT FileException : public std::exception
+class DLLEXPORT FileException : public std::exception
 {
 public:
 	FileException(int error, const char *format, ...) :
@@ -31,13 +31,13 @@ private:
 	char _errorMsg[256];
 };
 
-class EMUEXPORT EndOfFileException : public std::exception
+class DLLEXPORT EndOfFileException : public std::exception
 {
 public:
 	inline const char *what() const { return "End of file was reached"; }
 };
 
-class EMUEXPORT File
+class DLLEXPORT File
 {
 public:
 
@@ -76,7 +76,7 @@ public:
 
 	File &operator=(File &other);
 
-	bool Seek(long int offset, seekOrigins origin = seekCurrent);
+	bool Seek(long offset, seekOrigins origin = seekCurrent);
 	long int GetPosition();
 	long int GetSize();
 	bool IsEOF() const;
@@ -103,7 +103,7 @@ private:
 	Prvt *_prvt;
 };
 
-class EMUEXPORT RawFile : public File
+class DLLEXPORT RawFile : public File
 {
 public:
 
