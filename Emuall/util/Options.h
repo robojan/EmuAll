@@ -2,7 +2,8 @@
 #define _OPTIONS_H
 
 #define DEFAULT_SAMPLERATE 44100
-#define DEFAULT_BUFFERSIZE 4096
+#define DEFAULT_BUFFERSIZE 1024
+#define DEFAULT_NUMAUDIOBUFFERS 2
 #define DEFAULT_KEEPASPECT true
 #define DEFAULT_VIDEOFILTER 0
 
@@ -20,6 +21,7 @@ typedef struct
 {
 	int sampleRate;
 	int bufferSize;
+	int numBuffers;
 } OptionsAud_t;
 
 class Options

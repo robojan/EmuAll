@@ -291,7 +291,8 @@ void MainFrame::LoadEmulator(std::string &fileName)
 		for (int i = 0; i < info.numAudioStreams; ++i) {
 			_audioCBData.emplace_back(&_emulator, i);
 			AudioStream stream(AudioBuffer::Stereo16, options.audioOptions.sampleRate,
-				options.audioOptions.bufferSize, 3, &MainFrame::AudioStreamCB, &_audioCBData.back());
+				options.audioOptions.bufferSize, options.audioOptions.numBuffers, 
+				&MainFrame::AudioStreamCB, &_audioCBData.back());
 			_audio.AddAudioStream(stream);
 			emu->InitAudio(handle, i, options.audioOptions.sampleRate, 2);
 		}

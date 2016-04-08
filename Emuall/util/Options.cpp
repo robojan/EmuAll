@@ -13,6 +13,7 @@ Options::Options()
 	videoOptions.filter = DEFAULT_VIDEOFILTER;
 	audioOptions.sampleRate = DEFAULT_SAMPLERATE;
 	audioOptions.bufferSize = DEFAULT_BUFFERSIZE;
+	audioOptions.numBuffers = DEFAULT_NUMAUDIOBUFFERS;
 
 }
 
@@ -40,6 +41,7 @@ void Options::LoadOptions()
 	// Read Audio
 	audioOptions.sampleRate = mFileConfig.ReadLong("Audio/SampleRate", DEFAULT_SAMPLERATE);
 	audioOptions.bufferSize = mFileConfig.ReadLong("Audio/BufferSize", DEFAULT_BUFFERSIZE);
+	audioOptions.numBuffers = mFileConfig.ReadLong("Audio/NumBuffers", DEFAULT_NUMAUDIOBUFFERS);
 
 	// Read Video
 	videoOptions.keepAspect = mFileConfig.ReadBool("Video/KeepAspectRatio", DEFAULT_KEEPASPECT);
@@ -64,6 +66,7 @@ void Options::SaveOptions()
 	// Read Audio
 	mFileConfig.Write("Audio/SampleRate", audioOptions.sampleRate);
 	mFileConfig.Write("Audio/BufferSize", audioOptions.bufferSize);
+	mFileConfig.Write("Audio/NumBuffers", audioOptions.numBuffers);
 
 	// Read Video
 	mFileConfig.Write("Video/KeepAspectRatio", videoOptions.keepAspect);
