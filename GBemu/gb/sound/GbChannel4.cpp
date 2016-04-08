@@ -13,7 +13,7 @@
 #include "../../util/log.h"
 
 GbChannel4::GbChannel4(Gameboy *master) :
-	GbChannel(44100, 4), _gb(master),
+	GbChannel(4), _gb(master),
 	_enabled(true), _volume(CHANNEL_AMPLITUDE), _volumeCtrl(0xf),
 	_powered(true), _periodCounter(0),
 	_soundLength(0), _lengthEnabled(false), _lfsr(0xffff), _volumeCounter(0)

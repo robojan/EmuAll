@@ -17,6 +17,7 @@ File::File(const char *filename, fileOpenMode mode)
 	_prvt->_filename = filename;
 	_prvt->_mode = mode;
 	_prvt->_lastErrno = 0;
+	_prvt->_file = nullptr;
 	Open();
 }
 
@@ -25,6 +26,16 @@ File::File()
 	_prvt = new Prvt;
 	_prvt->_mode = openReadOnly;
 	_prvt->_lastErrno = 0;
+	_prvt->_file = nullptr;
+}
+
+File::File(File &other)
+{
+	_prvt = other._prvt;
+	other._prvt = new Prvt;
+	_prvt->_mode = openReadOnly;
+	_prvt->_lastErrno = 0;
+	_prvt->_file = nullptr;
 }
 
 File::~File()
@@ -297,6 +308,13 @@ void File::ClearErrno()
 	_prvt->_lastErrno = 0;
 }
 
+File & File::operator=(File &other)
+{
+	_prvt = other._prvt;
+	other._prvt = new Prvt;
+	return *this;
+}
+
 RawFile::RawFile(const char *filepath, fileOpenMode mode, bool littleEndian) : 
 	File(filepath, mode), _conv(!littleEndian)
 {
@@ -307,8 +325,21 @@ RawFile::RawFile(bool littleEndian) :
 {
 }
 
+RawFile::RawFile(RawFile &other) :
+	File(other), _conv(other._conv)
+{
+
+}
+
 RawFile::~RawFile()
 {
+}
+
+RawFile & RawFile::operator=(RawFile &other)
+{
+	File::operator=(other);
+	_conv = other._conv;
+	return *this;
 }
 
 uint8_t RawFile::GetU8()

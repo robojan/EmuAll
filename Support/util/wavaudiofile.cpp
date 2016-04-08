@@ -565,7 +565,7 @@ unsigned int WavFile::WritePCM(int16_t *buffer, unsigned int samples)
 	return samplesWritten;
 }
 
-void WavFile::WriteToFile(const char *path) const
+void WavFile::WriteToFile(const char *path)
 {
 	RawFile file;
 	assert(_waveData != NULL);

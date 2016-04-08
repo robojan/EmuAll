@@ -7,22 +7,20 @@
 #include <emuall/util/wavaudiofile.h>
 #include "../../types/EventQueue.h"
 
-// The number of buffers
-#define NUM_BUFFERS 2
-// How long each buffer wil contain audio data
-#define BUFFER_TIME 80
 // The amplitude of the signal
 #define CHANNEL_AMPLITUDE 6000
 
 class GbChannel
 {
 public:
-	GbChannel(unsigned int sampleFreq, int channel);
-	~GbChannel();
+	GbChannel(int channel);
+	virtual ~GbChannel();
 
 	void EnableAudio(bool enable);
-	void SlowTick();
 	void SetAmplitude(uint_fast8_t left, uint_fast8_t right);
+
+	virtual void InitAudio(unsigned int sampleRate, int channels);
+	virtual void GetAudio(short * buffer, int samples);
 
 protected:
 	inline void CpuTick() { _tickCounter++; }
@@ -31,6 +29,7 @@ protected:
 
 	virtual void SaveState(std::vector<uint8_t> &data);
 	virtual uint8_t *LoadState(uint8_t *data, int &len);
+
 
 	uint64_t _tickCounter; 
 private:
@@ -54,8 +53,6 @@ private:
 		};
 	};
 
-	void LoadBuffer(uint32_t buffer);
-
 	// Misc
 	int _channel;
 	uint64_t _cpuWritten;
@@ -64,16 +61,12 @@ private:
 	int8_t _lastRVol;
 
 	// openAL members
-	uint32_t _source;
-	uint32_t _buffers[NUM_BUFFERS];
 	uint64_t _playingCounter;
 	int16_t _currentValue;
-	int16_t *_workingBuffer;
-	size_t _workingBufferSamples;
 	uint_fast8_t _leftVolume;
 	uint_fast8_t _rightVolume;
-	const unsigned int _sampleFreq;
-	//std::queue<struct ChannelEvent, std::deque<struct ChannelEvent>> _eventQueue;
+	unsigned int _sampleFreq;
+	int _numChannels;
 	EventQueue<struct ChannelEvent> _eventQueue;
 	bool _audioEnabled;
 };

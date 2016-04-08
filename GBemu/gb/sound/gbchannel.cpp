@@ -2,130 +2,41 @@
 
 #include "../../util/log.h"
 #include "../defines.h"
-#include <AL/al.h>
 
 
-GbChannel::GbChannel(unsigned int sampleFreq, int channel) : 
-	_source(-1), _tickCounter(0), _currentValue(0), _workingBuffer(NULL), 
-	_workingBufferSamples(0), _playingCounter(0), _leftVolume(7), _rightVolume(7),
-	_sampleFreq(sampleFreq), _channel(channel), _audioEnabled(false), 
+GbChannel::GbChannel(int channel) : 
+	_tickCounter(0), _currentValue(0),
+	_playingCounter(0), _leftVolume(7), _rightVolume(7),
+	_sampleFreq(1), _channel(channel), _audioEnabled(false), 
 	_cpuWritten(0), _lastValue(0), _lastLVol(7), _lastRVol(7)
 {
-	ALenum alRet;
 
-	// Reset openAL errors
-	alGetError();
-	// Create source 
-	alGenSources(1, &_source);
-	if ((alRet = alGetError()) != AL_NO_ERROR)
-	{
-		Log(Error, "Could not generate audio source for channel %d: %d", channel, alRet);
-	}
-	alSourcei(_source, AL_LOOPING, AL_FALSE);
-
-	// Create buffers
-	alGenBuffers(NUM_BUFFERS, _buffers);
-	if ((alRet = alGetError()) != AL_NO_ERROR)
-	{
-		Log(Error, "Could not generate audio buffer for channel %d: %d", channel, alRet);
-	}
-
-	// Load buffers
-	for (int i = 0; i < NUM_BUFFERS; ++i)
-	{
-		LoadBuffer(_buffers[i]);
-	}
-
-	// Push the buffers on the stack
-	alSourceQueueBuffers(_source, NUM_BUFFERS, _buffers);
-	if ((alRet = alGetError()) != AL_NO_ERROR)
-	{
-		Log(Error, "Could not push audio buffers in the queue for channel %d: %d", channel, alRet);
-	}
-
-	alSourcePlay(_source);
 }
 
 GbChannel::~GbChannel()
 {
-	if (_workingBuffer)
-	{
-		delete[] _workingBuffer;
-	}
-	if (alIsSource(_source))
-	{
-		alDeleteSources(1, &_source);
-	}
-	if (alIsBuffer(_buffers[0]))
-	{
-		alDeleteBuffers(NUM_BUFFERS, _buffers);
-	}
 }
 
-void GbChannel::SlowTick()
+void GbChannel::InitAudio(unsigned int sampleRate, int channels)
 {
-	ALenum alRet;
-	if (alIsSource(_source) == AL_FALSE)
-		return; // Audio not loaded
-
-	// Check whether data is loaded
-	ALint buffersProcessed;
-	alGetSourcei(_source, AL_BUFFERS_PROCESSED, &buffersProcessed);
-
-	while (buffersProcessed > 0)
-	{
-		uint32_t buffer;
-		alSourceUnqueueBuffers(_source, 1, &buffer);
-		if ((alRet = alGetError()) != AL_NO_ERROR)
-		{
-			Log(Error, "Could not unqueue audio buffer for channel %d: %d", _channel, alRet);
-		}
-		else {
-			LoadBuffer(buffer);
-			alSourceQueueBuffers(_source, 1, &buffer);
-			if ((alRet = alGetError()) != AL_NO_ERROR)
-			{
-				Log(Error, "Could not queue audio buffer for channel %d: %d", _channel, alRet);
-			}
-		}
-		--buffersProcessed;
-	}
-
-	// Check whether the source is playing, if not start it.
-	ALint sourceState;
-	alGetSourcei(_source, AL_SOURCE_STATE, &sourceState);
-	if (sourceState != AL_PLAYING && sourceState != AL_PAUSED)
-	{
-		alSourcePlay(_source);
-	}
+	_sampleFreq = sampleRate;
+	_numChannels = channels;
 }
 
-void GbChannel::LoadBuffer(uint32_t buffer)
+void GbChannel::GetAudio(short * buffer, int samples)
 {
-	ALenum alRet;
-	//alGetSourcei(buffer, AL_FREQUENCY, &sampleFrequency);
-	if (!_workingBuffer)
-	{
-		_workingBufferSamples = (_sampleFreq*BUFFER_TIME * 2) / 1000UL;
-		_workingBuffer = new int16_t[_workingBufferSamples]; // create a working buffer
-	}
-	if (_tickCounter < (FCPU / _sampleFreq)*(_workingBufferSamples / 2) + _playingCounter)
+	if (_tickCounter < (FCPU / _sampleFreq)*(samples / 2) + _playingCounter)
 	{
 		// When there is not yet enough data to fill a buffer, skip it. 
-		memset(_workingBuffer, 0, _workingBufferSamples*sizeof(int16_t)); // clear the buffer
+		memset(buffer, 0, samples*sizeof(int16_t)); // clear the buffer
 		Log(Warn, "Channel %d underrun", _channel);
-		alBufferData(buffer, AL_FORMAT_STEREO16, (ALvoid*) _workingBuffer, _workingBufferSamples*sizeof(int16_t), _sampleFreq);
-		if ((alRet = alGetError()) != AL_NO_ERROR)
-		{
-			Log(Error, "Could not load audio buffer for channel %d: %d", _channel, alRet);
-		}
 		return;
 	}
 
-	if (_playingCounter < _tickCounter - (FCPU / _sampleFreq)*(_workingBufferSamples / 2) * NUM_BUFFERS)
+	/*if (_playingCounter < _tickCounter - (FCPU / _sampleFreq)*(samples / 2) * 3)
 	{
-		_playingCounter = _tickCounter - (FCPU / _sampleFreq)*(_workingBufferSamples / 2) * NUM_BUFFERS;
-	}
+		_playingCounter = _tickCounter - (FCPU / _sampleFreq)*(samples / 2) * 3;
+	}*/
 
 	ChannelEvent *event;
 	if (_eventQueue.empty()) {
@@ -134,7 +45,7 @@ void GbChannel::LoadBuffer(uint32_t buffer)
 	else {
 		event = &_eventQueue.front();
 	}
-	for (size_t i = 0; i < _workingBufferSamples; i += 2)
+	for (int i = 0; i < samples; i += 1)
 	{
 		_playingCounter += FCPU / _sampleFreq;
 
@@ -162,13 +73,11 @@ void GbChannel::LoadBuffer(uint32_t buffer)
 			}
 		}
 		// Write the value to the buffer
-		_workingBuffer[i] = (_leftVolume*_currentValue) / 7;
-		_workingBuffer[i + 1] = (_rightVolume*_currentValue) / 7;
-	}
-	alBufferData(buffer, AL_FORMAT_STEREO16, (ALvoid*) _workingBuffer, _workingBufferSamples*sizeof(int16_t), _sampleFreq);
-	if ((alRet = alGetError()) != AL_NO_ERROR)
-	{
-		Log(Error, "Could not load audio buffer for channel %d: %d", _channel, alRet);
+		buffer[0] = (_leftVolume*_currentValue) / 7;
+		if (_numChannels >= 2) {
+			buffer[1] = (_rightVolume*_currentValue) / 7;
+		}
+		buffer += _numChannels;
 	}
 }
 
@@ -291,10 +200,6 @@ void GbChannel::EnableAudio(bool enable)
 	{
 		_playingCounter = 0;
 		_tickCounter = 0;
-		CleanSoundOutput();
-		alSourcePlay(_source);
-	}
-	else {
-		alSourcePause(_source);
+		_eventQueue.clear();
 	}
 }

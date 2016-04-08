@@ -58,7 +58,6 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
 	_emulator.emu = NULL;
 	_emulator.handle = NULL;
 	_emulators = NULL;
-	_audio = NULL;
 	_inputOptionsFrame = NULL;
 
 	// Constructor
@@ -104,8 +103,6 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
 	//_timer = new wxTimer(this, ID_Timer);
 	//_timer->Start(16, false);
 	Log(Message,"EmuAll started");
-	_audio = new Audio();
-	_audio->Init();
 }
 
 MainFrame::~MainFrame()
@@ -238,6 +235,7 @@ void MainFrame::DrawGL(int user)
 
 void MainFrame::LoadEmulator(std::string &fileName)
 {
+	Options &options = Options::GetInstance();
 	// Load the emulator
 	// Detect and create the emulator
 	EmulatorInterface *emu = _emulators->GetCompatibleEmulator(fileName.c_str());
@@ -247,8 +245,6 @@ void MainFrame::LoadEmulator(std::string &fileName)
 		return;
 	}
 	Log(Message, "Loading the \"%s\" emulator", emu->GetName().c_str());
-	
-	EmulatorSettings_t configuration = emu->GetEmulatorSettings();
 
 	EMUHANDLE handle = emu->CreateEmulator();
 	if (!handle)
@@ -274,16 +270,38 @@ void MainFrame::LoadEmulator(std::string &fileName)
 	}
 
 	EmulatorInfo_t info = emu->GetInfo();
-	assert(info.screens.size() <= 1);
-	if (info.screens.size() != 0 && info.screens[0].width > 0 && info.screens[0].height > 0) {
-		_display->SetFrameBufferSize(info.screens[0].width, info.screens[0].height);
+
+	try {
+		// Init the display
+		assert(info.screens.size() <= 1);
+		if (info.screens.size() != 0 && info.screens[0].width > 0 && info.screens[0].height > 0) {
+			_display->SetFrameBufferSize(info.screens[0].width, info.screens[0].height);
+		}
+		else {
+			int w, h;
+			_display->GetSize(&w, &h);
+			_display->SetFrameBufferSize(w, h);
+			emu->Reshape(handle, _display->GetUserData(), w, h, options.videoOptions.keepAspect);
+		}
+
+		// Init the audio
+		assert(info.numAudioStreams > 0);
+		_audioCBData.clear();
+		_audioCBData.reserve(info.numAudioStreams);
+		for (int i = 0; i < info.numAudioStreams; ++i) {
+			_audioCBData.emplace_back(&_emulator, i);
+			AudioStream stream(AudioBuffer::Stereo16, options.audioOptions.sampleRate,
+				options.audioOptions.bufferSize, 3, &MainFrame::AudioStreamCB, &_audioCBData.back());
+			_audio.AddAudioStream(stream);
+			emu->InitAudio(handle, i, options.audioOptions.sampleRate, 2);
+		}
+		_audio.Play();
 	}
-	else {
-		int w, h;
-		_display->GetSize(&w, &h);
-		_display->SetFrameBufferSize(w, h);
-		emu->Reshape(handle, _display->GetUserData(), w, h, Options::GetInstance().videoOptions.keepAspect);
+	catch (BaseException &e) {
+		Log(Error, "%s\nStacktrace:\n%s", e.GetMsg(), e.GetStacktrace());
+		throw;
 	}
+	
 
 	// Loading the rom in memory
 	Log(Message, "Loading the ROM in memory");
@@ -330,8 +348,8 @@ void MainFrame::LoadEmulator(std::string &fileName)
 	if (saveData.miscData != NULL) delete[] saveData.miscData;
 
 	// store emulator
-	_emulator.emu = emu;
 	_emulator.handle = handle;
+	_emulator.emu = emu;
 
 	// Register for keybindings
 	_inputHandler.RegisterClient(_emulator);
@@ -362,7 +380,16 @@ void MainFrame::CloseEmulator()
 		_memDebugger->SetEmulator(emu);
 		_gpuDebugger->SetEmulator(emu);
 
-		_display->DestroyGL();
+		try {
+			_audio.Pause();
+			_audio.ClearAudioStreams();
+			_audioCBData.clear();
+			_display->DestroyGL();
+		}
+		catch (BaseException &e) {
+			Log(Error, "%s\nStacktrace:\n", e.GetMsg(), e.GetStacktrace());
+			throw;
+		}
 
 		_inputHandler.ClearClient(_emulator);
 		SaveData_t saveData;
@@ -435,6 +462,7 @@ void MainFrame::RunEmulator(uint32_t deltaTime)
 		}
 	}
 	try {
+		_audio.Tick();
 		_display->Refresh();
 	}
 	catch (BaseException &e) {
@@ -478,12 +506,6 @@ void MainFrame::OnClose(wxCloseEvent &evt)
 		_timer->Stop();
 		delete _timer;
 		_timer = NULL;
-	}
-	if(_audio != NULL)
-	{
-		_audio->Close();
-		delete _audio;
-		_audio = NULL;
 	}
 
 	Options::GetInstance().SaveOptions();
@@ -740,5 +762,19 @@ void MainFrame::DestroyGL(int user)
 	if (_emulator.emu != NULL)
 	{
 		_emulator.emu->DestroyGL(_emulator.handle, user);
+	}
+}
+
+void MainFrame::AudioStreamCB(AudioBuffer::Format format, int freq, int elements, void *data, void *user)
+{
+	short *dataPtr = reinterpret_cast<short *>(data);
+	MainFrame::AudioCallbackData *cbData = reinterpret_cast<MainFrame::AudioCallbackData *>(user);
+	(void)freq;
+
+	if (cbData != nullptr && cbData->emulator != nullptr && cbData->emulator->emu != nullptr) {
+		cbData->emulator->emu->GetAudio(cbData->emulator->handle, cbData->id, dataPtr, elements);
+	}
+	else {
+		memset(dataPtr, 0, elements * sizeof(short));
 	}
 }

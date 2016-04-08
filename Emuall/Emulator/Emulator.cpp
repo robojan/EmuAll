@@ -16,7 +16,7 @@ EmulatorInterface::EmulatorInterface(const std::string &dllName) :
 	_run(NULL), _isRunning(NULL), _tick(NULL), _input(NULL), _initPlugin(NULL),
 	_draw(NULL), _reshape(NULL), _save(NULL), _step(NULL), _saveState(NULL), _loadState(NULL),
 	_disassemble(NULL), _addBreakpoint(NULL), _removeBreakpoint(NULL), _isBreakpoint(NULL),
-	_getMemoryData(NULL), _getValI(NULL), _getValU(NULL), _getString(NULL)
+	_getMemoryData(NULL), _getValI(NULL), _getValU(NULL), _getString(NULL), _initAudio(nullptr), _getAudio(nullptr)
 {
 	_hDLL = LoadSharedLibrary(dllName.c_str());
 	if (_hDLL == NULL)
@@ -87,6 +87,8 @@ EmulatorInterface::EmulatorInterface(const std::string &dllName) :
 		_removeBreakpoint		= (void(__stdcall*)(EMUHANDLE, uint32_t))					GetStdcallFunc<EMUHANDLE, uint32_t>				(_hDLL, "RemoveBreakpoint");
 		_isBreakpoint			= (int32_t(__stdcall*)(EMUHANDLE, uint32_t))				GetStdcallFunc<EMUHANDLE, uint32_t>				(_hDLL, "IsBreakpoint");
 		_getMemoryData			= (uint8_t(__stdcall*)(EMUHANDLE, int32_t, uint32_t))		GetStdcallFunc<EMUHANDLE, int32_t, uint32_t>	(_hDLL, "GetMemoryData");
+		_initAudio				= (void (__stdcall *)(EMUHANDLE, int32_t, uint32_t, int32_t)) GetStdcallFunc<EMUHANDLE, int32_t, uint32_t, int32_t> (_hDLL, "InitAudio");
+		_getAudio				= (void (__stdcall *)(EMUHANDLE, int32_t, int16_t *, uint32_t)) GetStdcallFunc<EMUHANDLE, int32_t, int16_t *, uint32_t> (_hDLL, "GetAudio");
 	}
 	_valid = true;
 	Log(Debug, "Loaded functions from emulator");
@@ -110,18 +112,14 @@ EmulatorInfo_t EmulatorInterface::GetInfo() const
 	info.aboutInfo = _root.child_value("about");
 	for (pugi::xml_node screen = _root.child("screen"); screen; screen = screen.next_sibling("screen")) {
 		EmulatorScreen_t screenInfo;
-		const char *temp;
-		screenInfo.id = screen.attribute("id").as_int(-1);
-		temp = screen.child_value("width");
-		screenInfo.width = *temp == '\0' ? -1 : strtol(temp, NULL, 0);
-		temp = screen.child_value("height");
-		screenInfo.height = *temp == '\0' ? -1 : strtol(temp, NULL, 0);
-		temp = screen.child_value("mousex");
-		screenInfo.mouseXvarID = *temp == '\0' ? -1 : strtol(temp, NULL, 0);
-		temp = screen.child_value("mousey");
-		screenInfo.mouseYvarID = *temp == '\0' ? -1 : strtol(temp, NULL, 0);
+		screenInfo.id = screen.attribute("id").as_int(-1);		
+		screenInfo.width = screen.child("width").text().as_int(-1);
+		screenInfo.height = screen.child("height").text().as_int(-1);
+		screenInfo.mouseXvarID = screen.child("mousex").text().as_int(-1);
+		screenInfo.mouseYvarID = screen.child("mousey").text().as_int(-1);
 		info.screens.push_back(screenInfo);
 	}
+	info.numAudioStreams = _root.child("audio").child("sources").text().as_int(0);
 	return info;
 }
 
@@ -303,13 +301,6 @@ Debugger::DebuggerRoot *EmulatorInterface::GetGpuDebuggerInfo(Emulator *emu) con
 	}
 }
 
-EmulatorSettings_t EmulatorInterface::GetEmulatorSettings() const
-{
-	EmulatorSettings_t ret;
-	ret.audioSources = _root.child("audio").child("sources").text().as_int(0);
-	return ret;
-}
-
 uint32_t EmulatorInterface::GetValU(EMUHANDLE handle, int id) const
 {
 	if (_getValU == NULL)
@@ -489,6 +480,22 @@ int EmulatorInterface::SaveState(EMUHANDLE handle, SaveData_t *data)
 	if (_saveState == NULL)
 		return false;
 	return _saveState(handle, data);
+}
+
+void EmulatorInterface::InitAudio(EMUHANDLE handle, int source, unsigned int sampleRate, int channels)
+{
+	if (_initAudio == nullptr) {
+		return;
+	}
+	_initAudio(handle, source, sampleRate, channels);
+}
+
+void EmulatorInterface::GetAudio(EMUHANDLE handle, int source, short *buffer, unsigned int samples)
+{
+	if (_getAudio == nullptr) {
+		return;
+	}
+	_getAudio(handle, source, buffer, samples);
 }
 
 char EmulatorInterface::Disassemble(EMUHANDLE handle, unsigned int pos, const char **raw, const char **instr)

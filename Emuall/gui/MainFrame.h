@@ -6,8 +6,10 @@
 #include <string>
 
 #include "EmulatorScreen.h"
-#include "../audio.h"
 #include "../Emulator/Emulator.h"
+#include "../Emulator/Sound/AudioManager.h"
+#include "../Emulator/Sound/AudioStream.h"
+#include "../Emulator/Sound/AudioBuffer.h"
 #include "../util/Options.h"
 #include "../util/logWx.h"
 #include "../keyhandler.h"
@@ -16,15 +18,25 @@
 #include "memDebugger.h"
 #include "gpuDebugger.h"
 
+
+
 class MainFrame: public wxFrame, GLPaneI
 {
 	DECLARE_EVENT_TABLE()
 public:
+	class AudioCallbackData {
+	public:
+		AudioCallbackData(Emulator *emu, int id) : emulator(emu), id(id) { }
+		Emulator *emulator;
+		int id;
+	};
+
 	MainFrame(const wxString &title, const wxPoint &pos, const wxSize &size);
 	~MainFrame();
 	void Update();
 
 private:
+
 	// wxWidgets members
 	wxMenuBar	*_bar;
 	wxMenu		*_menFile;
@@ -49,8 +61,10 @@ private:
 	std::string	_filePath;
 	std::string _saveFilePath;
 	std::string _saveStateFilePath;
-	Audio		*_audio;
+	AudioManager _audio;
 	InputMaster _inputHandler;
+
+	std::vector<AudioCallbackData> _audioCBData;
 
 	// private functions
 	void CreateLayout();
@@ -83,6 +97,7 @@ private:
 	void DrawGL(int user);
 	bool InitGL(int user);
 	void DestroyGL(int user);
+	static void AudioStreamCB(AudioBuffer::Format format, int freq, int elements, void *data, void *user);
 };
 
 

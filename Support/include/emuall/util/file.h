@@ -70,8 +70,11 @@ public:
 	};
 
 	File(const char *filename, fileOpenMode mode = openReadOnly);
+	File(File &other);
 	File();
 	virtual ~File();
+
+	File &operator=(File &other);
 
 	bool Seek(long int offset, seekOrigins origin = seekCurrent);
 	long int GetPosition();
@@ -106,7 +109,10 @@ public:
 
 	RawFile(const char *filepath, fileOpenMode mode = File::openReadOnly, bool littleEndian = true);
 	RawFile(bool littleEndian = true);
+	RawFile(RawFile &other);
 	virtual ~RawFile();
+
+	RawFile &operator=(RawFile &other);
 
 	uint8_t GetU8();
 	int8_t GetI8();

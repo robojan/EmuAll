@@ -123,7 +123,6 @@ bool Gameboy::Tick(uint32_t time)
 		{
 			execute = execute * 2;
 		}
-		int slowTickCounter = execute/4;
 		for (int i = execute; i != 0; --i)
 		{
 			if (_cpu->_stopped)
@@ -154,13 +153,6 @@ bool Gameboy::Tick(uint32_t time)
 				_gpu->tick();
 				// keep sound in sync
 				_sound->Tick();
-			}
-			--slowTickCounter;
-			if (slowTickCounter == 0)
-			{
-				// Update sound
-				_sound->SlowTick();
-				slowTickCounter = execute / 4;
 			}
 		}
 	}

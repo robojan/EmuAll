@@ -43,12 +43,15 @@
     <Filter Include="Header Files\util\xml">
       <UniqueIdentifier>{4faffbbc-203f-4084-910d-aa839cb71f58}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Emulator\Sound">
+      <UniqueIdentifier>{962ca482-68ff-4c8e-8af3-65bb5d64f9bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Emulator\Sound">
+      <UniqueIdentifier>{935eea95-0703-4f5a-a20a-8d7d1a94d1aa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="emuAll.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="audio.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="keyhandler.cpp">
@@ -141,11 +144,29 @@
     <ClCompile Include="resources\resources.c">
       <Filter>Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="Emulator\Sound\AudioManager.cpp">
+      <Filter>Source Files\Emulator\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Sound\AudioDevice.cpp">
+      <Filter>Source Files\Emulator\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Sound\AudioException.cpp">
+      <Filter>Source Files\Emulator\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Sound\AudioContext.cpp">
+      <Filter>Source Files\Emulator\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Sound\AudioBuffer.cpp">
+      <Filter>Source Files\Emulator\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Sound\AudioSource.cpp">
+      <Filter>Source Files\Emulator\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Sound\AudioStream.cpp">
+      <Filter>Source Files\Emulator\Sound</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="audio.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="keyhandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -259,6 +280,27 @@
     </ClInclude>
     <ClInclude Include="gui\icon.h">
       <Filter>Header Files\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Sound\AudioManager.h">
+      <Filter>Header Files\Emulator\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Sound\AudioDevice.h">
+      <Filter>Header Files\Emulator\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Sound\AudioException.h">
+      <Filter>Header Files\Emulator\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Sound\AudioContext.h">
+      <Filter>Header Files\Emulator\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Sound\AudioBuffer.h">
+      <Filter>Header Files\Emulator\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Sound\AudioSource.h">
+      <Filter>Header Files\Emulator\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Sound\AudioStream.h">
+      <Filter>Header Files\Emulator\Sound</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

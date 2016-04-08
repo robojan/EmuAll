@@ -9,6 +9,7 @@
 #include <assert.h>
 #include "gb/cpu/GbCpu.h"
 #include "gb/gpu/GbGpu.h"
+#include "gb/sound/GbSound.h"
 #include "resources/resources.h"
 #include <GL/glew.h>
 
@@ -457,10 +458,16 @@ uint8_t __stdcall GetMemoryData(EMUHANDLE handle, int32_t memory, uint32_t addre
 }
 
 void __stdcall InitAudio(EMUHANDLE handle, int32_t source, uint32_t sampleRate, int32_t channels) {
-
+	Gameboy *emulator = (Gameboy *)handle;
+	if (handle == nullptr)
+		return;
+	emulator->GetSound()->InitAudio(source, sampleRate, channels);
 }
 
-void __stdcall GetAudio(EMUHANDLE handle, int32_t source, int16_t *buffer, int32_t samples){
-
+void __stdcall GetAudio(EMUHANDLE handle, int32_t source, int16_t *buffer, int32_t samples) {
+	Gameboy *emulator = (Gameboy *)handle;
+	if (handle == nullptr)
+		return;
+	emulator->GetSound()->GetAudio(source, buffer, samples);
 }
 

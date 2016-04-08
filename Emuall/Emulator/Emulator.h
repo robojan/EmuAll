@@ -94,11 +94,8 @@ typedef struct {
 	std::string description;
 	std::string aboutInfo;
 	std::vector <EmulatorScreen_t> screens;
+	int numAudioStreams;
 } EmulatorInfo_t;
-
-typedef struct {
-	int audioSources;
-} EmulatorSettings_t;
 
 class EmulatorInterface
 {
@@ -115,7 +112,6 @@ public:
 	CpuDebuggerInfo_t GetCpuDebuggerInfo() const;
 	MemDebuggerInfo_t GetMemDebuggerInfo(EMUHANDLE handle) const;
 	Debugger::DebuggerRoot *GetGpuDebuggerInfo(Emulator *emu) const;
-	EmulatorSettings_t GetEmulatorSettings() const;
 
 	uint32_t GetValU(EMUHANDLE handle, int id) const;
 	int32_t GetValI(EMUHANDLE handle, int id) const;
@@ -145,6 +141,9 @@ public:
 
 	int Save(EMUHANDLE handle, SaveData_t* data);
 	int SaveState(EMUHANDLE handle, SaveData_t *state);
+
+	void InitAudio(EMUHANDLE handle, int source, unsigned int sampleRate, int channels);
+	void GetAudio(EMUHANDLE handle, int source, short *buffer, unsigned int samples);
 
 	// Debugging
 	char Disassemble(EMUHANDLE handle, unsigned int pos, const char **raw, const char **instr);
@@ -198,6 +197,10 @@ private:
 	// stopping functions
 	int32_t(__stdcall *_save)(EMUHANDLE, SaveData_t *);
 	int32_t(__stdcall *_saveState)(EMUHANDLE, SaveData_t *);
+
+	// Audio functions
+	void(__stdcall *_initAudio)(EMUHANDLE, int32_t, uint32_t, int32_t);
+	void(__stdcall *_getAudio)(EMUHANDLE, int32_t, int16_t *, uint32_t);
 
 	// Debugging functions
 	uint8_t(__stdcall *_disassemble)(EMUHANDLE, uint32_t, const uint8_t **, const uint8_t **);

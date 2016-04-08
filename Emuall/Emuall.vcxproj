@@ -159,9 +159,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="emuAll.cpp" />
-    <ClCompile Include="audio.cpp" />
+    <ClCompile Include="Emulator\Sound\AudioBuffer.cpp" />
+    <ClCompile Include="Emulator\Sound\AudioContext.cpp" />
+    <ClCompile Include="Emulator\Sound\AudioDevice.cpp" />
+    <ClCompile Include="Emulator\Sound\AudioException.cpp" />
+    <ClCompile Include="Emulator\Sound\AudioManager.cpp" />
     <ClCompile Include="Emulator\Emulator.cpp" />
     <ClCompile Include="Emulator\SaveFile.cpp" />
+    <ClCompile Include="Emulator\Sound\AudioSource.cpp" />
+    <ClCompile Include="Emulator\Sound\AudioStream.cpp" />
     <ClCompile Include="gui\cpuDebugger.cpp" />
     <ClCompile Include="gui\debugger\DebuggerBoxSizer.cpp" />
     <ClCompile Include="gui\debugger\DebuggerCheckbox.cpp" />
@@ -192,10 +198,16 @@
     <ClCompile Include="util\xml\pugixml.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="audio.h" />
+    <ClInclude Include="Emulator\Sound\AudioBuffer.h" />
+    <ClInclude Include="Emulator\Sound\AudioContext.h" />
+    <ClInclude Include="Emulator\Sound\AudioDevice.h" />
+    <ClInclude Include="Emulator\Sound\AudioException.h" />
+    <ClInclude Include="Emulator\Sound\AudioManager.h" />
     <ClInclude Include="emuAll.h" />
     <ClInclude Include="Emulator\Emulator.h" />
     <ClInclude Include="Emulator\SaveFile.h" />
+    <ClInclude Include="Emulator\Sound\AudioSource.h" />
+    <ClInclude Include="Emulator\Sound\AudioStream.h" />
     <ClInclude Include="gui\cpuDebugger.h" />
     <ClInclude Include="gui\debugger\DebuggerBoxSizer.h" />
     <ClInclude Include="gui\debugger\DebuggerCheckbox.h" />

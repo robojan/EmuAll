@@ -150,7 +150,7 @@ public:
 
 	void SetFormat(unsigned int sampleRate, unsigned short channels);
 	unsigned int WritePCM(int16_t *buffer, unsigned int samples);
-	void WriteToFile(const char *path = NULL) const;
+	void WriteToFile(const char *path = NULL);
 
 private:
 	virtual void Release();

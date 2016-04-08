@@ -3,8 +3,6 @@
 #include "GbSound.h"
 #include "../defines.h"
 
-#include <AL/al.h>
-
 GbSound::GbSound(Gameboy *master) : 
 	_channel1(master, false), 
 	_channel2(master, true),
@@ -12,16 +10,6 @@ GbSound::GbSound(Gameboy *master) :
 	_channel4(master)
 {
 	_gb = master;
-
-	// Init Audio state
-	alDistanceModel(AL_NONE);
-	alDopplerFactor(0.0);
-
-	// Init Audio listener
-	alListener3f(AL_POSITION, 0, 0, 0);
-	alListener3f(AL_VELOCITY, 0, 0, 0);
-	ALfloat orientation[] = { 0.0, 0.0, -1.0, 0.0, 1.0, 0.0 };
-	alListenerfv(AL_ORIENTATION, orientation);
 }
 
 GbSound::~GbSound()
@@ -40,14 +28,6 @@ void GbSound::registerEvents(void)
 void GbSound::MemEvent(address_t address, gbByte val)
 {
 
-}
-
-void GbSound::SlowTick()
-{
-	_channel1.SlowTick();
-	_channel2.SlowTick();
-	_channel3.SlowTick();
-	_channel4.SlowTick();
 }
 
 void GbSound::BeginTick()
@@ -124,4 +104,37 @@ bool GbSound::SaveState(std::vector<uint8_t> &data)
 	dataLen = data.size() - size;
 	*(uint32_t *)(ptr + 4) = conv.convu32(dataLen);
 	return true;
+}
+
+void GbSound::InitAudio(int source, unsigned int sampleRate, int channels)
+{	
+	GetChannel(source).InitAudio(sampleRate, channels);
+}
+
+void GbSound::GetAudio(int source, short *buffer, int samples)
+{
+	GetChannel(source).GetAudio(buffer, samples);
+}
+
+GbChannel & GbSound::GetChannel(int source)
+{
+	GbChannel *channel = nullptr;
+	switch (source) {
+	case 0:
+		channel = &_channel1;
+		break;
+	case 1:
+		channel = &_channel2;
+		break;
+	case 2:
+		channel = &_channel3;
+		break;
+	case 3:
+		channel = &_channel4;
+		break;
+	default:
+		Log(Error, "Unknown initAudio channel received: %d", source);
+		break;
+	}
+	return *channel;
 }

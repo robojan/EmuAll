@@ -8,7 +8,7 @@
 #include "../../util/exceptions.h"
 
 GbChannel3::GbChannel3(Gameboy *master) :
-	GbChannel(44100, 3), _gb(master),
+	GbChannel(3), _gb(master),
 	_enabled(true), _volume(CHANNEL_AMPLITUDE),	_volumeCtrl(0xf),
 	_powered(true), _periodCounter(0), _frequency(10), _outputLevel(0),
 	_playing(false), _soundLength(0), _lengthEnabled(false)

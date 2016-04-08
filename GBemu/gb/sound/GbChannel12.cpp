@@ -4,7 +4,7 @@
 #include "../../util/log.h"
 #include "GbSound.h"
 GbChannel12::GbChannel12(Gameboy *master, bool channel2) : 
-	_gb(master), _channel2(channel2), GbChannel(44100, channel2 ? 2 : 1),
+	_gb(master), _channel2(channel2), GbChannel(channel2 ? 2 : 1),
 	_frameSequencer(0), _periodCounter(0), _frequency(0x77D),
 	_dutyCounter(0), _dutyMode(2), _shadowFrequency(0), _sweepEnabled(false),
 	_enabled(true), _soundLength(0), _sweepTimer(0), _volume(CHANNEL_AMPLITUDE),

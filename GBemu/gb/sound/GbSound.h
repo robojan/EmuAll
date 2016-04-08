@@ -20,14 +20,18 @@ public:
 	void registerEvents(void);
 	void MemEvent(address_t address, gbByte val);
 	inline void Tick();
-	void SlowTick();
 	void BeginTick();
 	void EnableAudio(bool enable);
 	uint_fast8_t GetEnabledFlags();
 
 	bool LoadState(const SaveData_t *data);
 	bool SaveState(std::vector<uint8_t> &data);
+
+	void InitAudio(int source, unsigned int sampleRate, int channels);
+	void GetAudio(int source, short *buffer, int samples);
 private:
+	GbChannel &GetChannel(int source);
+
 	Gameboy			*_gb;
 
 	GbChannel12		_channel1;
