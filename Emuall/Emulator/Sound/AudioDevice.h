@@ -9,7 +9,7 @@
 class AudioDevice {
 	friend class AudioContext;
 public:
-	AudioDevice(std::string device);
+	explicit AudioDevice(std::string device);
 	AudioDevice(AudioDevice &other);
 	AudioDevice();
 	~AudioDevice();

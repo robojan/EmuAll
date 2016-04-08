@@ -40,12 +40,10 @@ AudioStream::AudioStream(AudioBuffer::Format format, int freq, int bufferSize, i
 }
 
 AudioStream::AudioStream(AudioStream &other) :
-	_callback(other._callback), _user(other._user), _format(other._format), 
+	_user(other._user), _callback(other._callback), _format(other._format),
 	_bufferSize(other._bufferSize),_numBuffers(other._numBuffers), _sampFreq(other._sampFreq),
-	_source(other._source)
+	_buffers(std::move(other._buffers)), _source(other._source), _workingBuffer(std::move(other._workingBuffer))
 {
-	_buffers = std::move(other._buffers);
-	_workingBuffer = std::move(other._workingBuffer);
 	other._user = nullptr;
 	other._callback = nullptr;
 	other._bufferSize = 0;

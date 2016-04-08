@@ -6,8 +6,8 @@
 
 class EMUEXPORT BaseException {
 public:
-	BaseException(const char *msg);
-	BaseException(const std::string &msg);
+	explicit BaseException(const char *msg);
+	explicit BaseException(const std::string &msg);
 	BaseException(BaseException &other);
 
 	BaseException &operator=(BaseException &other);
