@@ -37,6 +37,5 @@ vec4 GetTextureColor(sampler2D textureSampler, vec2 textureCoord) {
 			denom = denom + f1 * f2;
 		}
 	}
-	return sum / denom;
-	
+	return sum / denom;	
 }

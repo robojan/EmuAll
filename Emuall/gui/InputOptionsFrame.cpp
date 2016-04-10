@@ -169,7 +169,7 @@ void InputOptionsFrame::OnShow(wxShowEvent &evt)
 		return;
 	if (_notebook->GetPageCount() >0 && _notebook->GetPageText(0) == _("No emulators"))
 		_notebook->DeletePage(0);
-	Options &options = Options::GetInstance();
+	Options &options = Options::GetSingleton();
 	if (options._keyBindings.size() == 0)
 	{
 		// Add empty page
@@ -226,7 +226,7 @@ void InputOptionsFrame::OnShow(wxShowEvent &evt)
 
 void InputOptionsFrame::RestoreBinding()
 {
-	_activeRebind->SetLabelText(KeyToString(Options::GetInstance().GetInputKeyBinding(
+	_activeRebind->SetLabelText(KeyToString(Options::GetSingleton().GetInputKeyBinding(
 		_activeRebind->GetName(), _activeRebind->GetKey(), 0)));
 	_activeRebind = NULL;
 }
@@ -252,7 +252,7 @@ void InputOptionsFrame::OnKeyboardInput(wxKeyEvent &evt)
 	if (_activeRebind == NULL || keyCode == 0)
 		return; // How the hell did we come here?
 
-	Options &options = Options::GetInstance();
+	Options &options = Options::GetSingleton();
 	options.RebindKey(_activeRebind->GetName(), _activeRebind->GetKey(), evt.GetKeyCode());
 	_activeRebind->Unbind(wxEVT_KEY_UP, &InputOptionsFrame::OnKeyboardInput,this, wxID_ANY, wxID_ANY, NULL);
 	// Update all boxes
@@ -273,7 +273,7 @@ void InputOptionsFrame::OnPageChanging(wxNotebookEvent &evt)
 		std::map<int, KeyBindBox *>::iterator it;
 		for (it = _bindingBoxes[_activeRebind->GetName()].begin(); it != _bindingBoxes[_activeRebind->GetName()].end(); ++it)
 		{
-			it->second->SetLabelText(KeyToString(Options::GetInstance().GetInputKeyBinding(
+			it->second->SetLabelText(KeyToString(Options::GetSingleton().GetInputKeyBinding(
 				it->second->GetName(), it->second->GetKey(), 0)));
 		}
 	}

@@ -1,4 +1,5 @@
 #ifndef TEXTURE_H_
+#define TEXTURE_H_
 
 #include <emuall/common.h>
 
@@ -8,6 +9,7 @@ public:
 	enum Format {
 		RGB,
 		RGBA,
+		Red,
 	};
 
 	enum Filter {

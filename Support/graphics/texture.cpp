@@ -51,18 +51,26 @@ void Texture::LoadTexture(const char *fileName)
 void Texture::LoadTexture(int width, int height, const char *data, Format format, int stride /*= -1*/)
 {
 	GLint glFormat;
+	GLint glInternalFormat;
 	int elementSize = 0;
 	switch (format) {
 	case RGB:
 		elementSize = 3;
 		glFormat = GL_RGB;
+		glInternalFormat = GL_RGB;
 		break;
 	case RGBA:
 		elementSize = 4;
 		glFormat = GL_RGBA;
+		glInternalFormat = GL_RGBA;
+		break;
+	case Red:
+		elementSize = 1;
+		glFormat = GL_RED;
+		glInternalFormat = GL_RED;
 		break;
 	default:
-		return;
+		throw GraphicsException(GL_INVALID_ENUM, "Texture format not recognized");
 		break;
 	}
 	if (stride == -1) {
@@ -74,7 +82,7 @@ void Texture::LoadTexture(int width, int height, const char *data, Format format
 
 	Begin();
 	GL_CHECKED(glPixelStorei(GL_UNPACK_ROW_LENGTH, stride));
-	GL_CHECKED(glTexImage2D(_type, 0, glFormat, width, height, 0, glFormat, GL_UNSIGNED_BYTE, data));
+	GL_CHECKED(glTexImage2D(_type, 0, glInternalFormat, width, height, 0, glFormat, GL_UNSIGNED_BYTE, data));
 	GL_CHECKED(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
 	End();
 }
@@ -179,8 +187,11 @@ void Texture::UpdateData(int x, int y, int width, int height, const char *data, 
 	case RGBA:
 		glFormat = GL_RGBA;
 		break;
+	case Red:
+		glFormat = GL_RED;
+		break;
 	default:
-		return;
+		throw GraphicsException(GL_INVALID_ENUM, "Texture format not recognized");
 		break;
 	}
 	if (stride == -1) {
@@ -189,6 +200,7 @@ void Texture::UpdateData(int x, int y, int width, int height, const char *data, 
 
 	Begin();
 	GL_CHECKED(glPixelStorei(GL_UNPACK_ROW_LENGTH, stride));
+	GL_CHECKED(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
 	GL_CHECKED(glTexSubImage2D(_type, 0, x, y, width, height,glFormat, GL_UNSIGNED_BYTE, data));
 	GL_CHECKED(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
 	End();

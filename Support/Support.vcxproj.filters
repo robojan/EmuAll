@@ -25,6 +25,12 @@
     <Filter Include="Header Files\graphics">
       <UniqueIdentifier>{b6ee2d76-f831-4ff8-8b54-eca9ceb2298d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\math">
+      <UniqueIdentifier>{99b7fcc5-b7a9-4dc4-8330-b3b9469532f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\math">
+      <UniqueIdentifier>{53a8572c-f44c-4007-b291-56145968b731}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -52,6 +58,36 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="graphics\graphicsException.cpp">
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\font.cpp">
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\fontException.cpp">
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="math\math.cpp">
+      <Filter>Source Files\math</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\BufferObject.cpp">
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\vertexArrayObject.cpp">
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="resources\resources.c">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\fontlibrary.cpp">
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\fontcache.cpp">
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\glyphlayout.cpp">
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\guiRenderer.cpp">
       <Filter>Source Files\graphics</Filter>
     </ClCompile>
   </ItemGroup>
@@ -86,5 +122,34 @@
     <ClInclude Include="include\emuall\exception.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\emuall\graphics\font.h">
+      <Filter>Header Files\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\emuall\math\math.h">
+      <Filter>Header Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\emuall\graphics\BufferObject.h">
+      <Filter>Header Files\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\emuall\graphics\VertexArrayObject.h">
+      <Filter>Header Files\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="resources\resources.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\emuall\graphics\guiRenderer.h">
+      <Filter>Header Files\graphics</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="resources\resources.rlst">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="resources\gui.frag.glsl">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="resources\gui.vert.glsl">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

@@ -181,10 +181,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="resources\gb.vert">
+    <Text Include="resources\gb.frag.glsl">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="resources\gb.frag">
+    <Text Include="resources\gb.vert.glsl">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

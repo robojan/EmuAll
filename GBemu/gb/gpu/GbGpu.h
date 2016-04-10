@@ -11,6 +11,8 @@
 #include <stdint.h>
 #include <vector>
 #include <emuall/graphics/ShaderProgram.h>
+#include <emuall/graphics/BufferObject.h>
+#include <emuall/graphics/VertexArrayObject.h>
 #include <emuall/graphics/texture.h>
 
 typedef union
@@ -139,9 +141,8 @@ private:
 
 	// Main screen
 	Texture		_texture;
-	unsigned int _surfaceVBO;
-	unsigned int _surfaceUVBO;
-	unsigned int _vao;
+	BufferObject *_surfaceBO;
+	VertexArrayObject *_surfaceVAO;
 	ShaderProgram _shader;
 	gbColor		*_screen;
 	gbColor		*_screen_buffer1;
@@ -151,25 +152,22 @@ private:
 	// Background
 	BackgroundDebuggerData _BGDebug;
 	Texture		_BGTexture;
-	unsigned int _BGVBO;
-	unsigned int _BGUVBO;
-	unsigned int _BGVAO;
+	BufferObject *_BGBO;
+	VertexArrayObject *_BGVAO;
 	ShaderProgram _BGShader;
 
 	// Tiles
 	TilesDebuggerData _TiDebug;
 	Texture		_TiTexture;
-	unsigned int _TiVBO;
-	unsigned int _TiUVBO;
-	unsigned int _TiVAO;
+	BufferObject *_TiBO;
+	VertexArrayObject *_TiVAO;
 	ShaderProgram _TiShader;
 
 	// OAM
 	OAMDebuggerData _OAMDebug;
 	Texture		_OAMTexture;
-	unsigned int _OAMVBO;
-	unsigned int _OAMUVBO;
-	unsigned int _OAMVAO;
+	BufferObject *_OAMBO;
+	VertexArrayObject *_OAMVAO;
 	ShaderProgram _OAMShader;
 };
 

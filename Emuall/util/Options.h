@@ -15,6 +15,9 @@ typedef struct
 {
 	bool keepAspect;
 	int filter;
+	std::string messageFont;
+	int messageFontIdx;
+	int messageFontSize;
 } OptionsVid_t;
 
 typedef struct
@@ -30,7 +33,7 @@ class Options
 public:
 	~Options();
 
-	static Options &GetInstance();
+	static Options &GetSingleton();
 
 	void LoadOptions();
 	void SaveOptions();

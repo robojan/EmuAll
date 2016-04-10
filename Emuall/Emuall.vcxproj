@@ -132,28 +132,28 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LibraryPath>$(LIBDIR)\glew-1.13.0\lib\Release\$(PlatformName);$(LIBDIR)\openal-soft-1.17.2-bin\libs\$(PlatformName);$(LIBDIR)\wxWidgets-3.1.0\lib\vc_lib;$(LIBDIR)\SFML-2.3.2\lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(SolutionDir)Support\include;$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(LIBDIR)\SFML-2.3.2\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(LIBDIR)\freetype-2.6\include;$(SolutionDir)Support\include;$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(LIBDIR)\SFML-2.3.2\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LibraryPath>$(LIBDIR)\glew-1.13.0\lib\Release\$(PlatformName);$(LIBDIR)\openal-soft-1.17.2-bin\libs\Win64;$(LIBDIR)\wxWidgets-3.1.0\lib\vc_x64_lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(SolutionDir)Support\include;$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(LIBDIR)\freetype-2.6\include;$(SolutionDir)Support\include;$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">
     <LibraryPath>$(LIBDIR)\glew-1.13.0\lib\Release\$(PlatformName);$(LIBDIR)\openal-soft-1.17.2-bin\libs\$(PlatformName);$(LIBDIR)\wxWidgets-3.1.0\lib\vc_lib;$(LIBDIR)\SFML-2.3.2\lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(SolutionDir)Support\include;$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(LIBDIR)\SFML-2.3.2\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(LIBDIR)\freetype-2.6\include;$(SolutionDir)Support\include;$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(LIBDIR)\SFML-2.3.2\include;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug inline|x64'">
     <LinkIncremental>false</LinkIncremental>
     <LibraryPath>$(LIBDIR)\glew-1.13.0\lib\Release\$(PlatformName);$(LIBDIR)\openal-soft-1.17.2-bin\libs\Win64;$(LIBDIR)\wxWidgets-3.1.0\lib\vc_x64_lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(SolutionDir)Support\include;$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(LIBDIR)\freetype-2.6\include;$(SolutionDir)Support\include;$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">
-    <IncludePath>$(SolutionDir)Support\include;$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(LIBDIR)\SFML-2.3.2\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(LIBDIR)\freetype-2.6\include;$(SolutionDir)Support\include;$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(LIBDIR)\SFML-2.3.2\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release wx|x64'">
-    <IncludePath>$(SolutionDir)Support\include;$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(LIBDIR)\freetype-2.6\include;$(SolutionDir)Support\include;$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">
     <LibraryPath>$(LIBDIR)\glew-1.13.0\lib\Release\$(PlatformName);$(LIBDIR)\openal-soft-1.17.2-bin\libs\$(PlatformName);$(LIBDIR)\wxWidgets-3.1.0\lib\vc_lib;$(LIBDIR)\SFML-2.3.2\lib;$(LibraryPath)</LibraryPath>
@@ -162,10 +162,10 @@
     <LibraryPath>$(LIBDIR)\glew-1.13.0\lib\Release\$(PlatformName);$(LIBDIR)\openal-soft-1.17.2-bin\libs\Win64;$(LIBDIR)\wxWidgets-3.1.0\lib\vc_x64_lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)Support\include;$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(LIBDIR)\SFML-2.3.2\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(LIBDIR)\freetype-2.6\include;$(SolutionDir)Support\include;$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(LIBDIR)\SFML-2.3.2\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)Support\include;$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(LIBDIR)\freetype-2.6\include;$(SolutionDir)Support\include;$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LibraryPath>$(LIBDIR)\glew-1.13.0\lib\Release\$(PlatformName);$(LIBDIR)\openal-soft-1.17.2-bin\libs\$(PlatformName);$(LIBDIR)\wxWidgets-3.1.0\lib\vc_lib;$(LIBDIR)\SFML-2.3.2\lib;$(LibraryPath)</LibraryPath>

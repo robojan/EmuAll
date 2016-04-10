@@ -11,6 +11,7 @@ Options::Options()
 {
 	videoOptions.keepAspect = DEFAULT_KEEPASPECT;
 	videoOptions.filter = DEFAULT_VIDEOFILTER;
+	videoOptions.messageFontSize = 16;
 	audioOptions.sampleRate = DEFAULT_SAMPLERATE;
 	audioOptions.bufferSize = DEFAULT_BUFFERSIZE;
 	audioOptions.numBuffers = DEFAULT_NUMAUDIOBUFFERS;
@@ -24,7 +25,7 @@ Options::~Options()
 
 }
 
-Options & Options::GetInstance()
+Options & Options::GetSingleton()
 {
 	return _instance;
 }
@@ -46,6 +47,21 @@ void Options::LoadOptions()
 	// Read Video
 	videoOptions.keepAspect = mFileConfig.ReadBool("Video/KeepAspectRatio", DEFAULT_KEEPASPECT);
 	videoOptions.filter = mFileConfig.ReadLong("Video/Filter", DEFAULT_VIDEOFILTER);
+
+	wxString defaultMessageFont;
+#ifdef _WIN32
+	wxGetEnv("WINDIR", &defaultMessageFont);
+	defaultMessageFont.append(wxFileName::GetPathSeparator());
+	defaultMessageFont.append("Fonts");
+	defaultMessageFont.append(wxFileName::GetPathSeparator());
+	defaultMessageFont.append("georgia.ttf");
+#elif defined(__APPLE__)
+	defaultMessageFont = "/System/Library/Fonts/georgia.ttf";
+#elif defined(__linux__) || defined(__unix__)
+#endif
+	videoOptions.messageFont = mFileConfig.Read("Video/MessageFont", defaultMessageFont);
+	videoOptions.messageFontIdx = mFileConfig.ReadLong("Video/MessageFontIdx", 0);
+	videoOptions.messageFontSize = mFileConfig.ReadLong("Video/MessageFontSize", 16);
 
 	// Recent files
 	recentFiles[0] = mFileConfig.Read("RecentFiles/file0", "");
@@ -71,6 +87,9 @@ void Options::SaveOptions()
 	// Read Video
 	mFileConfig.Write("Video/KeepAspectRatio", videoOptions.keepAspect);
 	mFileConfig.Write("Video/Filter", videoOptions.filter);
+	mFileConfig.Write("Video/MessageFont", wxString(videoOptions.messageFont));
+	mFileConfig.Write("Video/MessageFontIdx", videoOptions.messageFontIdx);
+	mFileConfig.Write("Video/MessageFontSize", videoOptions.messageFontSize);
 
 	// Recent files
 	mFileConfig.Write("RecentFiles/file0", wxString(recentFiles[0]));

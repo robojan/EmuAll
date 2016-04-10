@@ -67,7 +67,7 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
 	InitLog(&_logDst);
 
 	// Load options
-	Options::GetInstance().LoadOptions();
+	Options::GetSingleton().LoadOptions();
 
 	// Create layout
 	CreateLayout();
@@ -183,7 +183,7 @@ void MainFrame::CreateMenuBar()
 	videoFilterMenu->AppendRadioItem(ID_Main_Options_Filter + 3, _("Bi-Cubic Bell"));
 	videoFilterMenu->AppendRadioItem(ID_Main_Options_Filter + 4, _("Bi-Cubic B-Spline"));
 	videoFilterMenu->AppendRadioItem(ID_Main_Options_Filter + 5, _("Bi-Cubic CatMull-Rom"));
-	int filterID = Options::GetInstance().videoOptions.filter;
+	int filterID = Options::GetSingleton().videoOptions.filter;
 	if (filterID >= 5 || filterID < 0) {
 		filterID = 0;
 	}
@@ -192,7 +192,7 @@ void MainFrame::CreateMenuBar()
 	// Create the options menu
 	_menOptions = new wxMenu;
 	_menOptions->AppendCheckItem(ID_Main_Options_KeepAspect, _("Keep aspect ratio"));
-	_menOptions->Check(ID_Main_Options_KeepAspect, Options::GetInstance().videoOptions.keepAspect);
+	_menOptions->Check(ID_Main_Options_KeepAspect, Options::GetSingleton().videoOptions.keepAspect);
 	_menOptions->AppendSubMenu(videoFilterMenu, _("Video &filter"));
 	_menOptions->Append(ID_Main_Options_input, _("&Input"));
 
@@ -235,7 +235,7 @@ void MainFrame::DrawGL(int user)
 
 void MainFrame::LoadEmulator(std::string &fileName)
 {
-	Options &options = Options::GetInstance();
+	Options &options = Options::GetSingleton();
 	// Load the emulator
 	// Detect and create the emulator
 	EmulatorInterface *emu = _emulators->GetCompatibleEmulator(fileName.c_str());
@@ -361,7 +361,7 @@ void MainFrame::LoadEmulator(std::string &fileName)
 	_gpuDebugger->SetEmulator(_emulator);
 
 	// Update save state labels
-	Options::GetInstance().SaveRecentFile(_filePath.c_str());
+	Options::GetSingleton().SaveRecentFile(_filePath.c_str());
 	UpdateSaveStateLabels();
 	UpdateRecentFiles();
 	return;
@@ -424,7 +424,7 @@ void MainFrame::UpdateSaveStateLabels()
 void MainFrame::UpdateRecentFiles()
 {
 	const int maxLength = 35;
-	Options &options = Options::GetInstance();
+	Options &options = Options::GetSingleton();
 	for (int i = 0; i < 5; i++) {
 		wxString name("---");
 		if (!options.recentFiles[i].empty()) {
@@ -509,7 +509,7 @@ void MainFrame::OnClose(wxCloseEvent &evt)
 		_timer = NULL;
 	}
 
-	Options::GetInstance().SaveOptions();
+	Options::GetSingleton().SaveOptions();
 
 	// Destroy the window
 	Destroy();
@@ -557,7 +557,7 @@ void MainFrame::OnOpenRecentFile(wxCommandEvent &evt)
 {
 	int idx = evt.GetId() - ID_Main_File_RecentFile;
 	if (idx < 0 || idx >= 5) return;
-	_filePath = Options::GetInstance().recentFiles[idx];
+	_filePath = Options::GetSingleton().recentFiles[idx];
 
 	CloseEmulator();
 	LoadEmulator(_filePath);
@@ -677,7 +677,7 @@ void MainFrame::OnOptions(wxCommandEvent &evt)
 	switch (evt.GetId())
 	{
 	case ID_Main_Options_KeepAspect:
-		Options::GetInstance().videoOptions.keepAspect = evt.IsChecked();
+		Options::GetSingleton().videoOptions.keepAspect = evt.IsChecked();
 		if (_emulator.emu != NULL)
 		{
 			int width, height;
@@ -739,7 +739,7 @@ void MainFrame::OnResize(wxSizeEvent &evt)
 	{
 		int width, height;
 		_display->GetSize(&width, &height);
-		_emulator.emu->Reshape(_emulator.handle, _display->GetUserData(), width, height, Options::GetInstance().videoOptions.keepAspect);
+		_emulator.emu->Reshape(_emulator.handle, _display->GetUserData(), width, height, Options::GetSingleton().videoOptions.keepAspect);
 	}
 	if (_display != NULL && _emulator.emu == NULL)
 	{

@@ -5,6 +5,8 @@
 #include "../util/log.h"
 #include "../util/Options.h"
 #include <emuall/graphics/graphicsException.h>
+#include <emuall/graphics/texture.h>
+#include <emuall/graphics/font.h>
 
 static GLfloat fboData[] = {
 	// X    Y     Z      U    V
@@ -16,31 +18,59 @@ static GLfloat fboData[] = {
 
 EmulatorScreen::EmulatorScreen(wxWindow *parent, GLPaneI *callback, int user, wxWindowID id, const wxPoint &pos,
 	const wxSize &size, long style, const wxGLAttributes &attr, const wxGLContextAttrs &ctxAttr) :
-	GLPane(parent, callback, user, id, pos, size, style, attr, ctxAttr), _fbo(nullptr), _initialized(false)
+	GLPane(parent, callback, user, id, pos, size, style, attr, ctxAttr), 
+	_fbo(nullptr), _vbo(nullptr), _vao(nullptr), _initialized(false), _guiRenderer(nullptr), _messageFont(nullptr)
 {
 }
 
 EmulatorScreen::~EmulatorScreen()
 {
+	if (_vao != nullptr) {
+		delete _vao;
+	}
+	if (_vbo != nullptr) {
+		delete _vbo;
+	}
 	if (_fbo != nullptr) {
 		delete _fbo;
+	}
+	if (_guiRenderer != nullptr) {
+		delete _guiRenderer;
+	}
+	if (_messageFont != nullptr) {
+		delete _messageFont;
 	}
 }
 
 void EmulatorScreen::InitGL()
 {
 	if (!_initialized) {
-
+		Options &options = Options::GetSingleton();
 		// Create vao
-		GL_CHECKED(glGenVertexArrays(1, &_vao));
-		GL_CHECKED(glBindVertexArray(_vao));
+		if (_vao == nullptr) {
+			_vao = new VertexArrayObject();
+		}
+		if (_vbo == nullptr) {
+			_vbo = new BufferObject(BufferObject::Array);
+		}
+		if (_guiRenderer == nullptr) {
+			_guiRenderer = new GuiRenderer();
+		}
+		if (_messageFont == nullptr) {
+			_messageFont = new Font(options.videoOptions.messageFont,
+				options.videoOptions.messageFontIdx, options.videoOptions.messageFontSize);
+		}
+		_vao->Begin();
+		_vbo->BufferData(BufferObject::StaticDraw, sizeof(fboData), fboData);
+		_vao->BindBuffer(0, *_vbo, 3, VertexArrayObject::Float, false, 5 * sizeof(float), 0);
+		_vao->BindBuffer(1, *_vbo, 2, VertexArrayObject::Float, false, 5 * sizeof(float), 3 * sizeof(float));
+		_vao->End();
 
-		// Generate vertex buffer
-		GL_CHECKED(glGenBuffers(1, &_vbo));
-		GL_CHECKED(glBindBuffer(GL_ARRAY_BUFFER, _vbo));
-		GL_CHECKED(glBufferData(GL_ARRAY_BUFFER, sizeof(fboData), fboData, GL_STATIC_DRAW));
+		SetPostProcessingFilter((EmulatorScreen::Filter)options.videoOptions.filter);
 
-		SetPostProcessingFilter((EmulatorScreen::Filter)Options::GetInstance().videoOptions.filter);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 		_initialized = true;
 	}
 	if (!GLPane::_initialized) {
@@ -100,7 +130,7 @@ void EmulatorScreen::SetPostProcessingFilter(Filter filter)
 		filterSrcLen = resource_bicubic_catmull_frag_glsl_len;
 		break;
 	}
-	Options::GetInstance().videoOptions.filter = (int)filter;
+	Options::GetSingleton().videoOptions.filter = (int)filter;
 	if (_shader.IsLinked()) {
 		_shader.Clean();
 	}
@@ -160,7 +190,7 @@ void EmulatorScreen::Render(wxPaintEvent &evt)
 
 		// Setup viewport
 		wxSize size = GetClientSize();
-		if (Options::GetInstance().videoOptions.keepAspect)
+		if (Options::GetSingleton().videoOptions.keepAspect)
 		{
 			if (((float)size.GetWidth()) / size.GetHeight() > ((float)_width) / _height)
 			{
@@ -179,25 +209,27 @@ void EmulatorScreen::Render(wxPaintEvent &evt)
 		// Render the framebuffer
 		// Enable shader and load buffers
 		_shader.Begin();
-		GL_CHECKED(glEnableVertexAttribArray(0));
-		GL_CHECKED(glBindBuffer(GL_ARRAY_BUFFER, _vbo));
-		GL_CHECKED(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid *)0));
-		GL_CHECKED(glEnableVertexAttribArray(1));
-		GL_CHECKED(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat))));
+		_vao->Begin();
 		Texture &frame = _fbo->GetColorBuffer(0);
 		_shader.SetUniform("textureSampler", 0, frame);
 
 		// Draw the screen
 		GL_CHECKED(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
 
-		// Unload the buffers
-		GL_CHECKED(glDisableVertexAttribArray(0));
-		GL_CHECKED(glDisableVertexAttribArray(1));
 		frame.End();
+		_vao->End();
 		_shader.End();
+
+		GL_CHECKED(glViewport(0, 0, size.GetWidth(), size.GetHeight()));
+		_guiRenderer->SetWindowSize(size.GetWidth(), size.GetHeight());
+		_messageFont->DrawText(*_guiRenderer, 10, size.GetHeight() - 10, "The Quick brown fox jumped over the lazy dog\n1234567890!@#$%^&*()-=[]{}_+;:'\"\\|,./<>?",
+			0xFF0000FF, 1.0f, 200, Alignment::Left, 200, Alignment::Bottom);
 	}
 	catch (GraphicsException & e) {
 		Log(Error, "GraphicsException caught: %s\nStacktrace:\n%s", e.GetMsg(), e.GetStacktrace());
+	}
+	catch (FontException & e) {
+		Log(Error, "FontException caught: %s\nStacktrace:\n%s", e.GetMsg(), e.GetStacktrace());
 	}
 
 	SwapBuffers();

@@ -11,6 +11,8 @@
 BaseException::BaseException(const std::string &msg) :
 	 _msg(nullptr), _stacktrace(nullptr)
 {
+	_msg = new std::string(msg);
+	_stacktrace = new std::string;
 	CreateStacktrace();
 }
 

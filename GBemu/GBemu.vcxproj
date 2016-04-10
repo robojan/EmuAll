@@ -457,10 +457,10 @@
     <ClInclude Include="util\memDbg.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="resources\gb.frag">
+    <Text Include="resources\gb.frag.glsl">
       <FileType>Document</FileType>
     </Text>
-    <Text Include="resources\gb.vert">
+    <Text Include="resources\gb.vert.glsl">
       <FileType>Document</FileType>
     </Text>
     <CustomBuild Include="resources\resources.rlst">

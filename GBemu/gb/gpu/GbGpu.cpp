@@ -10,7 +10,11 @@
 #include <algorithm>
 #include <string>
 
-GbGpu::GbGpu(Gameboy *master)
+GbGpu::GbGpu(Gameboy *master) :
+	_surfaceBO(nullptr), _surfaceVAO(nullptr), 
+	_BGBO(nullptr), _BGVAO(nullptr),
+	_TiBO(nullptr), _TiVAO(nullptr),
+	_OAMBO(nullptr), _OAMVAO(nullptr)
 {
 	_gb = master;
 	_enabled = false;

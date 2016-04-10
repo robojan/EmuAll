@@ -16,7 +16,7 @@ AudioManager::AudioManager()
 		std::string defaultDevice = AudioDevice::GetDefaultDevice();
 		AudioDevice device(defaultDevice);
 		AudioContext::Attributes attr;
-		attr.Frequency(Options::GetInstance().audioOptions.sampleRate);
+		attr.Frequency(Options::GetSingleton().audioOptions.sampleRate);
 		attr.FinishAttributes();
 		_context = AudioContext(device, attr);
 		_context.MakeCurrent();

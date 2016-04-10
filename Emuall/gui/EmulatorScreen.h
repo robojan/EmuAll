@@ -3,7 +3,10 @@
 
 #include "GLPane.h"
 #include <emuall/graphics/ShaderProgram.h>
+#include <emuall/graphics/VertexArrayObject.h>
 #include <emuall/graphics/frameBuffer.h>
+#include <emuall/graphics/guiRenderer.h>
+#include <emuall/graphics/font.h>
 
 class EmulatorScreen : public GLPane {
 public:
@@ -31,12 +34,14 @@ private:
 	void Create();
 
 	bool _initialized;
-	unsigned int _vao;
-	unsigned int _vbo;
 	int _width;
 	int _height;
+	VertexArrayObject *_vao;
+	BufferObject *_vbo;
 	ShaderProgram _shader;
 	FrameBuffer *_fbo;
+	GuiRenderer *_guiRenderer;
+	Font *_messageFont;
 };
 
 #endif
