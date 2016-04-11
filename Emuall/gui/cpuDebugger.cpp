@@ -93,7 +93,7 @@ void CPUDebugger::Update()
 		}
 
 	}
-	else if (_emu.emu->IsRunning(_emu.handle) == 0)
+	else
 	{
 		// Emulator not running
 		// Update button

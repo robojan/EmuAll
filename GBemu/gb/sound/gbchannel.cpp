@@ -28,7 +28,7 @@ void GbChannel::GetAudio(short * buffer, int samples)
 	if (_tickCounter < (FCPU / _sampleFreq)*(samples / 2) + _playingCounter)
 	{
 		// When there is not yet enough data to fill a buffer, skip it. 
-		memset(buffer, 0, samples*sizeof(int16_t)); // clear the buffer
+		memset(buffer, 0, samples*sizeof(int16_t) * 2); // clear the buffer
 		Log(Warn, "Channel %d underrun", _channel);
 		return;
 	}

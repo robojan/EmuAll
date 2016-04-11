@@ -407,6 +407,7 @@ void MainFrame::CloseEmulator()
 
 		_emulator = emu;
 	}
+	Update();
 }
 
 void MainFrame::UpdateSaveStateLabels()
@@ -485,9 +486,9 @@ void MainFrame::OnIdle(wxIdleEvent &evt)
 	_deltaTimeTimer.Start(0);
 	RunEmulator(deltaTime);
 	uint32_t emuTime = _deltaTimeTimer.TimeInMicro().GetLo();
-	if (emuTime < 16000) {
+	if (emuTime < 10000) {
 		// Yield to reduce CPU usage
-		Sleep((16000-emuTime)/1000);
+		Sleep((10000-emuTime)/1000);
 	}
 	evt.RequestMore();
 }
@@ -500,6 +501,12 @@ void MainFrame::Update()
 		_memDebugger->Update();
 	if (_gpuDebugger != NULL)
 		_gpuDebugger->Update();
+	if (_emulator.emu != nullptr && _emulator.emu->IsRunning(_emulator.handle) != 0) {
+		_menFile->SetLabel(ID_Main_File_run, _("&Pause\tCtrl+R"));
+	}
+	else {
+		_menFile->SetLabel(ID_Main_File_run, _("&Run\tCtrl+R"));
+	}
 }
 
 void MainFrame::OnClose(wxCloseEvent &evt)
@@ -571,10 +578,19 @@ void MainFrame::OnRun(wxCommandEvent &evt)
 {
 	if (_emulator.emu != NULL)
 	{
-		_display->ShowMessage("Start emulation");
-		_emulator.emu->Run(_emulator.handle, true);
-		Update();
+		if (_emulator.emu->IsRunning(_emulator.handle)) {
+			_display->ShowMessage(_("Emulation paused"));
+			_emulator.emu->Run(_emulator.handle, false);
+		}
+		else {
+			_display->ShowMessage(_("Emulation started"));
+			_emulator.emu->Run(_emulator.handle, true);
+		}
 	}
+	else {
+		_display->ShowMessage(_("No ROM loaded"));
+	}
+	Update();
 }
 
 void MainFrame::OnSaveState(wxCommandEvent &evt)
@@ -780,10 +796,13 @@ void MainFrame::AudioStreamCB(AudioBuffer::Format format, int freq, int elements
 	MainFrame::AudioCallbackData *cbData = reinterpret_cast<MainFrame::AudioCallbackData *>(user);
 	(void)freq;
 
-	if (cbData != nullptr && cbData->emulator != nullptr && cbData->emulator->emu != nullptr) {
+	if (cbData != nullptr && cbData->emulator != nullptr && cbData->emulator->emu != nullptr &&
+		cbData->emulator->emu->IsRunning(cbData->emulator->handle) != 0) {
 		cbData->emulator->emu->GetAudio(cbData->emulator->handle, cbData->id, dataPtr, elements);
 	}
 	else {
+		if (format == AudioBuffer::Stereo16 || AudioBuffer::Stereo8)
+			elements *= 2;
 		memset(dataPtr, 0, elements * sizeof(short));
 	}
 }
