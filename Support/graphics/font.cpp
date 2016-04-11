@@ -102,11 +102,9 @@ void Font::DrawText(GuiRenderer &renderer, float x, float y,
 {
 	std::string id = GetFontID();
 	FontCache &cache = FontCache::GetSingleton();
-	ShaderProgram &program = renderer.program;
-	program.Begin();
-	program.SetUniform("glyphColor", (color & 0xFF) / 255.0f,
-		((color >> 8) & 0xFF) / 255.0f, ((color >> 16) & 0xFF) / 255.0f, ((color >> 24) & 0xFF) / 255.0f);
-	renderer.vao.Begin();
+	renderer.TQBegin();
+	renderer.SetTQColor(color);
+	renderer.SetTQScale(scale, scale);
 	for (int i = 0; i < layout.GetCount(); i++) {
 		unsigned int glyphIndex = layout.GetGlyphIndex(i);
 		if (layout.IsNewLine(i)) {
@@ -132,17 +130,15 @@ void Font::DrawText(GuiRenderer &renderer, float x, float y,
 			texture->Begin();
 			texture->SetFilter(Texture::Linear, Texture::Linear);
 		}
-		program.SetUniform("textureSampler", 0, *texture);
-		program.SetUniform("position", (float)layout.GetPosX(i) * scale + x,
+		renderer.SetTQTexture(*texture);
+		renderer.SetTQPosition((float)layout.GetPosX(i) * scale + x, 
 			(float)layout.GetPosY(i) * scale + y);
-		program.SetUniform("glyphSize", cache.GetGlyphWidth(id, glyphIndex), cache.GetGlyphHeight(id, glyphIndex));
-		program.SetUniform("scale", scale, scale);
-		renderer.vao.BindBuffer(1, cache.GetUVBuffer(id, glyphIndex), 2, VertexArrayObject::Float);
-
-		GL_CHECKED(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
+		renderer.SetTQSize(cache.GetGlyphWidth(id, glyphIndex), 
+			cache.GetGlyphHeight(id, glyphIndex));
+		renderer.SetTQUVs(cache.GetUVBuffer(id, glyphIndex));
+		renderer.DrawTQ();
 	}
-	renderer.vao.End();
-	program.End();
+	renderer.TQEnd();
 }
 
 bool Font::SupportsUnicode() const

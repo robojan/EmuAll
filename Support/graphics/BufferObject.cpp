@@ -91,6 +91,13 @@ void BufferObject::BufferData(Usage usage, int size, const void *data)
 	End();
 }
 
+void BufferObject::BufferSubData(int offset, int size, const void *data)
+{
+	Begin();
+	GL_CHECKED(glBufferSubData(_type, offset, size, data));
+	End();
+}
+
 void BufferObject::Begin()
 {
 	GL_CHECKED(glBindBuffer(_type, _bo));

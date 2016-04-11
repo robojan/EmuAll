@@ -163,6 +163,7 @@
     <ClCompile Include="graphics\framebuffer.cpp" />
     <ClCompile Include="graphics\glyphlayout.cpp" />
     <ClCompile Include="graphics\graphicsException.cpp" />
+    <ClCompile Include="graphics\rectangle.cpp" />
     <ClCompile Include="graphics\ShaderProgram.cpp" />
     <ClCompile Include="graphics\texture.cpp" />
     <ClCompile Include="graphics\vertexArrayObject.cpp" />
@@ -177,6 +178,7 @@
     <ClInclude Include="include\emuall\common.h" />
     <ClInclude Include="include\emuall\exception.h" />
     <ClInclude Include="include\emuall\graphics\guiRenderer.h" />
+    <ClInclude Include="include\emuall\graphics\rectangle.h" />
     <ClInclude Include="include\emuall\graphics\VertexArrayObject.h" />
     <ClInclude Include="include\emuall\graphics\BufferObject.h" />
     <ClInclude Include="include\emuall\graphics\font.h" />
@@ -192,7 +194,7 @@
     <ClInclude Include="resources\resources.h" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="resources\gui.frag.glsl">
+    <CustomBuild Include="resources\tq.frag.glsl">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy /b "%(RootDir)%(Directory)/resources.rlst" +,,</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">touching resourceList</Message>
@@ -211,7 +213,7 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RootDir)%(Directory)/resources.rlst</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RootDir)%(Directory)/resources.rlst</Outputs>
     </CustomBuild>
-    <CustomBuild Include="resources\gui.vert.glsl">
+    <CustomBuild Include="resources\tq.vert.glsl">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy /b "%(RootDir)%(Directory)/resources.rlst" +,,</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy /b "%(RootDir)%(Directory)/resources.rlst" +,,</Command>
@@ -249,6 +251,10 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RootDir)%(Directory)%(Filename).c</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\solid.frag.glsl" />
+    <None Include="resources\solid.vert.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

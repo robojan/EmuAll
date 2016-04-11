@@ -38,6 +38,7 @@ public:
 	BufferObject &operator=(BufferObject &other);
 
 	void BufferData(Usage usage, int size, const void *data);
+	void BufferSubData(int offset, int size, const void *data);
 
 	void Begin();
 	void End();

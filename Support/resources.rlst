@@ -1,2 +1,4 @@
-gui.vert.glsl
-gui.frag.glsl
+tq.vert.glsl
+tq.frag.glsl
+solid.vert.glsl
+solid.frag.glsl

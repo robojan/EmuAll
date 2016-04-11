@@ -364,6 +364,10 @@ void MainFrame::LoadEmulator(std::string &fileName)
 	Options::GetSingleton().SaveRecentFile(_filePath.c_str());
 	UpdateSaveStateLabels();
 	UpdateRecentFiles();
+
+	wxFileName fileNameInfo(_filePath);
+	
+	_display->ShowMessage(wxString::Format("Loaded: %s", fileNameInfo.GetFullName()));
 	return;
 }
 
@@ -567,6 +571,7 @@ void MainFrame::OnRun(wxCommandEvent &evt)
 {
 	if (_emulator.emu != NULL)
 	{
+		_display->ShowMessage("Start emulation");
 		_emulator.emu->Run(_emulator.handle, true);
 		Update();
 	}
@@ -591,6 +596,7 @@ void MainFrame::OnSaveState(wxCommandEvent &evt)
 		wxString fileName = _saveStateFilePath;
 		fileName.Append(std::to_string(state));
 		SaveFile::WriteStateFile(fileName, saveData);
+		_display->ShowMessage(wxString::Format("Save state %d", state+1));
 	}
 	UpdateSaveStateLabels();
 }
@@ -613,6 +619,7 @@ void MainFrame::OnLoadState(wxCommandEvent &evt)
 		SaveFile::ReadStateFile(fileName, saveData);
 
 		_emulator.emu->LoadState(_emulator.handle, &saveData);
+		_display->ShowMessage(wxString::Format("load state %d", state+1));
 		Update();
 	}
 }
@@ -670,6 +677,7 @@ void MainFrame::OnReset(wxCommandEvent &evt)
 	
 	// Load the file
 	LoadEmulator(_filePath);
+	_display->ShowMessage("Emulator reset");
 }
 
 void MainFrame::OnOptions(wxCommandEvent &evt)

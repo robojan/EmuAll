@@ -7,6 +7,7 @@
 #include <emuall/graphics/frameBuffer.h>
 #include <emuall/graphics/guiRenderer.h>
 #include <emuall/graphics/font.h>
+#include <emuall/graphics/rectangle.h>
 
 class EmulatorScreen : public GLPane {
 public:
@@ -27,6 +28,8 @@ public:
 	void SetFrameBufferSize(int width, int height);
 	void SetPostProcessingFilter(Filter filter);
 
+	void ShowMessage(const wxString &message);
+
 protected:
 	virtual void Render(wxPaintEvent &evt);
 
@@ -42,6 +45,9 @@ private:
 	FrameBuffer *_fbo;
 	GuiRenderer *_guiRenderer;
 	Font *_messageFont;
+	GuiRectangle *_messageBackground;
+	wxStopWatch _messageTimer;
+	wxString _message;
 };
 
 #endif

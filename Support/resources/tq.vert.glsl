@@ -11,13 +11,13 @@ out vec2 UV;
 uniform vec2 position;
 // size of the screen
 uniform ivec2 screenSize;
-uniform ivec2 glyphSize;
+uniform vec2 size;
 uniform vec2 scale;
 
 void main() {
 	// Output the vertex position
 	// position in screenCoordinates
-	vec2 screenPos = position - vec2(0.0, glyphSize.y) + vertexPosition * vec2(glyphSize) * scale;
+	vec2 screenPos = position - vec2(0.0, size.y) + vertexPosition * size * scale;
 
 	gl_Position.xy = (screenPos / vec2(screenSize)) * 2.0 - vec2(1.0, 1.0);
 	gl_Position.w = 1.0;

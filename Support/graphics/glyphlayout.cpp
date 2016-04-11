@@ -151,8 +151,9 @@ void GlyphLayout::DoLayout(bool wrapping, int width /*= -1*/, Alignment hAlign /
 	// Fix the vertical alignment
 	if (height > 0 && vAlign != Alignment::Top) {
 		int startY = (*_layout)[0].y;
-		int endY = (*_layout)[_layout->size() - 1].y + _lineHeight;
+		int endY = (*_layout)[_layout->size() - 1].y - _lineHeight;
 		int textHeight = startY - endY;
+		textHeight = textHeight < 0 ? -textHeight : textHeight;
 		int offset;
 		if (vAlign == Alignment::Center) {
 			offset = (height - textHeight) / 2;

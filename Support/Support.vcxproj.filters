@@ -90,6 +90,9 @@
     <ClCompile Include="graphics\guiRenderer.cpp">
       <Filter>Source Files\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\rectangle.cpp">
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\emuall\common.h">
@@ -140,16 +143,27 @@
     <ClInclude Include="include\emuall\graphics\guiRenderer.h">
       <Filter>Header Files\graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\emuall\graphics\rectangle.h">
+      <Filter>Header Files\graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="resources\resources.rlst">
       <Filter>Resource Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="resources\gui.frag.glsl">
+    <CustomBuild Include="resources\tq.frag.glsl">
       <Filter>Resource Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="resources\gui.vert.glsl">
+    <CustomBuild Include="resources\tq.vert.glsl">
       <Filter>Resource Files</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\solid.frag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\solid.vert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

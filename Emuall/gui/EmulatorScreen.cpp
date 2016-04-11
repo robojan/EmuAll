@@ -18,8 +18,9 @@ static GLfloat fboData[] = {
 
 EmulatorScreen::EmulatorScreen(wxWindow *parent, GLPaneI *callback, int user, wxWindowID id, const wxPoint &pos,
 	const wxSize &size, long style, const wxGLAttributes &attr, const wxGLContextAttrs &ctxAttr) :
-	GLPane(parent, callback, user, id, pos, size, style, attr, ctxAttr), 
-	_fbo(nullptr), _vbo(nullptr), _vao(nullptr), _initialized(false), _guiRenderer(nullptr), _messageFont(nullptr)
+	GLPane(parent, callback, user, id, pos, size, style, attr, ctxAttr),
+	_fbo(nullptr), _vbo(nullptr), _vao(nullptr), _initialized(false), _guiRenderer(nullptr), _messageFont(nullptr),
+	_messageBackground(nullptr)
 {
 }
 
@@ -40,6 +41,9 @@ EmulatorScreen::~EmulatorScreen()
 	if (_messageFont != nullptr) {
 		delete _messageFont;
 	}
+	if (_messageBackground != nullptr) {
+		delete _messageBackground;
+	}
 }
 
 void EmulatorScreen::InitGL()
@@ -59,6 +63,9 @@ void EmulatorScreen::InitGL()
 		if (_messageFont == nullptr) {
 			_messageFont = new Font(options.videoOptions.messageFont,
 				options.videoOptions.messageFontIdx, options.videoOptions.messageFontSize);
+		}
+		if (_messageBackground == nullptr) {
+			_messageBackground = new GuiRectangle(0, 0, 200, 50, 0x80000000);
 		}
 		_vao->Begin();
 		_vbo->BufferData(BufferObject::StaticDraw, sizeof(fboData), fboData);
@@ -155,6 +162,12 @@ void EmulatorScreen::SetPostProcessingFilter(Filter filter)
 
 }
 
+void EmulatorScreen::ShowMessage(const wxString &message)
+{
+	_message = message;
+	_messageTimer.Start(0);
+}
+
 void EmulatorScreen::Render(wxPaintEvent &evt)
 {
 	if (!IsShownOnScreen())
@@ -222,8 +235,20 @@ void EmulatorScreen::Render(wxPaintEvent &evt)
 
 		GL_CHECKED(glViewport(0, 0, size.GetWidth(), size.GetHeight()));
 		_guiRenderer->SetWindowSize(size.GetWidth(), size.GetHeight());
-		_messageFont->DrawText(*_guiRenderer, 10, size.GetHeight() - 10, "The Quick brown fox jumped over the lazy dog\n1234567890!@#$%^&*()-=[]{}_+;:'\"\\|,./<>?",
-			0xFF0000FF, 1.0f, 200, Alignment::Left, 200, Alignment::Bottom);
+
+		if (!_message.empty() && _messageTimer.Time() < 4000) {
+			_messageBackground->SetPos(0, 50);
+			_messageBackground->SetSize(size.GetWidth(), 50);
+			float alpha = 1;
+			if (_messageTimer.Time() > 3000) {
+				alpha = 1.0 - (_messageTimer.Time() - 3000) / 1000.0;
+			}
+			_messageBackground->SetColor(0, 0, 0, alpha*0.5f);
+			unsigned int messageColor = (int(alpha * 255) << 24) | 0xFF;
+			_messageBackground->Draw(*_guiRenderer);
+			_messageFont->DrawText(*_guiRenderer, 0, 50, _message.ToStdString(),
+				messageColor, 1.0f, size.GetWidth(), Alignment::Center, 50, Alignment::Center);
+		}
 	}
 	catch (GraphicsException & e) {
 		Log(Error, "GraphicsException caught: %s\nStacktrace:\n%s", e.GetMsg(), e.GetStacktrace());
