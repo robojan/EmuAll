@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\util">
+      <UniqueIdentifier>{7f95281a-bbec-40db-bd93-404ad07b3f4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Memory">
+      <UniqueIdentifier>{6b11bb1d-729c-4253-848a-b4f23ad67e75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Memory">
+      <UniqueIdentifier>{05f138a9-e90d-4fc5-a794-2aa4606abd05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\cpu">
+      <UniqueIdentifier>{f5800f02-3eb3-4d1c-9137-7d1d17f5d3a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\cpu">
+      <UniqueIdentifier>{4770a3a0-5ce2-42dd-9a6b-ec4e583b8fc3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="emu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="resources\resources.c">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gba.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="memory\memory.cpp">
+      <Filter>Source Files\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="cpu\cpu.cpp">
+      <Filter>Source Files\cpu</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="resources\gbaemu.xml">
+      <Filter>Resource Files</Filter>
+    </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="resources\resources.rlst">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resources\resources.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GBAemu\memory\memory.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GBAemu\util\log.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GBAemu\gba.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GBAemu\defines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gbaemu\cpu\cpu.h">
+      <Filter>Header Files\cpu</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GBAemu\cpu\hostInstructions.h">
+      <Filter>Header Files\cpu</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpu\miscInstructions.inl">
+      <Filter>Source Files\cpu</Filter>
+    </None>
+    <None Include="cpu\opcodeExecution.inl">
+      <Filter>Source Files\cpu</Filter>
+    </None>
+  </ItemGroup>
+</Project>

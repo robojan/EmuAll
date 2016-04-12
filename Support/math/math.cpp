@@ -1,4 +1,4 @@
-#include "math.h"
+#include <emuall/math/math.h>
 
 int nextPowerOf2(int x)
 {
@@ -11,3 +11,9 @@ int nextPowerOf2(int x)
 	x++;
 	return x;
 }
+
+bool isPowerOf2(int x)
+{
+	return (x & (x - 1)) == 0;
+} 
+ 

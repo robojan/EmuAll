@@ -25,7 +25,10 @@ std::vector<std::string> GetDirFiles(std::string folder, std::string extension)
 
 	do
 	{
-		result.push_back(folder.append("\\").append(ffd.cFileName));
+		std::string file = folder;
+		file.append("\\");
+		file.append(ffd.cFileName);
+		result.push_back(file);
 	} while (FindNextFileA(hfind, &ffd) != 0);
 	FindClose(hfind);
 	return result;

@@ -239,3 +239,5 @@ Emuall/resources/resources.c
 GBemu/resources/resources.c
 Support/resources/resources.c
 Support/resources/resources.h
+GBAemu/resources/resources.c
+GBAemu/resources/resources.h

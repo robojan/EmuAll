@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<emulator>
+  <name>Gameboy Advance Emulator V1.0</name>
+  <description>Gameboy Advance Emulator.</description>
+  <about>Gameboy Advance Emulator made by Robbert-Jan "robojan" de Jager.</about>
+  <fileFilter>*.gba</fileFilter>
+  <screen id="0">
+    <width>240</width>
+    <height>160</height>
+  </screen>
+  <audio>
+    <sources>0</sources>
+  </audio>
+  <input>
+    <key key="1">
+      <name>A</name>
+      <defaultKey>88</defaultKey>
+    </key>
+    <key key="2">
+      <name>B</name>
+      <defaultKey>90</defaultKey>
+    </key>
+    <key key="3">
+      <name>Up</name>
+      <defaultKey>315</defaultKey>
+    </key>
+    <key key="4">
+      <name>Down</name>
+      <defaultKey>317</defaultKey>
+    </key>
+    <key key="5">
+      <name>Left</name>
+      <defaultKey>314</defaultKey>
+    </key>
+    <key key="6">
+      <name>Right</name>
+      <defaultKey>316</defaultKey>
+    </key>
+    <key key="7">
+      <name>Start</name>
+      <defaultKey>13</defaultKey>
+    </key>
+    <key key="8">
+      <name>Select</name>
+      <defaultKey>8</defaultKey>
+    </key>
+    <key key="9">
+      <name>L</name>
+      <defaultKey>81</defaultKey>
+    </key>
+    <key key="10">
+      <name>R</name>
+      <defaultKey>83</defaultKey>
+    </key>
+  </input>
+  <debugging>
+    <cpu>
+      <disassembler>
+        <enabled>false</enabled>
+        <breakpoint>false</breakpoint>
+        <size>0</size>
+      </disassembler>
+      <step>false</step>
+      <stepOut>false</stepOut>
+      <stepOver>false</stepOver>
+      <registers>
+        
+      </registers>
+    </cpu>
+    <mem>
+    </mem>
+    <gpu>
+      <hor prop="1">
+      </hor>
+    </gpu>
+    <sound>
+      
+    </sound>
+  </debugging>
+  <options>
+    
+  </options>
+</emulator>

@@ -285,18 +285,20 @@ void MainFrame::LoadEmulator(std::string &fileName)
 		}
 
 		// Init the audio
-		assert(info.numAudioStreams > 0);
+		assert(info.numAudioStreams >= 0);
 		_audioCBData.clear();
-		_audioCBData.reserve(info.numAudioStreams);
-		for (int i = 0; i < info.numAudioStreams; ++i) {
-			_audioCBData.emplace_back(&_emulator, i);
-			AudioStream stream(AudioBuffer::Stereo16, options.audioOptions.sampleRate,
-				options.audioOptions.bufferSize, options.audioOptions.numBuffers, 
-				&MainFrame::AudioStreamCB, &_audioCBData.back());
-			_audio.AddAudioStream(stream);
-			emu->InitAudio(handle, i, options.audioOptions.sampleRate, 2);
+		if (info.numAudioStreams > 0) {
+			_audioCBData.reserve(info.numAudioStreams);
+			for (int i = 0; i < info.numAudioStreams; ++i) {
+				_audioCBData.emplace_back(&_emulator, i);
+				AudioStream stream(AudioBuffer::Stereo16, options.audioOptions.sampleRate,
+					options.audioOptions.bufferSize, options.audioOptions.numBuffers,
+					&MainFrame::AudioStreamCB, &_audioCBData.back());
+				_audio.AddAudioStream(stream);
+				emu->InitAudio(handle, i, options.audioOptions.sampleRate, 2);
+			}
+			_audio.Play();
 		}
-		_audio.Play();
 	}
 	catch (BaseException &e) {
 		Log(Error, "%s\nStacktrace:\n%s", e.GetMsg(), e.GetStacktrace());
