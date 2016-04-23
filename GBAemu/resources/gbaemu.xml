@@ -59,15 +59,135 @@
         <enabled>false</enabled>
         <breakpoint>false</breakpoint>
         <size>0</size>
+        <curLineId>1015</curLineId>
       </disassembler>
       <step>false</step>
       <stepOut>false</stepOut>
       <stepOver>false</stepOver>
       <registers>
-        
+        <register id="1000">
+          <name>R0</name>
+          <size>32</size>
+        </register>
+        <register id="1001">
+          <name>R1</name>
+          <size>32</size>
+        </register>
+        <register id="1002">
+          <name>R2</name>
+          <size>32</size>
+        </register>
+        <register id="1003">
+          <name>R3</name>
+          <size>32</size>
+        </register>
+        <register id="1004">
+          <name>R4</name>
+          <size>32</size>
+        </register>
+        <register id="1005">
+          <name>R5</name>
+          <size>32</size>
+        </register>
+        <register id="1006">
+          <name>R6</name>
+          <size>32</size>
+        </register>
+        <register id="1007">
+          <name>R7</name>
+          <size>32</size>
+        </register>
+        <register id="1008">
+          <name>R8</name>
+          <size>32</size>
+        </register>
+        <register id="1009">
+          <name>R9</name>
+          <size>32</size>
+        </register>
+        <register id="1010">
+          <name>R10</name>
+          <size>32</size>
+        </register>
+        <register id="1011">
+          <name>R11</name>
+          <size>32</size>
+        </register>
+        <register id="1012">
+          <name>R12</name>
+          <size>32</size>
+        </register>
+        <register id="1013">
+          <name>SP</name>
+          <size>32</size>
+        </register>
+        <register id="1014">
+          <name>LR</name>
+          <size>32</size>
+        </register>
+        <register id="1015">
+          <name>PC</name>
+          <size>32</size>
+        </register>
+        <register id="1016">
+          <name>CPSR</name>
+          <size>32</size>
+        </register>
+        <flag id="1017">
+          <name>N</name>
+        </flag>
+        <flag id="1018">
+          <name>Z</name>
+        </flag>
+        <flag id="1019">
+          <name>C</name>
+        </flag>
+        <flag id="1020">
+          <name>V</name>
+        </flag>
       </registers>
     </cpu>
     <mem>
+      <memory id="2000">
+        <name>Memory map</name>
+        <size>0x10000000</size>
+      </memory>
+      <memory id="2001">
+        <name>BIOS</name>
+        <size>0x4000</size>
+      </memory>
+      <memory id="2002">
+        <name>WRAM</name>
+        <size>0x40000</size>
+      </memory>
+      <memory id="2003">
+        <name>WRAM2</name>
+        <size>0x8000</size>
+      </memory>
+      <memory id="2004">
+        <name>I/O Registers</name>
+        <size>0x400</size>
+      </memory>
+      <memory id="2005">
+        <name>Palette data</name>
+        <size>0x400</size>
+      </memory>
+      <memory id="2006">
+        <name>VRAM</name>
+        <size>0x18000</size>
+      </memory>
+      <memory id="2007">
+        <name>OAM Data</name>
+        <size>0x400</size>
+      </memory>
+      <memory id="2008">
+        <name>SRAM</name>
+        <size var="true">2009</size>
+      </memory>
+      <memory id="2010">
+        <name>ROM</name>
+        <size var="true">2011</size>
+      </memory>
     </mem>
     <gpu>
       <hor prop="1">

@@ -21,6 +21,11 @@ public:
 
 	// Graphics functions
 	void Draw(int id);
+	
+	// access functions
+	Memory &GetMemory() { return _memory; }
+	Cpu &GetCpu() { return _cpu; }
+
 private:
 	Memory _memory;
 	Cpu _cpu;

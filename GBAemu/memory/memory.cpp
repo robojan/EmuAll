@@ -276,3 +276,67 @@ void Memory::Write32(uint32_t address, uint32_t value)
 	}
 	*((uint32_t *)&_memmap[index][address]) = value;
 }
+
+uint32_t Memory::GetRomSize()
+{
+	return _romLength;
+}
+
+uint32_t Memory::GetSRAMSize()
+{
+	return _sramLength;
+}
+
+uint8_t Memory::ReadBios8(uint32_t address)
+{
+	assert(address < BIOSSIZE);
+	return _bios[address];
+}
+
+uint8_t Memory::ReadWRAM8(uint32_t address)
+{
+	assert(address < WRAMSIZE);
+	return _wram[address];
+}
+
+uint8_t Memory::ReadChipWRAM8(uint32_t address)
+{
+	assert(address < WRAMCHIPSIZE);
+	return _chipWram[address];
+}
+
+uint8_t Memory::ReadRegister8(uint32_t address)
+{
+	assert(address < IOREGISTERSSIZE);
+	return _ioRegisters[address];
+}
+
+uint8_t Memory::ReadPRAM8(uint32_t address)
+{
+	assert(address < PRAMSIZE);
+	return _pram[address];
+}
+
+uint8_t Memory::ReadVRAM8(uint32_t address)
+{
+	assert(address < VRAMSIZE);
+	return _vram[address];
+}
+
+uint8_t Memory::ReadORAM8(uint32_t address)
+{
+	assert(address < ORAMSIZE);
+	return _oram[address];
+}
+
+uint8_t Memory::ReadSRAM8(uint32_t address)
+{
+	assert(address < _sramLength);
+	return _sram[address];
+}
+
+uint8_t Memory::ReadROM8(uint32_t address)
+{
+	assert(address < _romLength);
+	return _rom[address];
+}

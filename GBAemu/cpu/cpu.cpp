@@ -132,6 +132,20 @@ void Cpu::EnableIRQs(bool enabled)
 	_cpsr = (_cpsr & ~0x80) | (enabled ? 0x00 : 0x80);
 }
 
+uint32_t Cpu::GetRegisterValue(int id)
+{
+	if (id >= 0 && id < 16) {
+		return _registers[id];
+	}
+	else if (id == 16) {
+		return _cpsr;
+	}
+	else if (id == 17) {
+		return _spsr;
+	}
+	return 0;
+}
+
 void Cpu::UpdateMode()
 {
 	Mode newMode = GetMode();

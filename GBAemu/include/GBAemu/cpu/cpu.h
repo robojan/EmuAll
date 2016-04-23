@@ -35,6 +35,7 @@ public:
 	void EnableFIQs(bool enabled);
 	bool AreIRQsEnabled() const;
 	void EnableIRQs(bool enabled);
+	uint32_t GetRegisterValue(int id);
 
 	void UpdateMode();
 private:

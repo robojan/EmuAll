@@ -167,7 +167,8 @@ wxByte MemDebugger::OnGetValue(int address)
 {
 	if (_emu.emu == NULL)
 		return 0xCD;
-	return _emu.emu->GetMemoryData(_emu.handle, _picker->GetSelection(), address);
+	int memoryId = _memories.at(_picker->GetSelection()).id;
+	return _emu.emu->GetMemoryData(_emu.handle, memoryId, address);
 }
 
 void MemDebugger::OnSetValue(int address, wxByte val)

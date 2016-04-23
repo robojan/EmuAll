@@ -443,15 +443,15 @@ uint8_t __stdcall GetMemoryData(EMUHANDLE handle, int32_t memory, uint32_t addre
 		return 0;
 	switch (memory)
 	{
-	case 0: // Address space
+	case 100: // Address space
 		return emulator->GetMem()->read(address);
-	case 1: // ROM
+	case 101: // ROM
 		return emulator->GetMem()->GetROMData(address);
-	case 2: // ERAM
+	case 102: // ERAM
 		return emulator->GetMem()->GetERAMData(address);
-	case 3: // WRAM
+	case 103: // WRAM
 		return emulator->GetMem()->GetWRAMData(address);
-	case 4: // VRAM
+	case 104: // VRAM
 		return emulator->GetMem()->GetVRAMData(address);
 	}
 	return 0;

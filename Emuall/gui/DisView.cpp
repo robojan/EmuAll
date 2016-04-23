@@ -118,7 +118,7 @@ void DisView::OnPaint(wxPaintEvent &evt)
 	// Paint code section
 	dc.SetFont(codeFont);
 	dc.SetPen(codeTextPen);
-	if (_emu->emu != NULL)
+	if (_emu->emu != NULL && _numberOfLines > 0)
 	{
 
 		unsigned int address = _startingLine;
