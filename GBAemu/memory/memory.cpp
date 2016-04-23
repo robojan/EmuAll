@@ -23,6 +23,15 @@ Memory::Memory(Gba &gba) :
 	_pram = new uint8_t[PRAMSIZE];
 	_vram = new uint8_t[VRAMSIZE];
 	_oram = new uint8_t[ORAMSIZE];
+
+	// Initialize memory
+	memset(_bios, 0, BIOSSIZE);
+	memset(_wram, 0, WRAMSIZE);
+	memset(_chipWram, 0, WRAMCHIPSIZE);
+	memset(_ioRegisters, 0, IOREGISTERSSIZE);
+	memset(_pram, 0, PRAMSIZE);
+	memset(_vram, 0, VRAMSIZE);
+	memset(_oram, 0, ORAMSIZE);
 	
 	// Setup the memory map
 	_memmap[0x0] = _bios;
@@ -43,22 +52,22 @@ Memory::Memory(Gba &gba) :
 	_memmap[0xF] = nullptr;
 
 	// Setup the invalid mask ptrs
-	_memInvMask[0x0] = (~BIOSMASK) & 0xF0FFFFFF;
-	_memInvMask[0x1] = 0xFFFFFFFF;
-	_memInvMask[0x2] = (~WRAMMASK) & 0xF0FFFFFF;
-	_memInvMask[0x3] = (~WRAMCHIPMASK) & 0xF0FFFFFF;
-	_memInvMask[0x4] = (~IOREGISTERSMASK) & 0xF0FFFFFF;
-	_memInvMask[0x5] = (~PRAMMASK) & 0xF0FFFFFF;
-	_memInvMask[0x6] = (~VRAMMASK) & 0xF0FFFFFF;
-	_memInvMask[0x7] = (~ORAMMASK) & 0xF0FFFFFF;
-	_memInvMask[0x8] = 0xF0FFFFFF;
-	_memInvMask[0x9] = 0xF0FFFFFF;
-	_memInvMask[0xA] = 0xF0FFFFFF;
-	_memInvMask[0xB] = 0xF0FFFFFF;
-	_memInvMask[0xC] = 0xF0FFFFFF;
-	_memInvMask[0xD] = 0xF0FFFFFF;
-	_memInvMask[0xE] = 0xF0FFFFFF;
-	_memInvMask[0xF] = 0xF0FFFFFF;
+	_memMask[0x0] = BIOSMASK;
+	_memMask[0x1] = 0;
+	_memMask[0x2] = WRAMMASK;
+	_memMask[0x3] = WRAMCHIPMASK;
+	_memMask[0x4] = IOREGISTERSMASK;
+	_memMask[0x5] = PRAMMASK;
+	_memMask[0x6] = VRAMMASK;
+	_memMask[0x7] = ORAMMASK;
+	_memMask[0x8] = 0;
+	_memMask[0x9] = 0;
+	_memMask[0xA] = 0;
+	_memMask[0xB] = 0;
+	_memMask[0xC] = 0;
+	_memMask[0xD] = 0;
+	_memMask[0xE] = 0;
+	_memMask[0xF] = 0;
 
 	// Load bios from file
 	FILE *biosFile;
@@ -131,9 +140,9 @@ int Memory::Load(const SaveData_t *data)
 		_memmap[0xA] = _rom;
 		_memmap[0xC] = _rom;
 		if (_romLength >= 0x1000000) {
-			_memInvMask[0x8] = 0xF0000000;
-			_memInvMask[0xA] = 0xF0000000;
-			_memInvMask[0xC] = 0xF0000000;
+			_memMask[0x8] = 0xFFFFFF;
+			_memMask[0xA] = 0xFFFFFF;
+			_memMask[0xC] = 0xFFFFFF;
 		}
 		else {
 			if(!isPowerOf2(_romLength)) {
@@ -141,9 +150,9 @@ int Memory::Load(const SaveData_t *data)
 				return 0;
 			}
 			uint32_t romMask = _romLength - 1;
-			_memInvMask[0x8] = (~romMask) & 0xF0FFFFFF;
-			_memInvMask[0xA] = (~romMask) & 0xF0FFFFFF;
-			_memInvMask[0xC] = (~romMask) & 0xF0FFFFFF;
+			_memMask[0x8] = romMask;
+			_memMask[0xA] = romMask;
+			_memMask[0xC] = romMask;
 		}
 	}
 	if (_romLength > 0x1000000) {
@@ -151,19 +160,19 @@ int Memory::Load(const SaveData_t *data)
 		_memmap[0xB] = _rom + 0x1000000;
 		_memmap[0xD] = _rom + 0x1000000;
 		if (_romLength == 0x2000000) {
-			_memInvMask[0x9] = 0xF0000000;
-			_memInvMask[0xB] = 0xF0000000;
-			_memInvMask[0xD] = 0xF0000000;
+			_memMask[0x9] = 0xFFFFFF;
+			_memMask[0xB] = 0xFFFFFF;
+			_memMask[0xD] = 0xFFFFFF;
 		}
 		else {
 			if (!isPowerOf2(_romLength-0x1000000)) {
 				Log(Error, "Rom length is not a power of 2");
 				return 0;
 			}
-			uint32_t romMask = _romLength - 0x1000001;
-			_memInvMask[0x9] = (~romMask) & 0xF0FFFFFF;
-			_memInvMask[0xB] = (~romMask) & 0xF0FFFFFF;
-			_memInvMask[0xD] = (~romMask) & 0xF0FFFFFF;
+			uint32_t romMask = _romLength - 1;
+			_memMask[0x9] = romMask;
+			_memMask[0xB] = romMask;
+			_memMask[0xD] = romMask;
 		}
 	}
 
@@ -193,35 +202,77 @@ void Memory::Tick()
 uint8_t Memory::Read8(uint32_t address)
 {
 	uint8_t index = (address >> 24) & 0xF;
-	if ((address & _memInvMask[index]) != 0) {
-		assert((address & _memInvMask[index]) == 0); // TODO nice error handling
+	address &= _memMask[index];
+	if (_memmap[index] == nullptr) {
+		assert(_memmap[index] != nullptr); // TODO nice error handling
 	}
-	if (index == 6 && (address & 0x1FFFF) > 0x17FFF) {
-		assert((address & 0x1FFFF) <= 0x17FFF); // TODO nice error handling
+	if (index == 6 && address > 0x17FFF) {
+		assert(address <= 0x17FFF); // TODO nice error handling
 	}
-	return _memmap[index][address & 0xFFFFFF];
+	return _memmap[index][address];
 }
 
 uint16_t Memory::Read16(uint32_t address)
 {
 	uint8_t index = (address >> 24) & 0xF;
-	if ((address & _memInvMask[index]) != 0) {
-		assert((address & _memInvMask[index]) == 0); // TODO nice error handling
+	address &= _memMask[index];
+	if (_memmap[index] == nullptr) {
+		assert(_memmap[index] != nullptr); // TODO nice error handling
 	}
-	if (index == 6 && (address & 0x1FFFF) > 0x17FFF) {
-		assert((address & 0x1FFFF) <= 0x17FFF); // TODO nice error handling
+	if (index == 6 && address > 0x17FFF) {
+		assert(address <= 0x17FFF); // TODO nice error handling
 	}
-	return *((uint16_t *)&_memmap[index][address & 0xFFFFFF]);
+	return *((uint16_t *)&_memmap[index][address]);
 }
 
 uint32_t Memory::Read32(uint32_t address)
 {
 	uint8_t index = (address >> 24) & 0xF;
-	if ((address & _memInvMask[index]) != 0) {
-		assert((address & _memInvMask[index]) == 0); // TODO nice error handling
+	address &= _memMask[index];
+	if (_memmap[index] == nullptr) {
+		assert(_memmap[index] != nullptr); // TODO nice error handling
 	}
-	if (index == 6 && (address & 0x1FFFF) > 0x17FFF) {
-		assert((address & 0x1FFFF) <= 0x17FFF); // TODO nice error handling
+	if (index == 6 && address > 0x17FFF) {
+		assert(address <= 0x17FFF); // TODO nice error handling
 	}
-	return *((uint32_t *)&_memmap[index][address & 0xFFFFFF]);
+	return *((uint32_t *)&_memmap[index][address]);
+}
+
+void Memory::Write8(uint32_t address, uint8_t value)
+{
+	uint8_t index = (address >> 24) & 0xF;
+	address &= _memMask[index];
+	if (_memmap[index] == nullptr) {
+		assert(_memmap[index] != nullptr); // TODO nice error handling
+	}
+	if (index == 6 && address > 0x17FFF) {
+		assert(address <= 0x17FFF); // TODO nice error handling
+	}
+	_memmap[index][address] = value;
+}
+
+void Memory::Write16(uint32_t address, uint16_t value)
+{
+	uint8_t index = (address >> 24) & 0xF;
+	address &= _memMask[index];
+	if (_memmap[index] == nullptr) {
+		assert(_memmap[index] != nullptr); // TODO nice error handling
+	}
+	if (index == 6 && address > 0x17FFF) {
+		assert(address <= 0x17FFF); // TODO nice error handling
+	}
+	*((uint16_t *)&_memmap[index][address]) = value;
+}
+
+void Memory::Write32(uint32_t address, uint32_t value)
+{
+	uint8_t index = (address >> 24) & 0xF;
+	address &= _memMask[index];
+	if (_memmap[index] == nullptr) {
+		assert(_memmap[index] != nullptr); // TODO nice error handling
+	}
+	if (index == 6 && address > 0x17FFF) {
+		assert(address <= 0x17FFF); // TODO nice error handling
+	}
+	*((uint32_t *)&_memmap[index][address]) = value;
 }

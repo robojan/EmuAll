@@ -2,6 +2,11 @@
 
 // General defines
 #define FCPU                16780000
+
+// CPU defines
+#define ARM_NOP             0xF0001C00
+#define THUMB_NOP           0x1C00
+
 // Memory sizes
 #define BIOSSIZE            (16 * 1024)
 #define WRAMSIZE            (256 * 1024)

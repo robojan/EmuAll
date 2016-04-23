@@ -45,6 +45,12 @@
     <ClCompile Include="cpu\cpu.cpp">
       <Filter>Source Files\cpu</Filter>
     </ClCompile>
+    <ClCompile Include="cpu\armThumb.cpp">
+      <Filter>Source Files\cpu</Filter>
+    </ClCompile>
+    <ClCompile Include="cpu\arm.cpp">
+      <Filter>Source Files\cpu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="resources\gbaemu.xml">
@@ -78,13 +84,8 @@
     <ClInclude Include="include\GBAemu\cpu\hostInstructions.h">
       <Filter>Header Files\cpu</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="cpu\miscInstructions.inl">
-      <Filter>Source Files\cpu</Filter>
-    </None>
-    <None Include="cpu\opcodeExecution.inl">
-      <Filter>Source Files\cpu</Filter>
-    </None>
+    <ClInclude Include="include\GBAemu\util\preprocessor.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

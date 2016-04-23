@@ -102,6 +102,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>EMUDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -146,6 +147,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="cpu\arm.cpp" />
+    <ClCompile Include="cpu\armThumb.cpp" />
     <ClCompile Include="cpu\cpu.cpp" />
     <ClCompile Include="emu.cpp" />
     <ClCompile Include="gba.cpp" />
@@ -183,11 +186,8 @@
     <ClInclude Include="include\GBAemu\gba.h" />
     <ClInclude Include="include\GBAemu\memory\memory.h" />
     <ClInclude Include="include\GBAemu\util\log.h" />
+    <ClInclude Include="include\GBAemu\util\preprocessor.h" />
     <ClInclude Include="resources\resources.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="cpu\miscInstructions.inl" />
-    <None Include="cpu\opcodeExecution.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
