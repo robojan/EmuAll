@@ -4,6 +4,7 @@
 #include "../mem/GbMem.h"
 #include <cassert>
 #include <sstream>
+#include <emuall/util/string.h>
 
 #define MAX_OPCODESIZE 3
 
@@ -122,21 +123,6 @@ static const DisassembleInfo_t disassembleInfo[] =
 	{ { 0xD9 }, { 0xFF }, 1, "RETI" }
 };
 
-char hexChars[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
-
-const char *HexToString(unsigned int data, int minPrint = 0)
-{
-	static char buffer[9] = {0};
-	int i = 7;
-	do
-	{
-		buffer[i] = hexChars[data&0xF];
-		data >>= 4;
-		--i;
-		--minPrint;
-	} while ((data || minPrint > 0)&&i>=0);
-	return &buffer[i+1];
-}
 
 GbDis::GbDis(Gameboy *master)
 {

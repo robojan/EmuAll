@@ -164,7 +164,7 @@ bool GbMem::LoadState(const SaveData_t *data)
 	Endian conv(false);
 	uint8_t *ptr = (uint8_t *)data->miscData;
 	size_t miscLen = data->miscDataLen;
-	int expectedDataLen = 42 + VRAM_BANKS * VRAM_BANK_SIZE + WRAM_BANKS * WRAM_BANK_SIZE + REGS_BANK_SIZE;
+	size_t expectedDataLen = 42 + VRAM_BANKS * VRAM_BANK_SIZE + WRAM_BANKS * WRAM_BANK_SIZE + REGS_BANK_SIZE;
 	// Find cpu segment
 	while (miscLen >= 8) {
 		uint32_t id = conv.convu32(*(uint32_t *)(ptr + 0));

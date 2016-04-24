@@ -22,7 +22,6 @@ public:
 
 private:
 	Gameboy *_master;
-	std::map<unsigned int, std::map<address_t, DisassembleLine_t>> _ROMinstructions;
 };
 
 #endif

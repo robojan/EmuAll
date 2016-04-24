@@ -3,7 +3,7 @@
 #include <GBAemu/util/log.h>
 
 Gba::Gba() :
-	_memory(*this), _cpu(*this)
+	_memory(*this), _cpu(*this), _disassembler(*this)
 {
 
 }
@@ -23,6 +23,12 @@ int Gba::Load(const SaveData_t *data)
 	return _memory.Load(data);
 }
 
+void Gba::Step()
+{
+	_memory.Tick();
+	_cpu.Tick();
+}
+
 int Gba::Tick(unsigned int time)
 {
 	if (!IsRunning())
@@ -30,6 +36,7 @@ int Gba::Tick(unsigned int time)
 	int execute = ((uint64_t)time * FCPU + 500000) / 1000000;
 	for (int i = execute; i != 0; --i)
 	{
+		_memory.Tick();
 		_cpu.Tick();
 	}
 	return 1;

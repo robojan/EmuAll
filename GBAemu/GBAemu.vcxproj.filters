@@ -51,6 +51,9 @@
     <ClCompile Include="cpu\arm.cpp">
       <Filter>Source Files\cpu</Filter>
     </ClCompile>
+    <ClCompile Include="cpu\disassembler.cpp">
+      <Filter>Source Files\cpu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="resources\gbaemu.xml">
@@ -86,6 +89,9 @@
     </ClInclude>
     <ClInclude Include="include\GBAemu\util\preprocessor.h">
       <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GBAemu\cpu\disassembler.h">
+      <Filter>Header Files\cpu</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

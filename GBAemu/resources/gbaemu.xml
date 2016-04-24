@@ -56,12 +56,12 @@
   <debugging>
     <cpu>
       <disassembler>
-        <enabled>false</enabled>
+        <enabled>true</enabled>
         <breakpoint>false</breakpoint>
-        <size>0</size>
+        <size>0x10000000</size>
         <curLineId>1015</curLineId>
       </disassembler>
-      <step>false</step>
+      <step>true</step>
       <stepOut>false</stepOut>
       <stepOver>false</stepOver>
       <registers>
@@ -133,17 +133,30 @@
           <name>CPSR</name>
           <size>32</size>
         </register>
-        <flag id="1017">
+        <register id="1017">
+          <name>SPSR</name>
+          <size>32</size>
+        </register>
+        <flag id="1018">
           <name>N</name>
         </flag>
-        <flag id="1018">
+        <flag id="1019">
           <name>Z</name>
         </flag>
-        <flag id="1019">
+        <flag id="1020">
           <name>C</name>
         </flag>
-        <flag id="1020">
+        <flag id="1021">
           <name>V</name>
+        </flag>
+        <flag id="1022">
+          <name>T</name>
+        </flag>
+        <flag id="1023">
+          <name>I</name>
+        </flag>
+        <flag id="1024">
+          <name>F</name>
         </flag>
       </registers>
     </cpu>

@@ -93,6 +93,9 @@
     <ClCompile Include="graphics\rectangle.cpp">
       <Filter>Source Files\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="util\string.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\emuall\common.h">
@@ -145,6 +148,9 @@
     </ClInclude>
     <ClInclude Include="include\emuall\graphics\rectangle.h">
       <Filter>Header Files\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\emuall\util\string.h">
+      <Filter>Header Files\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

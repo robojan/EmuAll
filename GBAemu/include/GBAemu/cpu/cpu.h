@@ -38,6 +38,8 @@ public:
 	uint32_t GetRegisterValue(int id);
 
 	void UpdateMode();
+	void SaveHostFlagsToCPSR();
+	void LoadHostFlagsFromCPSR();
 private:
 	void TickARM();
 	void TickThumb();
@@ -61,8 +63,6 @@ private:
 	uint32_t GetShifterOperandImmFlags(uint32_t instruction);
 
 	void SoftwareInterrupt(uint32_t value);
-	void SaveHostFlagsToCPSR();
-	void LoadHostFlagsFromCPSR();
 
 	Gba &_system;
 	uint32_t _hostFlags;

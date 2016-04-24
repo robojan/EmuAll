@@ -24,6 +24,7 @@ private:
 	void OnStep(wxCommandEvent &evt);
 
 	Emulator _emu;
+	CpuDebuggerInfo_t _config;
 	DisView *_codeView;
 	wxListCtrl *_registerView;
 	std::vector<wxCheckBox *> _statusWidget;

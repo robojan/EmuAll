@@ -85,6 +85,8 @@ void CPUDebugger::Update()
 		// Emulator running
 		_runButton->SetLabel(_("Stop"));
 		_stepButton->Disable();
+		_stepOutButton->Disable();
+		_stepOverButton->Disable();
 		_registerView->Disable();
 		std::vector<wxCheckBox *>::iterator it;
 		for (it = _statusWidget.begin(); it != _statusWidget.end(); ++it)
@@ -98,7 +100,9 @@ void CPUDebugger::Update()
 		// Emulator not running
 		// Update button
 		_runButton->SetLabel(_("Run"));
-		_stepButton->Enable();
+		_stepButton->Enable(_config.step);
+		_stepOutButton->Enable(_config.stepOut);
+		_stepOverButton->Enable(_config.stepOver);
 		// Update registers
 		
 		std::map<int, EmulatorRegister_t>::iterator it;
@@ -143,6 +147,15 @@ void CPUDebugger::SetEmulator(const Emulator &emu)
 		_stepOverButton->Enable(false);
 		_stepOutButton->Enable(false);
 
+		_config.breakpointSupport = false;
+		_config.curLineId = 0;
+		_config.disassembler = false;
+		_config.disassemblerSize = 0;
+		_config.flags.clear();
+		_config.registers.clear();
+		_config.step = false;
+		_config.stepOut = false;
+		_config.stepOver = false;
 	}
 	else {
 		// Load registers
@@ -157,12 +170,12 @@ void CPUDebugger::SetEmulator(const Emulator &emu)
 		_registers.clear();
 
 		// Get cpu debugging information
-		CpuDebuggerInfo_t config = _emu.emu->GetCpuDebuggerInfo();
+		_config = _emu.emu->GetCpuDebuggerInfo();
 
-		_codeView->Update(config.disassemblerSize, config.curLineId);
+		_codeView->Update(_config.disassemblerSize, _config.curLineId);
 
 		std::vector<EmulatorRegister_t>::iterator it2;
-		for (it2 = config.registers.begin(); it2 != config.registers.end(); ++it2)
+		for (it2 = _config.registers.begin(); it2 != _config.registers.end(); ++it2)
 		{
 			// add register
 			long pos = _registerView->InsertItem(_registerView->GetItemCount(), it2->name);
@@ -171,7 +184,7 @@ void CPUDebugger::SetEmulator(const Emulator &emu)
 			_registerView->SetItem(pos, 1, wxString::Format(wxString::Format("0x%%0%dX", (it2->size + 1) / 4), 0));
 			_registers[pos] = *it2;
 		}
-		for (it2 = config.flags.begin(); it2 != config.flags.end(); ++it2)
+		for (it2 = _config.flags.begin(); it2 != _config.flags.end(); ++it2)
 		{
 			// add flag
 			wxCheckBox *flag = new wxCheckBox(this, wxID_ANY, it2->name, wxDefaultPosition, wxDefaultSize, 0);
@@ -183,9 +196,9 @@ void CPUDebugger::SetEmulator(const Emulator &emu)
 		_registerView->Enable();
 
 		_runButton->Enable(true);
-		_stepButton->Enable(config.step);
-		_stepOverButton->Enable(config.stepOver);
-		_stepOutButton->Enable(config.stepOut);
+		_stepButton->Enable(_config.step);
+		_stepOverButton->Enable(_config.stepOver);
+		_stepOutButton->Enable(_config.stepOut);
 	}
 	Fit();
 	Layout();

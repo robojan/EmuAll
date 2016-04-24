@@ -48,9 +48,15 @@
 #define CPSR_Z              30
 #define CPSR_C              29
 #define CPSR_V              28
+#define CPSR_I				7
+#define CPSR_F				6
+#define CPSR_T              5
 
 #define CPSR_N_MASK         (1<<CPSR_N)
 #define CPSR_Z_MASK         (1<<CPSR_Z)
 #define CPSR_C_MASK         (1<<CPSR_C)
 #define CPSR_V_MASK         (1<<CPSR_V)
+#define CPSR_I_MASK         (1<<CPSR_I)
+#define CPSR_F_MASK         (1<<CPSR_F)
+#define CPSR_T_MASK         (1<<CPSR_T)
 

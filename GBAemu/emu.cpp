@@ -3,6 +3,7 @@
 
 #include <emu.h>
 #include <GBAemu/gba.h>
+#include <GBAemu/defines.h>
 #include <GBAemu/util/preprocessor.h>
 #include "resources/resources.h"
 
@@ -53,6 +54,13 @@ int32_t __stdcall Load(EMUHANDLE handle, const SaveData_t *data) {
 	return emulator->Load(data);
 }
 
+void __stdcall Step(EMUHANDLE handle) {
+	Gba *emulator = reinterpret_cast<Gba *>(handle);
+	if (emulator == nullptr)
+		return;
+	return emulator->Step();
+}
+
 int32_t __stdcall Tick(EMUHANDLE handle, uint32_t time) {
 	Gba *emulator = reinterpret_cast<Gba *>(handle);
 	if (emulator == nullptr)
@@ -78,9 +86,7 @@ uint8_t __stdcall Disassemble(EMUHANDLE handle, uint32_t pos, const uint8_t **ra
 	Gba *emulator = reinterpret_cast<Gba *>(handle);
 	if (emulator == nullptr)
 		return -1;
-	*(char **)raw = "00000000";
-	*(char **)instr = "Not implemented";
-	return 4;
+	return emulator->GetDisassembler().Disassemble(pos, (const char **)raw, (const char **)instr);
 }
 
 uint8_t __stdcall GetMemoryData(EMUHANDLE handle, int32_t memory, uint32_t address) {
@@ -114,7 +120,29 @@ uint32_t __stdcall GetValU(EMUHANDLE handle, int32_t id) {
 	CASE_RANGE16(1000)
 	case 1016:
 	case 1017:
+		emulator->GetCpu().SaveHostFlagsToCPSR();
 		return emulator->GetCpu().GetRegisterValue(id - 1000);
+	case 1018:
+		emulator->GetCpu().SaveHostFlagsToCPSR();
+		return (emulator->GetCpu().GetRegisterValue(16) & CPSR_N_MASK) != 0 ? 1 : 0;
+	case 1019:
+		emulator->GetCpu().SaveHostFlagsToCPSR();
+		return (emulator->GetCpu().GetRegisterValue(16) & CPSR_Z_MASK) != 0 ? 1 : 0;
+	case 1020:
+		emulator->GetCpu().SaveHostFlagsToCPSR();
+		return (emulator->GetCpu().GetRegisterValue(16) & CPSR_C_MASK) != 0 ? 1 : 0;
+	case 1021:
+		emulator->GetCpu().SaveHostFlagsToCPSR();
+		return (emulator->GetCpu().GetRegisterValue(16) & CPSR_V_MASK) != 0 ? 1 : 0;
+	case 1022:
+		emulator->GetCpu().SaveHostFlagsToCPSR();
+		return (emulator->GetCpu().GetRegisterValue(16) & CPSR_T_MASK) != 0 ? 1 : 0;
+	case 1023:
+		emulator->GetCpu().SaveHostFlagsToCPSR();
+		return (emulator->GetCpu().GetRegisterValue(16) & CPSR_I_MASK) != 0 ? 1 : 0;
+	case 1024:
+		emulator->GetCpu().SaveHostFlagsToCPSR();
+		return (emulator->GetCpu().GetRegisterValue(16) & CPSR_F_MASK) != 0 ? 1 : 0;
 	case 2009: // SRAM size
 		return emulator->GetMemory().GetSRAMSize();
 	case 2011: // ROM size
