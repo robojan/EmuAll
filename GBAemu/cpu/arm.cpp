@@ -1,6 +1,7 @@
 
 #include <GBAemu/cpu/hostInstructions.h>
 #include <GBAemu/cpu/cpu.h>
+#include <GBAemu/cpu/armException.h>
 #include <GBAemu/gba.h>
 #include <GBAemu/util/log.h>
 #include <GBAemu/defines.h>
@@ -257,9 +258,12 @@ uint32_t Cpu::GetShifterOperandRORRegFlags(uint32_t instruction)
 	}
 }
 
-void Cpu::TickARM() {
+void Cpu::TickARM(bool step) {
 	uint32_t instruction = _pipelineInstruction;
 	_pipelineInstruction = _system._memory.Read32(_registers[REGPC] & 0xFFFFFFFC);
+	if (step && IsBreakpoint(_registers[REGPC] - 4)) {
+		instruction = _breakpoints.at(_registers[REGPC] - 4);
+	}
 	_registers[REGPC] += 4;
 	uint8_t cond = instruction >> 28;
 	if (!IsConditionMet(cond, _hostFlags)) {
@@ -1081,11 +1085,10 @@ void Cpu::TickARM() {
 		break;
 	}
 	// BKPT
-	case 0x127: { // BKPT <immediate>
+	case 0x127: { // BKPT <imm_16>
 		uint16_t imm = instruction & 0xF;
 		imm |= (instruction >> 4) & 0xFFF0;
-		Log(Error, "ARM CPU breakpoint not implemented");
-		__debugbreak();
+		throw BreakPointARMException(imm);
 		break;
 	}
 	// BX

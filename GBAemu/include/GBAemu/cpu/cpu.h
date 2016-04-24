@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <map>
 
 class Gba;
 
@@ -22,7 +23,7 @@ public:
 
 	void Reset();
 
-	void Tick();
+	void Tick(bool step = false);
 
 	bool InAPrivilegedMode() const;
 	bool InABankedUserRegistersMode() const;
@@ -40,9 +41,14 @@ public:
 	void UpdateMode();
 	void SaveHostFlagsToCPSR();
 	void LoadHostFlagsFromCPSR();
+
+	void AddBreakpoint(uint32_t address);
+	void RemoveBreakpoint(uint32_t address);
+	bool IsBreakpoint(uint32_t address);
+	uint32_t GetBreakpointInstruction(uint32_t address);
 private:
-	void TickARM();
-	void TickThumb();
+	void TickARM(bool step);
+	void TickThumb(bool step);
 	uint32_t GetShifterOperandLSL(uint32_t instruction);
 	uint32_t GetShifterOperandLSLReg(uint32_t instruction);
 	uint32_t GetShifterOperandLSR(uint32_t instruction);
@@ -83,4 +89,6 @@ private:
 	uint32_t _spsrUND;
 	uint32_t _spsrIRQ;
 	uint32_t _spsrFIQ;
+
+	std::map<uint32_t, uint32_t> _breakpoints;
 };

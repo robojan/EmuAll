@@ -5,7 +5,7 @@
 #include <GBAemu/util/log.h>
 #include <GBAemu/defines.h>
 
-void Cpu::TickThumb()
+void Cpu::TickThumb(bool step)
 {
 	uint16_t instruction = _pipelineInstruction;
 	_pipelineInstruction = _system._memory.Read16(_registers[REGPC] & 0xFFFFFFFE);

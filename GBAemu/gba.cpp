@@ -1,6 +1,7 @@
 #include <GBAemu/gba.h>
 #include <GBAemu/defines.h>
 #include <GBAemu/util/log.h>
+#include <GBAemu/cpu/armException.h>
 
 Gba::Gba() :
 	_memory(*this), _cpu(*this), _disassembler(*this)
@@ -26,7 +27,7 @@ int Gba::Load(const SaveData_t *data)
 void Gba::Step()
 {
 	_memory.Tick();
-	_cpu.Tick();
+	_cpu.Tick(true);
 }
 
 int Gba::Tick(unsigned int time)
@@ -37,7 +38,14 @@ int Gba::Tick(unsigned int time)
 	for (int i = execute; i != 0; --i)
 	{
 		_memory.Tick();
-		_cpu.Tick();
+		try {
+			_cpu.Tick();
+		}
+		catch (BreakPointARMException &e) {
+			Log(Message, "Breakpoint hit %d", e._value);
+			Run(false);
+			break;
+		}
 	}
 	return 1;
 }

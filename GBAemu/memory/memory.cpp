@@ -5,6 +5,7 @@
 
 #include <Emuall/math/math.h>
 
+#include <GBAemu/cpu/armException.h>
 #include <GBAemu/memory/memory.h>
 #include <GBAemu/util/log.h>
 #include <GBAemu/defines.h>
@@ -204,10 +205,10 @@ uint8_t Memory::Read8(uint32_t address)
 	uint8_t index = (address >> 24) & 0xF;
 	address &= _memMask[index];
 	if (_memmap[index] == nullptr) {
-		assert(_memmap[index] != nullptr); // TODO nice error handling
+		throw DataAbortARMException();
 	}
 	if (index == 6 && address > 0x17FFF) {
-		assert(address <= 0x17FFF); // TODO nice error handling
+		throw DataAbortARMException();
 	}
 	return _memmap[index][address];
 }
@@ -217,10 +218,10 @@ uint16_t Memory::Read16(uint32_t address)
 	uint8_t index = (address >> 24) & 0xF;
 	address &= _memMask[index];
 	if (_memmap[index] == nullptr) {
-		assert(_memmap[index] != nullptr); // TODO nice error handling
+		throw DataAbortARMException();
 	}
 	if (index == 6 && address > 0x17FFF) {
-		assert(address <= 0x17FFF); // TODO nice error handling
+		throw DataAbortARMException();
 	}
 	return *((uint16_t *)&_memmap[index][address]);
 }
@@ -230,10 +231,10 @@ uint32_t Memory::Read32(uint32_t address)
 	uint8_t index = (address >> 24) & 0xF;
 	address &= _memMask[index];
 	if (_memmap[index] == nullptr) {
-		assert(_memmap[index] != nullptr); // TODO nice error handling
+		throw DataAbortARMException();
 	}
 	if (index == 6 && address > 0x17FFF) {
-		assert(address <= 0x17FFF); // TODO nice error handling
+		throw DataAbortARMException();
 	}
 	return *((uint32_t *)&_memmap[index][address]);
 }
@@ -243,10 +244,13 @@ void Memory::Write8(uint32_t address, uint8_t value)
 	uint8_t index = (address >> 24) & 0xF;
 	address &= _memMask[index];
 	if (_memmap[index] == nullptr) {
-		assert(_memmap[index] != nullptr); // TODO nice error handling
+		throw DataAbortARMException();
 	}
 	if (index == 6 && address > 0x17FFF) {
-		assert(address <= 0x17FFF); // TODO nice error handling
+		throw DataAbortARMException();
+	}
+	if (index == 0 || (index >= 8 && index <= 0xD)) {
+		throw DataAbortARMException();
 	}
 	_memmap[index][address] = value;
 }
@@ -256,10 +260,13 @@ void Memory::Write16(uint32_t address, uint16_t value)
 	uint8_t index = (address >> 24) & 0xF;
 	address &= _memMask[index];
 	if (_memmap[index] == nullptr) {
-		assert(_memmap[index] != nullptr); // TODO nice error handling
+		throw DataAbortARMException();
 	}
 	if (index == 6 && address > 0x17FFF) {
-		assert(address <= 0x17FFF); // TODO nice error handling
+		throw DataAbortARMException();
+	}
+	if (index == 0 || (index >= 8 && index <= 0xD)) {
+		throw DataAbortARMException();
 	}
 	*((uint16_t *)&_memmap[index][address]) = value;
 }
@@ -269,10 +276,26 @@ void Memory::Write32(uint32_t address, uint32_t value)
 	uint8_t index = (address >> 24) & 0xF;
 	address &= _memMask[index];
 	if (_memmap[index] == nullptr) {
-		assert(_memmap[index] != nullptr); // TODO nice error handling
+		throw DataAbortARMException();
 	}
 	if (index == 6 && address > 0x17FFF) {
-		assert(address <= 0x17FFF); // TODO nice error handling
+		throw DataAbortARMException();
+	}
+	if (index == 0 || (index >= 8 && index <= 0xD)) {
+		throw DataAbortARMException();
+	}
+	*((uint32_t *)&_memmap[index][address]) = value;
+}
+
+void Memory::ManagedWrite32(uint32_t address, uint32_t value)
+{
+	uint8_t index = (address >> 24) & 0xF;
+	address &= _memMask[index];
+	if (_memmap[index] == nullptr) {
+		throw DataAbortARMException();
+	}
+	if (index == 6 && address > 0x17FFF) {
+		throw DataAbortARMException();
 	}
 	*((uint32_t *)&_memmap[index][address]) = value;
 }

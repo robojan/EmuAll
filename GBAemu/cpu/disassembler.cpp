@@ -36,7 +36,13 @@ int Disassembler::Disassemble(uint32_t address, const char **raw, const char **i
 		return 2;
 	}
 	else {
-		uint32_t opcode = _system.GetMemory().Read32(address);
+		uint32_t opcode;
+		if (_system.GetCpu().IsBreakpoint(address)) {
+			opcode = _system.GetCpu().GetBreakpointInstruction(address);
+		}
+		else {
+			opcode = _system.GetMemory().Read32(address);
+		}
 		if (raw != nullptr) {
 			*raw = HexToString(opcode, 8);
 		}
@@ -143,7 +149,7 @@ const char * Disassembler::DisassembleArm(uint32_t address, uint32_t instruction
 				tempBuffer[tempPos] = '\0';
 				dataStr = tempBuffer + 2;
 			}
-			else if (strncmp(formatStr + formatPos, "immed_24", argLen) == 0) {
+			else if (strncmp(formatStr + formatPos, "imm_24", argLen) == 0) {
 				uint32_t offset = instruction & 0xFFFFFF;
 				HexToString(tempBuffer + 2, offset);
 				dataStr = tempBuffer;
@@ -342,7 +348,7 @@ const char * Disassembler::GetARMFormatString(uint32_t instruction)
 	case 0x1D7: return "BIC<cond>S <Rd>, <Rn>, <Rm>, ROR <Rs>";
 	CASE_RANGE16(0x3C0) return "BIC<cond> <Rd>, <Rn>, #<immediate>";
 	CASE_RANGE16(0x3D0) return "BIC<cond>S <Rd>, <Rn>, #<immediate>";
-	case 0x127: return "BKPT<cond> <immediate>";
+	case 0x127: return "BKPT<cond> <imm_16>";
 	case 0x121: return "BX<cond> <Rm>";
 	case 0x178:
 	case 0x170: return "CMN<cond> <Rd>, <Rn>, <Rm>, LSL #<shift_imm>";

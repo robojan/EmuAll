@@ -108,6 +108,27 @@ uint8_t __stdcall GetMemoryData(EMUHANDLE handle, int32_t memory, uint32_t addre
 	}
 }
 
+void __stdcall AddBreakpoint(EMUHANDLE handle, uint32_t pos) {
+	Gba *emulator = reinterpret_cast<Gba *>(handle);
+	if (emulator == nullptr)
+		return;
+	emulator->GetCpu().AddBreakpoint(pos);
+}
+
+void __stdcall RemoveBreakpoint(EMUHANDLE handle, uint32_t pos) {
+	Gba *emulator = reinterpret_cast<Gba *>(handle);
+	if (emulator == nullptr)
+		return;
+	emulator->GetCpu().RemoveBreakpoint(pos);
+}
+
+int32_t __stdcall IsBreakpoint(EMUHANDLE handle, uint32_t pos) {
+	Gba *emulator = reinterpret_cast<Gba *>(handle);
+	if (emulator == nullptr)
+		return 0;
+	return emulator->GetCpu().IsBreakpoint(pos) ? 1 : 0;
+}
+
 int32_t __stdcall GetValI(EMUHANDLE handle, int32_t id) {
 	return GetValU(handle, id);
 }

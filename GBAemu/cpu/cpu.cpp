@@ -2,6 +2,7 @@
 #include <GBAemu/gba.h>
 #include <GBAemu/defines.h>
 #include <GBAemu/cpu/cpu.h>
+#include <GBAemu/cpu/armException.h>
 #include <GBAemu/util/log.h>
 #include <GBAemu/cpu/hostInstructions.h>
 
@@ -28,14 +29,21 @@ void Cpu::Reset()
 	_pipelineInstruction = 0xF0000000;
 }
 
-void Cpu::Tick()
+void Cpu::Tick(bool step)
 {
 	// Read instruction
-	if (IsInThumbMode()) {
-		TickThumb();
+	try {
+		if (IsInThumbMode()) {
+			TickThumb(step);
+		}
+		else {
+			TickARM(step);
+		}
 	}
-	else {
-		TickARM();
+	catch (BreakPointARMException &e) {
+		_registers[REGPC] -= 8;
+		_pipelineInstruction = ARM_NOP;
+		throw e;
 	}
 }
 
@@ -239,7 +247,20 @@ void Cpu::UpdateMode()
 
 void Cpu::SoftwareInterrupt(uint32_t value)
 {
-	Log(Debug, "Software interrupt");
+	SaveHostFlagsToCPSR();
+	_spsrSVC = _cpsr;
+	SetThumbMode(false);
+	EnableIRQs(false);
+	SetMode(Supervisor);
+	_registers[REGLR] = _registers[REGPC - 4];
+	_registers[REGPC] = 0x00000008;
+	_pipelineInstruction = ARM_NOP;
+	Log(Debug, "Software interrupt %d", value);
+}
+
+uint32_t Cpu::GetBreakpointInstruction(uint32_t address)
+{
+	return _breakpoints.at(address);
 }
 
 void Cpu::SaveHostFlagsToCPSR()
@@ -258,5 +279,29 @@ void Cpu::LoadHostFlagsFromCPSR()
 	if ((_cpsr & CPSR_C_MASK) != 0) _hostFlags |= (1 << 0);
 	if ((_cpsr & CPSR_Z_MASK) != 0) _hostFlags |= (1 << 6);
 	if ((_cpsr & CPSR_N_MASK) != 0) _hostFlags |= (1 << 7);
+}
+
+void Cpu::AddBreakpoint(uint32_t address)
+{
+	if (IsBreakpoint(address)) {
+		RemoveBreakpoint(address);
+	}
+	uint32_t instr = _system.GetMemory().Read32(address);
+	_system.GetMemory().ManagedWrite32(address, 0xE1200070);
+	_breakpoints[address] = instr;
+}
+
+void Cpu::RemoveBreakpoint(uint32_t address)
+{
+	if (!IsBreakpoint(address)) {
+		return;
+	}
+	_system.GetMemory().ManagedWrite32(address, _breakpoints[address]);
+	_breakpoints.erase(address);
+}
+
+bool Cpu::IsBreakpoint(uint32_t address)
+{
+	return _breakpoints.find(address) != _breakpoints.end();
 }
 

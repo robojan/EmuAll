@@ -57,7 +57,7 @@
     <cpu>
       <disassembler>
         <enabled>true</enabled>
-        <breakpoint>false</breakpoint>
+        <breakpoint>true</breakpoint>
         <size>0x10000000</size>
         <curLineId>1015</curLineId>
       </disassembler>

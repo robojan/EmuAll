@@ -19,6 +19,7 @@ public:
 	void Write8(uint32_t address, uint8_t value);
 	void Write16(uint32_t address, uint16_t value);
 	void Write32(uint32_t address, uint32_t value);
+	void ManagedWrite32(uint32_t address, uint32_t value);
 
 	uint32_t GetRomSize();
 	uint32_t GetSRAMSize();
