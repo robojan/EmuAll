@@ -1,7 +1,7 @@
 #ifndef _GBMEM_H
 #define _GBMEM_H
 
-#include "../../types/tree.h"
+#include <emuall/util/tree.h>
 #include <emuall/util/endian.h>
 #include "../defines.h"
 #include "../../util/log.h"
@@ -84,7 +84,7 @@ private:
 	gbTime			_timeStamp;
 	
 	// Events
-	tree			_eventTable;
+	AATree<address_t, GbMemEvent *> _eventTable;
 
 	void CalculateRTC(gbTime *time);
 };
@@ -255,17 +255,11 @@ inline void GbMem::write(address_t address, gbByte val, bool event)
 	}
 	if(event)
 	{
-		node *evt = _eventTable.search(address);
-		while(evt != NULL)
-		{
-			if(((GbMemEvent *)evt->ptr) == NULL)
-			{
-				evt = evt->middle;
-				continue;
-			}
-			((GbMemEvent *)evt->ptr)->MemEvent(address, val);
-			evt = evt->middle;
-		}
+		auto &it = _eventTable.Find(address);
+		while (it != _eventTable.End()) {
+			it->MemEvent(address, val);
+			it++;
+		}		
 	}
 }
 

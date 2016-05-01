@@ -154,6 +154,7 @@
     <ClCompile Include="cpu\disassembler.cpp" />
     <ClCompile Include="emu.cpp" />
     <ClCompile Include="gba.cpp" />
+    <ClCompile Include="gpu\gpu.cpp" />
     <ClCompile Include="memory\memory.cpp" />
     <ClCompile Include="resources\resources.c" />
   </ItemGroup>
@@ -188,6 +189,7 @@
     <ClInclude Include="include\GBAemu\cpu\hostInstructions.h" />
     <ClInclude Include="include\GBAemu\defines.h" />
     <ClInclude Include="include\GBAemu\gba.h" />
+    <ClInclude Include="include\GBAemu\gpu\gpu.h" />
     <ClInclude Include="include\GBAemu\memory\memory.h" />
     <ClInclude Include="include\GBAemu\util\log.h" />
     <ClInclude Include="include\GBAemu\util\preprocessor.h" />

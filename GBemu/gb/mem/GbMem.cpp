@@ -54,7 +54,8 @@ GbMem::GbMem(Gameboy *master)
 	_rtcRegister = 0x08;
 	_rtcActive = true;
 	_lastLatch = 0xFF;
-	_eventTable.destroy_tree();
+	//_eventTable.destroy_tree();
+	_eventTable.Clear();
 }
 
 GbMem::~GbMem()
@@ -305,7 +306,8 @@ void GbMem::DeleteRam(void)
 		delete _eram;
 		_eram = NULL;
 	}
-	_eventTable.destroy_tree();
+	//_eventTable.destroy_tree();
+	_eventTable.Clear();
 }
 
 void GbMem::switchBank(unsigned int bank)
@@ -518,7 +520,8 @@ bool GbMem::Save(SaveData_t *data)
 
 void GbMem::registerEvent(address_t address, GbMemEvent *evt)
 {
-	_eventTable.insert(address, evt);
+	//_eventTable.insert(address, evt);
+	_eventTable.Insert(address, evt);
 }
 
 void GbMem::registerEvent(address_t rangeLow, address_t rangeHigh, GbMemEvent *evt)

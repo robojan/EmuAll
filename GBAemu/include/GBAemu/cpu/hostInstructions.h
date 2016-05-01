@@ -229,6 +229,7 @@ inline void SUB_FLAGS(uint32_t x, uint32_t y, uint32_t &result, uint32_t &flags)
 		pop dx;
 		and edx, 0x000008C1;
 		or eax, edx;
+		xor eax, 0x1;
 		mov dword ptr[ecx], eax;
 	}
 }
@@ -377,6 +378,7 @@ inline void CMP(uint32_t x, uint32_t y, uint32_t &flags) {
 		pop dx;
 		and edx, 0x000008C1;
 		or eax, edx;
+		xor eax, 0x1;
 		mov dword ptr[ecx], eax;
 	}
 }

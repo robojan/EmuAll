@@ -5,8 +5,9 @@
 #include <GBAemu/memory/memory.h>
 #include <GBAemu/cpu/cpu.h>
 #include <GBAemu/cpu/disassembler.h>
+#include <GBAemu/gpu/gpu.h>
 
-class Gba {
+class Gba : public MemoryEventHandler {
 	friend class Cpu;
 public:
 	Gba();
@@ -29,10 +30,23 @@ public:
 	Cpu &GetCpu() { return _cpu; }
 	Disassembler &GetDisassembler() { return _disassembler; }
 
+	// execution functions
+	void RequestIRQ(int mask);
+	virtual void HandleEvent(uint32_t address, int size) override;
+
 private:
+	void InitRegisters();
+	void PowerModeStop();
+	void PowerModeHalt();
+
 	Memory _memory;
 	Cpu _cpu;
+	Gpu _gpu;
+	
+	uint16_t _if;
 
 	bool _running;
+	bool _halted;
+	bool _stopped;
 	Disassembler _disassembler;
 };

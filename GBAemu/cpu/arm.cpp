@@ -278,6 +278,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSL(instruction);
 		ADC(_registers[rn], operand, _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0A1: { // ADC <Rd>, <Rn>, <Rm>, LSL <Rs>
@@ -285,6 +286,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSLReg(instruction);
 		ADC(_registers[rn], operand, _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0AA:
@@ -293,6 +295,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSR(instruction);
 		ADC(_registers[rn], operand, _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0A3: { // ADC <Rd>, <Rn>, <Rm>, LSR <Rs>
@@ -300,6 +303,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSRReg(instruction);
 		ADC(_registers[rn], operand, _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0AC:
@@ -308,6 +312,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandASR(instruction);
 		ADC(_registers[rn], operand, _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0A5: { // ADC <Rd>, <Rn>, <Rm>, ASR <Rs>
@@ -315,6 +320,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandASRReg(instruction);
 		ADC(_registers[rn], operand, _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0AE:
@@ -324,6 +330,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandROR(instruction);
 		ADC(_registers[rn], operand, _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0A7: { // ADC <Rd>, <Rn>, <Rm>, ROR <Rs>
@@ -331,6 +338,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandRORReg(instruction);
 		ADC(_registers[rn], operand, _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0B8:
@@ -341,9 +349,12 @@ void Cpu::TickARM(bool step) {
 		if (rd == REGPC) {
 			ADC(_registers[rn], operand, _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			ADC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -354,10 +365,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSLReg(instruction);
 			ADC(_registers[rn], operand, _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSLRegFlags(instruction);
 			ADC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -369,10 +383,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSR(instruction);
 			ADC(_registers[rn], operand, _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSRFlags(instruction);
 			ADC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -383,10 +400,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSRReg(instruction);
 			ADC(_registers[rn], operand, _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSRRegFlags(instruction);
 			ADC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -399,10 +419,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandASR(instruction);
 			ADC(_registers[rn], operand, _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandASRFlags(instruction);
 			ADC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -413,10 +436,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandASRReg(instruction);
 			ADC(_registers[rn], operand, _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandASRRegFlags(instruction);
 			ADC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -429,10 +455,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandROR(instruction);
 			ADC(_registers[rn], operand, _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandRORFlags(instruction);
 			ADC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -443,10 +472,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandRORReg(instruction);
 			ADC(_registers[rn], operand, _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandRORRegFlags(instruction);
 			ADC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -455,6 +487,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandImm(instruction);
 		ADC(_registers[rn], operand, _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	CASE_RANGE16(0x2B0) { // ADC <Rd>, <Rn>, #<immediate>
@@ -464,10 +497,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandImm(instruction);
 			ADC(_registers[rn], operand, _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandImmFlags(instruction);
 			ADC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -478,6 +514,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSL(instruction);
 		ADD(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x081: { // ADD <Rd>, <Rn>, <Rm>, LSL <Rs>
@@ -485,6 +522,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSLReg(instruction);
 		ADD(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x082:
@@ -493,6 +531,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSR(instruction);
 		ADD(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x083: { // ADD <Rd>, <Rn>, <Rm>, LSR <Rs>
@@ -500,6 +539,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSRReg(instruction);
 		ADD(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x084:
@@ -508,6 +548,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandASR(instruction);
 		ADD(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x085: { // ADD <Rd>, <Rn>, <Rm>, ASR <Rs>
@@ -515,6 +556,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandASRReg(instruction);
 		ADD(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x086: // ADD <Rd>, <Rn>, <Rm>, RRX #<imm>
@@ -523,6 +565,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandROR(instruction);
 		ADD(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x087: { // ADD <Rd>, <Rn>, <Rm>, ROR <Rs>
@@ -530,6 +573,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandRORReg(instruction);
 		ADD(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x090:
@@ -540,10 +584,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSL(instruction);
 			ADD(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSLFlags(instruction);
 			ADD_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -554,10 +601,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSLReg(instruction);
 			ADD(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSLRegFlags(instruction);
 			ADD_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -569,10 +619,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSR(instruction);
 			ADD(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSRFlags(instruction);
 			ADD_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -583,10 +636,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSRReg(instruction);
 			ADD(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSRRegFlags(instruction);
 			ADD_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -598,10 +654,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandASR(instruction);
 			ADD(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandASRFlags(instruction);
 			ADD_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -612,10 +671,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandASRReg(instruction);
 			ADD(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandASRRegFlags(instruction);
 			ADD_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -627,10 +689,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandROR(instruction);
 			ADD(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandRORFlags(instruction);
 			ADD_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -641,10 +706,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandRORReg(instruction);
 			ADD(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandRORRegFlags(instruction);
 			ADD_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -653,6 +721,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandImm(instruction);
 		ADD(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	CASE_RANGE16(0x290) { // ADDS <Rd>, <Rn>, #<immediate>
@@ -662,10 +731,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandImm(instruction);
 			ADD(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandImmFlags(instruction);
 			ADD_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -676,6 +748,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSL(instruction);
 		AND(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x001: { // AND <Rd>, <Rn>, <Rm>, LSL <Rs>
@@ -683,6 +756,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSLReg(instruction);
 		AND(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x002:
@@ -691,6 +765,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSR(instruction);
 		AND(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x003: { // AND <Rd>, <Rn>, <Rm>, LSR <Rs>
@@ -698,6 +773,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSRReg(instruction);
 		AND(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x004:
@@ -706,6 +782,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandASR(instruction);
 		AND(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x005: { // AND <Rd>, <Rn>, <Rm>, ASR <Rs>
@@ -713,6 +790,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandASRReg(instruction);
 		AND(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x006: // AND <Rd>, <Rn>, <Rm>, RRX #<imm>
@@ -721,6 +799,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandROR(instruction);
 		AND(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x007: { // AND <Rd>, <Rn>, <Rm>, ROR <Rs>
@@ -728,6 +807,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandRORReg(instruction);
 		AND(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x010:
@@ -738,6 +818,8 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSL(instruction);
 			AND(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSLFlags(instruction);
@@ -752,10 +834,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSLReg(instruction);
 			AND(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSLRegFlags(instruction);
 			AND_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -767,10 +852,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSR(instruction);
 			AND(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSRFlags(instruction);
 			AND_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -781,10 +869,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSRReg(instruction);
 			AND(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSRRegFlags(instruction);
 			AND_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -796,10 +887,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandASR(instruction);
 			AND(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandASRFlags(instruction);
 			AND_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -810,10 +904,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandASRReg(instruction);
 			AND(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandASRRegFlags(instruction);
 			AND_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -825,10 +922,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandROR(instruction);
 			AND(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandRORFlags(instruction);
 			AND_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -839,10 +939,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandRORReg(instruction);
 			AND(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandRORRegFlags(instruction);
 			AND_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -851,6 +954,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandImm(instruction);
 		AND(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	CASE_RANGE16(0x210) { // ANDS <Rd>, <Rn>, #<immediate>
@@ -860,10 +964,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandImm(instruction);
 			AND(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandImmFlags(instruction);
 			AND_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -893,6 +1000,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSL(instruction);
 		BIC(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1C1: { // BIC <Rd>, <Rn>, <Rm>, LSL <Rs>
@@ -900,6 +1008,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSLReg(instruction);
 		BIC(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1C2:
@@ -908,6 +1017,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSR(instruction);
 		BIC(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1C3: { // BIC <Rd>, <Rn>, <Rm>, LSR <Rs>
@@ -915,6 +1025,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSRReg(instruction);
 		BIC(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1C4:
@@ -923,6 +1034,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandASR(instruction);
 		BIC(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1C5: { // BIC <Rd>, <Rn>, <Rm>, ASR <Rs>
@@ -930,6 +1042,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandASRReg(instruction);
 		BIC(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1C6: // BIC <Rd>, <Rn>, <Rm>, RRX #<imm>
@@ -938,6 +1051,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandROR(instruction);
 		BIC(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1C7: { // BIC <Rd>, <Rn>, <Rm>, ROR <Rs>
@@ -945,6 +1059,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandRORReg(instruction);
 		BIC(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1D0:
@@ -955,10 +1070,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSL(instruction);
 			BIC(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSLFlags(instruction);
 			BIC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -969,10 +1087,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSLReg(instruction);
 			BIC(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSLRegFlags(instruction);
 			BIC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -984,10 +1105,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSR(instruction);
 			BIC(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSRFlags(instruction);
 			BIC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -998,10 +1122,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSRReg(instruction);
 			BIC(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSRRegFlags(instruction);
 			BIC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -1013,10 +1140,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandASR(instruction);
 			BIC(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandASRFlags(instruction);
 			BIC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -1027,10 +1157,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandASRReg(instruction);
 			BIC(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandASRRegFlags(instruction);
 			BIC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -1042,10 +1175,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandROR(instruction);
 			BIC(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandRORFlags(instruction);
 			BIC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -1056,10 +1192,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandRORReg(instruction);
 			BIC(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandRORRegFlags(instruction);
 			BIC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -1068,6 +1207,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandImm(instruction);
 		BIC(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	CASE_RANGE16(0x3D0) { // BICS <Rd>, <Rn>, #<immediate>
@@ -1077,10 +1217,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandImm(instruction);
 			BIC(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandImmFlags(instruction);
 			BIC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -1097,6 +1240,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rm];
 		SetThumbMode((address & 0x1) != 0);
 		_registers[REGPC] = address & 0xFFFFFFFE;
+		_pipelineInstruction = ARM_NOP;
 		break;
 	}
 	CASE_RANGE128_OFFSET(0xE00, 1) { // CDP <coproc>, <opcode_1>, <CRd>, <CRn>, <CRm>, <opcode_2>
@@ -1230,6 +1374,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSL(instruction);
 		EOR(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x021: { // EOR <Rd>, <Rn>, <Rm>, LSL <Rs>
@@ -1237,6 +1382,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSLReg(instruction);
 		EOR(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x022:
@@ -1245,6 +1391,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSR(instruction);
 		EOR(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x023: { // EOR <Rd>, <Rn>, <Rm>, LSR <Rs>
@@ -1252,6 +1399,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSRReg(instruction);
 		EOR(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x024:
@@ -1260,6 +1408,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandASR(instruction);
 		EOR(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x025: { // EOR <Rd>, <Rn>, <Rm>, ASR <Rs>
@@ -1267,6 +1416,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandASRReg(instruction);
 		EOR(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x026: // EOR <Rd>, <Rn>, <Rm>, RRX #<imm>
@@ -1275,6 +1425,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandROR(instruction);
 		EOR(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x027: { // EOR <Rd>, <Rn>, <Rm>, ROR <Rs>
@@ -1282,6 +1433,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandRORReg(instruction);
 		EOR(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x030:
@@ -1292,10 +1444,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSL(instruction);
 			EOR(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSLFlags(instruction);
 			EOR_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -1306,10 +1461,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSLReg(instruction);
 			EOR(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSLRegFlags(instruction);
 			EOR_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -1321,10 +1479,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSR(instruction);
 			EOR(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSRFlags(instruction);
 			EOR_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -1335,10 +1496,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSRReg(instruction);
 			EOR(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSRRegFlags(instruction);
 			EOR_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -1350,10 +1514,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandASR(instruction);
 			EOR(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandASRFlags(instruction);
 			EOR_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -1364,10 +1531,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandASRReg(instruction);
 			EOR(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandASRRegFlags(instruction);
 			EOR_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -1379,10 +1549,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandROR(instruction);
 			EOR(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandRORFlags(instruction);
 			EOR_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -1393,10 +1566,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandRORReg(instruction);
 			EOR(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandRORRegFlags(instruction);
 			EOR_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -1405,6 +1581,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandImm(instruction);
 		EOR(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	CASE_RANGE16(0x230) { // EORS <Rd>, <Rn>, #<immediate>
@@ -1414,10 +1591,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandImm(instruction);
 			EOR(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandImmFlags(instruction);
 			EOR_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -1427,14 +1607,14 @@ void Cpu::TickARM(bool step) {
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint32_t address = _registers[rn];
 		if ((registerList & (1 << 15)) != 0) {
-			address -= 4;
 			_registers[REGPC] = _system._memory.Read32(address) & 0xFFFFFFFC;
 			_pipelineInstruction = ARM_NOP;
+			address -= 4;
 		}
 		for (int i = 14; i >= 0; i--) {
 			if ((registerList & (1 << i)) != 0) {
-				address -= 4;
 				_registers[i] = _system._memory.Read32(address);
+				address -= 4;
 			}
 		}
 		break;
@@ -1444,13 +1624,14 @@ void Cpu::TickARM(bool step) {
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint32_t address = _registers[rn];
 		if ((registerList & (1 << 15)) != 0) {
-			address -= 4;
 			_registers[REGPC] = _system._memory.Read32(address) & 0xFFFFFFFC;
+			_pipelineInstruction = ARM_NOP;
+			address -= 4;
 		}
 		for (int i = 14; i >= 0; i--) {
 			if ((registerList & (1 << i)) != 0) {
-				address -= 4;
 				_registers[i] = _system._memory.Read32(address);
+				address -= 4;
 			}
 		}
 		_registers[rn] = address;
@@ -1462,13 +1643,14 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn];
 		for (int i = 0; i <= 14; i++) {
 			if ((registerList & (1 << i)) != 0) {
-				address += 4;
 				_registers[i] = _system._memory.Read32(address);
+				address += 4;
 			}
 		}
 		if ((registerList & (1 << 15)) != 0) {
-			address += 4;
 			_registers[REGPC] = _system._memory.Read32(address) & 0xFFFFFFFC;
+			_pipelineInstruction = ARM_NOP;
+			address += 4;
 		}
 		break;
 	}
@@ -1478,13 +1660,14 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn];
 		for (int i = 0; i <= 14; i++) {
 			if ((registerList & (1 << i)) != 0) {
-				address += 4;
 				_registers[i] = _system._memory.Read32(address);
+				address += 4;
 			}
 		}
 		if ((registerList & (1 << 15)) != 0) {
-			address += 4;
 			_registers[REGPC] = _system._memory.Read32(address) & 0xFFFFFFFC;
+			_pipelineInstruction = ARM_NOP;
+			address += 4;
 		}
 		_registers[rn] = address;
 		break;
@@ -1495,6 +1678,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn];
 		if ((registerList & (1 << 15)) != 0) {
 			_registers[REGPC] = _system._memory.Read32(address) & 0xFFFFFFFC;
+			_pipelineInstruction = ARM_NOP;
 			address -= 4;
 		}
 		for (int i = 14; i >= 0; i--) {
@@ -1510,16 +1694,17 @@ void Cpu::TickARM(bool step) {
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint32_t address = _registers[rn];
 		if ((registerList & (1 << 15)) != 0) {
-			_registers[REGPC] = _system._memory.Read32(address) & 0xFFFFFFFC;
 			address -= 4;
+			_registers[REGPC] = _system._memory.Read32(address) & 0xFFFFFFFC;
+			_pipelineInstruction = ARM_NOP;
 		}
 		for (int i = 14; i >= 0; i--) {
 			if ((registerList & (1 << i)) != 0) {
-				_registers[i] = _system._memory.Read32(address);
 				address -= 4;
+				_registers[i] = _system._memory.Read32(address);
 			}
 		}
-		_registers[rn] = address + 4;
+		_registers[rn] = address;
 		break;
 	}
 	CASE_RANGE16(0x990) { // LDMIB <Rn>, <registers>
@@ -1528,13 +1713,14 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn];
 		for (int i = 0; i >= 14; i++) {
 			if ((registerList & (1 << i)) != 0) {
-				_registers[i] = _system._memory.Read32(address);
 				address += 4;
+				_registers[i] = _system._memory.Read32(address);
 			}
 		}
 		if ((registerList & (1 << 15)) != 0) {
-			_registers[REGPC] = _system._memory.Read32(address) & 0xFFFFFFFC;
 			address += 4;
+			_registers[REGPC] = _system._memory.Read32(address) & 0xFFFFFFFC;
+			_pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -1544,15 +1730,16 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn];
 		for (int i = 0; i <= 14; i++) {
 			if ((registerList & (1 << i)) != 0) {
-				_registers[i] = _system._memory.Read32(address);
 				address += 4;
+				_registers[i] = _system._memory.Read32(address);
 			}
 		}
 		if ((registerList & (1 << 15)) != 0) {
-			_registers[REGPC] = _system._memory.Read32(address) & 0xFFFFFFFC;
 			address += 4;
+			_registers[REGPC] = _system._memory.Read32(address) & 0xFFFFFFFC;
+			_pipelineInstruction = ARM_NOP;
 		}
-		_registers[rn] = address - 4;
+		_registers[rn] = address;
 		break;
 	}
 	CASE_RANGE16(0x850) { // LDMDA <Rn>, <registers>^
@@ -1571,6 +1758,7 @@ void Cpu::TickARM(bool step) {
 				else {
 					_registers[15] = pc & 0xFFFFFFFC;
 				}
+				_pipelineInstruction = ARM_NOP;
 			}
 			for (int i = 14; i >= 8; i--) {
 				if ((registerList & (1 << i)) != 0) {
@@ -1588,6 +1776,7 @@ void Cpu::TickARM(bool step) {
 				if ((registerList & (1 << i)) != 0) {
 					address -= 4;
 					_registers[i] = _system._memory.Read32(address);
+					if (i == REGPC) _pipelineInstruction = ARM_NOP;
 				}
 			}
 		}
@@ -1609,6 +1798,7 @@ void Cpu::TickARM(bool step) {
 				else {
 					_registers[15] = pc & 0xFFFFFFFC;
 				}
+				_pipelineInstruction = ARM_NOP;
 			}
 			for (int i = 14; i >= 8; i--) {
 				if ((registerList & (1 << i)) != 0) {
@@ -1626,6 +1816,7 @@ void Cpu::TickARM(bool step) {
 				if ((registerList & (1 << i)) != 0) {
 					address -= 4;
 					_registers[i] = _system._memory.Read32(address);
+					if (i == REGPC) _pipelineInstruction = ARM_NOP;
 				}
 			}
 		}
@@ -1658,6 +1849,7 @@ void Cpu::TickARM(bool step) {
 				else {
 					_registers[15] = pc & 0xFFFFFFFC;
 				}
+				_pipelineInstruction = ARM_NOP;
 			}
 		}
 		else {
@@ -1671,6 +1863,7 @@ void Cpu::TickARM(bool step) {
 				address += 4;
 				uint32_t pc = _system._memory.Read32(address);
 				_registers[15] = pc & 0xFFFFFFFC;
+				_pipelineInstruction = ARM_NOP;
 			}
 		}
 		_registers[rn] = address;
@@ -1702,6 +1895,7 @@ void Cpu::TickARM(bool step) {
 				else {
 					_registers[15] = pc & 0xFFFFFFFC;
 				}
+				_pipelineInstruction = ARM_NOP;
 			}
 		}
 		else {
@@ -1715,6 +1909,7 @@ void Cpu::TickARM(bool step) {
 				address += 4;
 				uint32_t pc = _system._memory.Read32(address);
 				_registers[15] = pc & 0xFFFFFFFC;
+				_pipelineInstruction = ARM_NOP;
 			}
 		}
 		break;
@@ -1734,6 +1929,7 @@ void Cpu::TickARM(bool step) {
 				else {
 					_registers[15] = pc & 0xFFFFFFFC;
 				}
+				_pipelineInstruction = ARM_NOP;
 				address -= 4;
 			}
 			for (int i = 14; i >= 8; i--) {
@@ -1751,6 +1947,7 @@ void Cpu::TickARM(bool step) {
 			if ((registerList & (1 << 15)) != 0) {
 				uint32_t pc = _system._memory.Read32(address);
 				_registers[15] = pc & 0xFFFFFFFC;
+				_pipelineInstruction = ARM_NOP;
 				address -= 4;
 			}
 			for (int i = 14; i >= 0; i--) {
@@ -1777,6 +1974,7 @@ void Cpu::TickARM(bool step) {
 				else {
 					_registers[15] = pc & 0xFFFFFFFC;
 				}
+				_pipelineInstruction = ARM_NOP;
 				address -= 4;
 			}
 			for (int i = 14; i >= 8; i--) {
@@ -1794,6 +1992,7 @@ void Cpu::TickARM(bool step) {
 			if ((registerList & (1 << 15)) != 0) {
 				uint32_t pc = _system._memory.Read32(address);
 				_registers[15] = pc & 0xFFFFFFFC;
+				_pipelineInstruction = ARM_NOP;
 				address -= 4;
 			}
 			for (int i = 14; i >= 0; i--) {
@@ -1831,6 +2030,7 @@ void Cpu::TickARM(bool step) {
 				else {
 					_registers[15] = pc & 0xFFFFFFFC;
 				}
+				_pipelineInstruction = ARM_NOP;
 				address += 4;
 			}
 		}
@@ -1844,6 +2044,7 @@ void Cpu::TickARM(bool step) {
 			if ((registerList & (1 << 15)) != 0) {
 				uint32_t pc = _system._memory.Read32(address);
 				_registers[15] = pc & 0xFFFFFFFC;
+				_pipelineInstruction = ARM_NOP;
 				address += 4;
 			}
 		}
@@ -1874,6 +2075,7 @@ void Cpu::TickARM(bool step) {
 				else {
 					_registers[15] = pc & 0xFFFFFFFC;
 				}
+				_pipelineInstruction = ARM_NOP;
 				address += 4;
 			}
 		}
@@ -1887,6 +2089,7 @@ void Cpu::TickARM(bool step) {
 			if ((registerList & (1 << 15)) != 0) {
 				uint32_t pc = _system._memory.Read32(address);
 				_registers[15] = pc & 0xFFFFFFFC;
+				_pipelineInstruction = ARM_NOP;
 				address += 4;
 			}
 		}
@@ -1901,6 +2104,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn];
 		_registers[rd] = _system._memory.Read32(address);
 		_registers[rn] = address - offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	CASE_RANGE16(0x490) { // LDR <Rd>, [<Rn>], #+<offset_12>
@@ -1910,6 +2114,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn];
 		_registers[rd] = _system._memory.Read32(address);
 		_registers[rn] = address + offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	CASE_RANGE16(0x510) { // LDR <Rd>, [<Rn>, #-<offset_12>]
@@ -1918,6 +2123,7 @@ void Cpu::TickARM(bool step) {
 		uint16_t offset = (instruction & 0xFFF);
 		uint32_t address = _registers[rn] - offset;
 		_registers[rd] = _system._memory.Read32(address);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	CASE_RANGE16(0x530) { // LDR <Rd>, [<Rn>, #-<offset_12>]!
@@ -1927,6 +2133,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn] - offset;
 		_registers[rd] = _system._memory.Read32(address);
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	CASE_RANGE16(0x590) { // LDR <Rd>, [<Rn>, #+<offset_12>]
@@ -1935,6 +2142,7 @@ void Cpu::TickARM(bool step) {
 		uint16_t offset = (instruction & 0xFFF);
 		uint32_t address = _registers[rn] + offset;
 		_registers[rd] = _system._memory.Read32(address);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	CASE_RANGE16(0x5B0) { // LDR <Rd>, [<Rn>, #+<offset_12>]!
@@ -1944,6 +2152,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn] + offset;
 		_registers[rd] = _system._memory.Read32(address);
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x610: 
@@ -1954,6 +2163,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandLSL(instruction);
 		_registers[rd] = _system._memory.Read32(address);
 		_registers[rn] = address - offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x612:
@@ -1964,6 +2174,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandLSR(instruction);
 		_registers[rd] = _system._memory.Read32(address);
 		_registers[rn] = address - offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x614:
@@ -1974,6 +2185,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandASR(instruction);
 		_registers[rd] = _system._memory.Read32(address);
 		_registers[rn] = address - offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x616:
@@ -1984,6 +2196,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandROR(instruction);
 		_registers[rd] = _system._memory.Read32(address);
 		_registers[rn] = address - offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x690:
@@ -1994,6 +2207,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandLSL(instruction);
 		_registers[rd] = _system._memory.Read32(address);
 		_registers[rn] = address + offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x692:
@@ -2004,6 +2218,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandLSR(instruction);
 		_registers[rd] = _system._memory.Read32(address);
 		_registers[rn] = address + offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x694:
@@ -2014,6 +2229,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandASR(instruction);
 		_registers[rd] = _system._memory.Read32(address);
 		_registers[rn] = address + offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x696:
@@ -2024,6 +2240,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandROR(instruction);
 		_registers[rd] = _system._memory.Read32(address);
 		_registers[rn] = address + offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x710:
@@ -2033,6 +2250,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandLSL(instruction);
 		uint32_t address = _registers[rn] - offset;
 		_registers[rd] = _system._memory.Read32(address);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x712:
@@ -2042,6 +2260,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandLSR(instruction);
 		uint32_t address = _registers[rn] - offset;
 		_registers[rd] = _system._memory.Read32(address);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x714:
@@ -2051,6 +2270,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandASR(instruction);
 		uint32_t address = _registers[rn] - offset;
 		_registers[rd] = _system._memory.Read32(address);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x716:
@@ -2060,6 +2280,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandROR(instruction);
 		uint32_t address = _registers[rn] - offset;
 		_registers[rd] = _system._memory.Read32(address);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x790:
@@ -2069,6 +2290,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandLSL(instruction);
 		uint32_t address = _registers[rn] + offset;
 		_registers[rd] = _system._memory.Read32(address);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x792:
@@ -2078,6 +2300,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandLSR(instruction);
 		uint32_t address = _registers[rn] + offset;
 		_registers[rd] = _system._memory.Read32(address);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x794:
@@ -2087,6 +2310,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandASR(instruction);
 		uint32_t address = _registers[rn] + offset;
 		_registers[rd] = _system._memory.Read32(address);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x796:
@@ -2096,6 +2320,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandROR(instruction);
 		uint32_t address = _registers[rn] + offset;
 		_registers[rd] = _system._memory.Read32(address);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x730:
@@ -2106,6 +2331,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn] - offset;
 		_registers[rd] = _system._memory.Read32(address);
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x732:
@@ -2116,6 +2342,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn] - offset;
 		_registers[rd] = _system._memory.Read32(address);
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x734:
@@ -2126,6 +2353,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn] - offset;
 		_registers[rd] = _system._memory.Read32(address);
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x736:
@@ -2136,6 +2364,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn] - offset;
 		_registers[rd] = _system._memory.Read32(address);
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x7B0:
@@ -2146,6 +2375,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn] + offset;
 		_registers[rd] = _system._memory.Read32(address);
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x7B2:
@@ -2156,6 +2386,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn] + offset;
 		_registers[rd] = _system._memory.Read32(address);
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x7B4:
@@ -2166,6 +2397,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn] + offset;
 		_registers[rd] = _system._memory.Read32(address);
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x7B6:
@@ -2176,6 +2408,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn] + offset;
 		_registers[rd] = _system._memory.Read32(address);
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	// LDRB
@@ -2186,6 +2419,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn];
 		_registers[rd] = _system._memory.Read8(address);
 		_registers[rn] = address - offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	CASE_RANGE16(0x4D0) { // LDRB <Rd>, [<Rn>], #+<offset_12>
@@ -2195,6 +2429,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn];
 		_registers[rd] = _system._memory.Read8(address);
 		_registers[rn] = address + offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	CASE_RANGE16(0x550) { // LDRB <Rd>, [<Rn>, #-<offset_12>]
@@ -2203,6 +2438,7 @@ void Cpu::TickARM(bool step) {
 		uint16_t offset = (instruction & 0xFFF);
 		uint32_t address = _registers[rn] - offset;
 		_registers[rd] = _system._memory.Read8(address);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	CASE_RANGE16(0x570) { // LDRB <Rd>, [<Rn>, #-<offset_12>]!
@@ -2212,6 +2448,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn] - offset;
 		_registers[rd] = _system._memory.Read8(address);
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	CASE_RANGE16(0x5D0) { // LDRB <Rd>, [<Rn>, #+<offset_12>]
@@ -2220,6 +2457,7 @@ void Cpu::TickARM(bool step) {
 		uint16_t offset = (instruction & 0xFFF);
 		uint32_t address = _registers[rn] + offset;
 		_registers[rd] = _system._memory.Read8(address);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	CASE_RANGE16(0x5F0) { // LDRB <Rd>, [<Rn>, #+<offset_12>]!
@@ -2229,6 +2467,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn] + offset;
 		_registers[rd] = _system._memory.Read8(address);
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x650:
@@ -2239,6 +2478,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandLSL(instruction);
 		_registers[rd] = _system._memory.Read8(address);
 		_registers[rn] = address - offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x652:
@@ -2249,6 +2489,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandLSR(instruction);
 		_registers[rd] = _system._memory.Read8(address);
 		_registers[rn] = address - offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x654:
@@ -2259,6 +2500,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandASR(instruction);
 		_registers[rd] = _system._memory.Read8(address);
 		_registers[rn] = address - offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x656:
@@ -2269,6 +2511,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandROR(instruction);
 		_registers[rd] = _system._memory.Read8(address);
 		_registers[rn] = address - offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x6D0:
@@ -2279,6 +2522,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandLSL(instruction);
 		_registers[rd] = _system._memory.Read8(address);
 		_registers[rn] = address + offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x6D2:
@@ -2289,6 +2533,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandLSR(instruction);
 		_registers[rd] = _system._memory.Read8(address);
 		_registers[rn] = address + offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x6D4:
@@ -2299,6 +2544,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandASR(instruction);
 		_registers[rd] = _system._memory.Read8(address);
 		_registers[rn] = address + offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x6D6:
@@ -2309,6 +2555,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandROR(instruction);
 		_registers[rd] = _system._memory.Read8(address);
 		_registers[rn] = address + offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x750:
@@ -2318,6 +2565,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandLSL(instruction);
 		uint32_t address = _registers[rn] - offset;
 		_registers[rd] = _system._memory.Read8(address);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x752:
@@ -2327,6 +2575,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandLSR(instruction);
 		uint32_t address = _registers[rn] - offset;
 		_registers[rd] = _system._memory.Read8(address);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x754:
@@ -2336,6 +2585,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandASR(instruction);
 		uint32_t address = _registers[rn] - offset;
 		_registers[rd] = _system._memory.Read8(address);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x756:
@@ -2345,6 +2595,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandROR(instruction);
 		uint32_t address = _registers[rn] - offset;
 		_registers[rd] = _system._memory.Read8(address);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x7D0:
@@ -2354,6 +2605,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandLSL(instruction);
 		uint32_t address = _registers[rn] + offset;
 		_registers[rd] = _system._memory.Read8(address);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x7D2:
@@ -2363,6 +2615,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandLSR(instruction);
 		uint32_t address = _registers[rn] + offset;
 		_registers[rd] = _system._memory.Read8(address);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x7D4:
@@ -2372,6 +2625,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandASR(instruction);
 		uint32_t address = _registers[rn] + offset;
 		_registers[rd] = _system._memory.Read8(address);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x7D6:
@@ -2381,6 +2635,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t offset = GetShifterOperandROR(instruction);
 		uint32_t address = _registers[rn] + offset;
 		_registers[rd] = _system._memory.Read8(address);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x770:
@@ -2391,6 +2646,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn] - offset;
 		_registers[rd] = _system._memory.Read8(address);
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x772:
@@ -2401,6 +2657,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn] - offset;
 		_registers[rd] = _system._memory.Read8(address);
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x774:
@@ -2411,6 +2668,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn] - offset;
 		_registers[rd] = _system._memory.Read8(address);
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x776:
@@ -2421,6 +2679,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn] - offset;
 		_registers[rd] = _system._memory.Read8(address);
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x7F0:
@@ -2431,6 +2690,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn] + offset;
 		_registers[rd] = _system._memory.Read8(address);
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x7F2:
@@ -2441,6 +2701,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn] + offset;
 		_registers[rd] = _system._memory.Read8(address);
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x7F4:
@@ -2451,6 +2712,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn] + offset;
 		_registers[rd] = _system._memory.Read8(address);
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x7F6:
@@ -2461,6 +2723,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn] + offset;
 		_registers[rd] = _system._memory.Read8(address);
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	//LDRBT
@@ -2472,6 +2735,7 @@ void Cpu::TickARM(bool step) {
 		if (InAPrivilegedMode()) {
 			if (rd == 15 || rd < 8 || (!InABankedUserRegistersMode() && rd < 13)) {
 				_registers[rd] = _system._memory.Read8(address);
+				if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 			}
 			else {
 				_registersUser[rd - 8] = _system._memory.Read8(address);
@@ -2479,6 +2743,7 @@ void Cpu::TickARM(bool step) {
 		}
 		else {
 			_registers[rd] = _system._memory.Read8(address);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		_registers[rn] = address - offset;
 		break;
@@ -2491,6 +2756,7 @@ void Cpu::TickARM(bool step) {
 		if (InAPrivilegedMode()) {
 			if (rd == 15 || rd < 8 || (!InABankedUserRegistersMode() && rd < 13)) {
 				_registers[rd] = _system._memory.Read8(address);
+				if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 			}
 			else {
 				_registersUser[rd-8] = _system._memory.Read8(address);
@@ -2498,6 +2764,7 @@ void Cpu::TickARM(bool step) {
 		}
 		else {
 			_registers[rd] = _system._memory.Read8(address);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		_registers[rn] = address + offset;
 		break;
@@ -2511,6 +2778,7 @@ void Cpu::TickARM(bool step) {
 		if (InAPrivilegedMode()) {
 			if (rd == 15 || rd < 8 || (!InABankedUserRegistersMode() && rd < 13)) {
 				_registers[rd] = _system._memory.Read8(address);
+				if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 			}
 			else {
 				_registersUser[rd - 8] = _system._memory.Read8(address);
@@ -2518,6 +2786,7 @@ void Cpu::TickARM(bool step) {
 		}
 		else {
 			_registers[rd] = _system._memory.Read8(address);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		_registers[rn] = address - offset;
 		break;
@@ -2531,6 +2800,7 @@ void Cpu::TickARM(bool step) {
 		if (InAPrivilegedMode()) {
 			if (rd == 15 || rd < 8 || (!InABankedUserRegistersMode() && rd < 13)) {
 				_registers[rd] = _system._memory.Read8(address);
+				if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 			}
 			else {
 				_registersUser[rd - 8] = _system._memory.Read8(address);
@@ -2538,6 +2808,7 @@ void Cpu::TickARM(bool step) {
 		}
 		else {
 			_registers[rd] = _system._memory.Read8(address);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		_registers[rn] = address - offset;
 		break;
@@ -2551,6 +2822,7 @@ void Cpu::TickARM(bool step) {
 		if (InAPrivilegedMode()) {
 			if (rd == 15 || rd < 8 || (!InABankedUserRegistersMode() && rd < 13)) {
 				_registers[rd] = _system._memory.Read8(address);
+				if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 			}
 			else {
 				_registersUser[rd - 8] = _system._memory.Read8(address);
@@ -2558,6 +2830,7 @@ void Cpu::TickARM(bool step) {
 		}
 		else {
 			_registers[rd] = _system._memory.Read8(address);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		_registers[rn] = address - offset;
 		break;
@@ -2571,6 +2844,7 @@ void Cpu::TickARM(bool step) {
 		if (InAPrivilegedMode()) {
 			if (rd == 15 || rd < 8 || (!InABankedUserRegistersMode() && rd < 13)) {
 				_registers[rd] = _system._memory.Read8(address);
+				if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 			}
 			else {
 				_registersUser[rd - 8] = _system._memory.Read8(address);
@@ -2578,6 +2852,7 @@ void Cpu::TickARM(bool step) {
 		}
 		else {
 			_registers[rd] = _system._memory.Read8(address);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		_registers[rn] = address - offset;
 		break;
@@ -2591,6 +2866,7 @@ void Cpu::TickARM(bool step) {
 		if (InAPrivilegedMode()) {
 			if (rd == 15 || rd < 8 || (!InABankedUserRegistersMode() && rd < 13)) {
 				_registers[rd] = _system._memory.Read8(address);
+				if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 			}
 			else {
 				_registersUser[rd - 8] = _system._memory.Read8(address);
@@ -2598,6 +2874,7 @@ void Cpu::TickARM(bool step) {
 		}
 		else {
 			_registers[rd] = _system._memory.Read8(address);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		_registers[rn] = address + offset;
 		break;
@@ -2611,6 +2888,7 @@ void Cpu::TickARM(bool step) {
 		if (InAPrivilegedMode()) {
 			if (rd == 15 || rd < 8 || (!InABankedUserRegistersMode() && rd < 13)) {
 				_registers[rd] = _system._memory.Read8(address);
+				if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 			}
 			else {
 				_registersUser[rd - 8] = _system._memory.Read8(address);
@@ -2618,6 +2896,7 @@ void Cpu::TickARM(bool step) {
 		}
 		else {
 			_registers[rd] = _system._memory.Read8(address);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		_registers[rn] = address + offset;
 		break;
@@ -2631,6 +2910,7 @@ void Cpu::TickARM(bool step) {
 		if (InAPrivilegedMode()) {
 			if (rd == 15 || rd < 8 || (!InABankedUserRegistersMode() && rd < 13)) {
 				_registers[rd] = _system._memory.Read8(address);
+				if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 			}
 			else {
 				_registersUser[rd - 8] = _system._memory.Read8(address);
@@ -2638,6 +2918,7 @@ void Cpu::TickARM(bool step) {
 		}
 		else {
 			_registers[rd] = _system._memory.Read8(address);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		_registers[rn] = address + offset;
 		break;
@@ -2651,6 +2932,7 @@ void Cpu::TickARM(bool step) {
 		if (InAPrivilegedMode()) {
 			if (rd == 15 || rd < 8 || (!InABankedUserRegistersMode() && rd < 13)) {
 				_registers[rd] = _system._memory.Read8(address);
+				if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 			}
 			else {
 				_registersUser[rd - 8] = _system._memory.Read8(address);
@@ -2658,6 +2940,7 @@ void Cpu::TickARM(bool step) {
 		}
 		else {
 			_registers[rd] = _system._memory.Read8(address);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		_registers[rn] = address + offset;
 		break;
@@ -2670,6 +2953,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn];
 		_registers[rd] = _system._memory.Read16(address);
 		_registers[rn] = address - _registers[rm];
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x09B: { // LDRH <Rd>, [<Rn>], +<Rm>
@@ -2679,6 +2963,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn];
 		_registers[rd] = _system._memory.Read16(address);
 		_registers[rn] = address + _registers[rm];
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x05B: { // LDRH <Rd>, [<Rn>], #-<offset_8>
@@ -2688,6 +2973,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn];
 		_registers[rd] = _system._memory.Read16(address);
 		_registers[rn] = address - offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0DB: { // LDRH <Rd>, [<Rn>], #+<offset_8>
@@ -2697,6 +2983,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn];
 		_registers[rd] = _system._memory.Read16(address);
 		_registers[rn] = address + offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x11B: { // LDRH <Rd>, [<Rn>, -<Rm>]
@@ -2705,6 +2992,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rm = instruction & 0xF;
 		uint32_t address = _registers[rn] - _registers[rm];
 		_registers[rd] = _system._memory.Read16(address);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x19B: { // LDRH <Rd>, [<Rn>, +<Rm>]
@@ -2713,6 +3001,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rm = instruction & 0xF;
 		uint32_t address = _registers[rn] + _registers[rm];
 		_registers[rd] = _system._memory.Read16(address);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x15B: { // LDRH <Rd>, [<Rn>, #-<offset_8>]
@@ -2721,6 +3010,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
 		uint32_t address = _registers[rn] - offset;
 		_registers[rd] = _system._memory.Read16(address);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1DB: { // LDRH <Rd>, [<Rn>, #+<offset_8>]
@@ -2729,6 +3019,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
 		uint32_t address = _registers[rn] + offset;
 		_registers[rd] = _system._memory.Read16(address);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x13B: { // LDRH <Rd>, [<Rn>, -<Rm>]!
@@ -2738,6 +3029,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn] - _registers[rm];
 		_registers[rd] = _system._memory.Read16(address);
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1BB: { // LDRH <Rd>, [<Rn>, +<Rm>]!
@@ -2747,6 +3039,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn] + _registers[rm];
 		_registers[rd] = _system._memory.Read16(address);
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x17B: { // LDRH <Rd>, [<Rn>, #-<offset_8>]!
@@ -2756,6 +3049,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn] - offset;
 		_registers[rd] = _system._memory.Read16(address);
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1FB: { // LDRH <Rd>, [<Rn>, #+<offset_8>]!
@@ -2765,6 +3059,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn] + offset;
 		_registers[rd] = _system._memory.Read16(address);
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	// LDRSB
@@ -2777,6 +3072,7 @@ void Cpu::TickARM(bool step) {
 		if ((value & 0x80) != 0) value |= 0xFFFFFF00;
 		_registers[rd] = value;
 		_registers[rn] = address - _registers[rm];
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x09D: { // LDRSB <Rd>, [<Rn>], +<Rm>
@@ -2788,6 +3084,7 @@ void Cpu::TickARM(bool step) {
 		if ((value & 0x80) != 0) value |= 0xFFFFFF00;
 		_registers[rd] = value;
 		_registers[rn] = address + _registers[rm];
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x05D: { // LDRSB <Rd>, [<Rn>], #-<offset_8>
@@ -2799,6 +3096,7 @@ void Cpu::TickARM(bool step) {
 		if ((value & 0x80) != 0) value |= 0xFFFFFF00;
 		_registers[rd] = value;
 		_registers[rn] = address - offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0DD: { // LDRSB <Rd>, [<Rn>], #+<offset_8>
@@ -2810,6 +3108,7 @@ void Cpu::TickARM(bool step) {
 		if ((value & 0x80) != 0) value |= 0xFFFFFF00;
 		_registers[rd] = value;
 		_registers[rn] = address + offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x11D: { // LDRSB <Rd>, [<Rn>, -<Rm>]
@@ -2820,6 +3119,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t value = _system._memory.Read8(address);
 		if ((value & 0x80) != 0) value |= 0xFFFFFF00;
 		_registers[rd] = value;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x19D: { // LDRSB <Rd>, [<Rn>, +<Rm>]
@@ -2830,6 +3130,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t value = _system._memory.Read8(address);
 		if ((value & 0x80) != 0) value |= 0xFFFFFF00;
 		_registers[rd] = value;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x15D: { // LDRSB <Rd>, [<Rn>], #-<offset_8>
@@ -2840,6 +3141,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t value = _system._memory.Read8(address);
 		if ((value & 0x80) != 0) value |= 0xFFFFFF00;
 		_registers[rd] = value;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1DD: { // LDRSB <Rd>, [<Rn>], #+<offset_8>
@@ -2850,6 +3152,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t value = _system._memory.Read8(address);
 		if ((value & 0x80) != 0) value |= 0xFFFFFF00;
 		_registers[rd] = value;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x13D: { // LDRSB <Rd>, [<Rn>, -<Rm>]
@@ -2861,6 +3164,7 @@ void Cpu::TickARM(bool step) {
 		if ((value & 0x80) != 0) value |= 0xFFFFFF00;
 		_registers[rd] = value;
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1BD: { // LDRSB <Rd>, [<Rn>, +<Rm>]
@@ -2872,6 +3176,7 @@ void Cpu::TickARM(bool step) {
 		if ((value & 0x80) != 0) value |= 0xFFFFFF00;
 		_registers[rd] = value;
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x17D: { // LDRSB <Rd>, [<Rn>, #-<offset_8>]
@@ -2883,6 +3188,7 @@ void Cpu::TickARM(bool step) {
 		if ((value & 0x80) != 0) value |= 0xFFFFFF00;
 		_registers[rd] = value;
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1FD: { // LDRSB <Rd>, [<Rn>, #+<offset_8>]
@@ -2894,6 +3200,7 @@ void Cpu::TickARM(bool step) {
 		if ((value & 0x80) != 0) value |= 0xFFFFFF00;
 		_registers[rd] = value;
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	// LDRSH
@@ -2906,6 +3213,7 @@ void Cpu::TickARM(bool step) {
 		if ((value & 0x8000) != 0) value |= 0xFFFF0000;
 		_registers[rd] = value;
 		_registers[rn] = address - _registers[rm];
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x09F: { // LDRSH <Rd>, [<Rn>], +<Rm>
@@ -2917,6 +3225,7 @@ void Cpu::TickARM(bool step) {
 		if ((value & 0x8000) != 0) value |= 0xFFFF0000;
 		_registers[rd] = value;
 		_registers[rn] = address + _registers[rm];
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x05F: { // LDRSH <Rd>, [<Rn>], #-<offset_8>
@@ -2928,6 +3237,7 @@ void Cpu::TickARM(bool step) {
 		if ((value & 0x8000) != 0) value |= 0xFFFF0000;
 		_registers[rd] = value;
 		_registers[rn] = address - offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0DF: { // LDRSH <Rd>, [<Rn>], #+<offset_8>
@@ -2939,6 +3249,7 @@ void Cpu::TickARM(bool step) {
 		if ((value & 0x8000) != 0) value |= 0xFFFF0000;
 		_registers[rd] = value;
 		_registers[rn] = address + offset;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x11F: { // LDRSH <Rd>, [<Rn>, -<Rm>]
@@ -2949,6 +3260,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t value = _system._memory.Read16(address);
 		if ((value & 0x8000) != 0) value |= 0xFFFF0000;
 		_registers[rd] = value;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x19F: { // LDRSH <Rd>, [<Rn>, +<Rm>]
@@ -2959,6 +3271,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t value = _system._memory.Read16(address);
 		if ((value & 0x8000) != 0) value |= 0xFFFF0000;
 		_registers[rd] = value;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x15F: { // LDRSH <Rd>, [<Rn>], #-<offset_8>
@@ -2969,6 +3282,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t value = _system._memory.Read16(address);
 		if ((value & 0x8000) != 0) value |= 0xFFFF0000;
 		_registers[rd] = value;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1DF: { // LDRSH <Rd>, [<Rn>], #+<offset_8>
@@ -2979,6 +3293,7 @@ void Cpu::TickARM(bool step) {
 		uint32_t value = _system._memory.Read16(address);
 		if ((value & 0x8000) != 0) value |= 0xFFFF0000;
 		_registers[rd] = value;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x13F: { // LDRSH <Rd>, [<Rn>, -<Rm>]
@@ -2990,6 +3305,7 @@ void Cpu::TickARM(bool step) {
 		if ((value & 0x8000) != 0) value |= 0xFFFF0000;
 		_registers[rd] = value;
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1BF: { // LDRSH <Rd>, [<Rn>, +<Rm>]
@@ -3001,6 +3317,7 @@ void Cpu::TickARM(bool step) {
 		if ((value & 0x8000) != 0) value |= 0xFFFF0000;
 		_registers[rd] = value;
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x17F: { // LDRSH <Rd>, [<Rn>, #-<offset_8>]
@@ -3012,6 +3329,7 @@ void Cpu::TickARM(bool step) {
 		if ((value & 0x8000) != 0) value |= 0xFFFF0000;
 		_registers[rd] = value;
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1FF: { // LDRSH <Rd>, [<Rn>, #+<offset_8>]
@@ -3023,6 +3341,7 @@ void Cpu::TickARM(bool step) {
 		if ((value & 0x8000) != 0) value |= 0xFFFF0000;
 		_registers[rd] = value;
 		_registers[rn] = address;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	// LDRT
@@ -3034,6 +3353,7 @@ void Cpu::TickARM(bool step) {
 		if (InAPrivilegedMode()) {
 			if (rd == 15 || rd < 8 || (!InABankedUserRegistersMode() && rd < 13)) {
 				_registers[rd] = _system._memory.Read32(address);
+				if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 			}
 			else {
 				_registersUser[rd - 8] = _system._memory.Read32(address);
@@ -3041,6 +3361,7 @@ void Cpu::TickARM(bool step) {
 		}
 		else {
 			_registers[rd] = _system._memory.Read32(address);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		_registers[rn] = address - offset;
 		break;
@@ -3053,6 +3374,7 @@ void Cpu::TickARM(bool step) {
 		if (InAPrivilegedMode()) {
 			if (rd == 15 || rd < 8 || (!InABankedUserRegistersMode() && rd < 13)) {
 				_registers[rd] = _system._memory.Read32(address);
+				if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 			}
 			else {
 				_registersUser[rd - 8] = _system._memory.Read32(address);
@@ -3060,6 +3382,7 @@ void Cpu::TickARM(bool step) {
 		}
 		else {
 			_registers[rd] = _system._memory.Read32(address);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		_registers[rn] = address + offset;
 		break;
@@ -3073,6 +3396,7 @@ void Cpu::TickARM(bool step) {
 		if (InAPrivilegedMode()) {
 			if (rd == 15 || rd < 8 || (!InABankedUserRegistersMode() && rd < 13)) {
 				_registers[rd] = _system._memory.Read32(address);
+				if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 			}
 			else {
 				_registersUser[rd - 8] = _system._memory.Read32(address);
@@ -3080,6 +3404,7 @@ void Cpu::TickARM(bool step) {
 		}
 		else {
 			_registers[rd] = _system._memory.Read32(address);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		_registers[rn] = address - offset;
 		break;
@@ -3093,6 +3418,7 @@ void Cpu::TickARM(bool step) {
 		if (InAPrivilegedMode()) {
 			if (rd == 15 || rd < 8 || (!InABankedUserRegistersMode() && rd < 13)) {
 				_registers[rd] = _system._memory.Read32(address);
+				if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 			}
 			else {
 				_registersUser[rd - 8] = _system._memory.Read32(address);
@@ -3100,6 +3426,7 @@ void Cpu::TickARM(bool step) {
 		}
 		else {
 			_registers[rd] = _system._memory.Read32(address);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		_registers[rn] = address - offset;
 		break;
@@ -3113,6 +3440,7 @@ void Cpu::TickARM(bool step) {
 		if (InAPrivilegedMode()) {
 			if (rd == 15 || rd < 8 || (!InABankedUserRegistersMode() && rd < 13)) {
 				_registers[rd] = _system._memory.Read32(address);
+				if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 			}
 			else {
 				_registersUser[rd - 8] = _system._memory.Read32(address);
@@ -3120,6 +3448,7 @@ void Cpu::TickARM(bool step) {
 		}
 		else {
 			_registers[rd] = _system._memory.Read32(address);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		_registers[rn] = address - offset;
 		break;
@@ -3133,6 +3462,7 @@ void Cpu::TickARM(bool step) {
 		if (InAPrivilegedMode()) {
 			if (rd == 15 || rd < 8 || (!InABankedUserRegistersMode() && rd < 13)) {
 				_registers[rd] = _system._memory.Read32(address);
+				if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 			}
 			else {
 				_registersUser[rd - 8] = _system._memory.Read32(address);
@@ -3140,6 +3470,7 @@ void Cpu::TickARM(bool step) {
 		}
 		else {
 			_registers[rd] = _system._memory.Read32(address);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		_registers[rn] = address - offset;
 		break;
@@ -3153,6 +3484,7 @@ void Cpu::TickARM(bool step) {
 		if (InAPrivilegedMode()) {
 			if (rd == 15 || rd < 8 || (!InABankedUserRegistersMode() && rd < 13)) {
 				_registers[rd] = _system._memory.Read32(address);
+				if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 			}
 			else {
 				_registersUser[rd - 8] = _system._memory.Read32(address);
@@ -3160,6 +3492,7 @@ void Cpu::TickARM(bool step) {
 		}
 		else {
 			_registers[rd] = _system._memory.Read32(address);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		_registers[rn] = address + offset;
 		break;
@@ -3173,6 +3506,7 @@ void Cpu::TickARM(bool step) {
 		if (InAPrivilegedMode()) {
 			if (rd == 15 || rd < 8 || (!InABankedUserRegistersMode() && rd < 13)) {
 				_registers[rd] = _system._memory.Read32(address);
+				if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 			}
 			else {
 				_registersUser[rd - 8] = _system._memory.Read32(address);
@@ -3180,6 +3514,7 @@ void Cpu::TickARM(bool step) {
 		}
 		else {
 			_registers[rd] = _system._memory.Read32(address);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		_registers[rn] = address + offset;
 		break;
@@ -3193,6 +3528,7 @@ void Cpu::TickARM(bool step) {
 		if (InAPrivilegedMode()) {
 			if (rd == 15 || rd < 8 || (!InABankedUserRegistersMode() && rd < 13)) {
 				_registers[rd] = _system._memory.Read32(address);
+				if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 			}
 			else {
 				_registersUser[rd - 8] = _system._memory.Read32(address);
@@ -3200,6 +3536,7 @@ void Cpu::TickARM(bool step) {
 		}
 		else {
 			_registers[rd] = _system._memory.Read32(address);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		_registers[rn] = address + offset;
 		break;
@@ -3213,6 +3550,7 @@ void Cpu::TickARM(bool step) {
 		if (InAPrivilegedMode()) {
 			if (rd == 15 || rd < 8 || (!InABankedUserRegistersMode() && rd < 13)) {
 				_registers[rd] = _system._memory.Read32(address);
+				if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 			}
 			else {
 				_registersUser[rd - 8] = _system._memory.Read32(address);
@@ -3220,6 +3558,7 @@ void Cpu::TickARM(bool step) {
 		}
 		else {
 			_registers[rd] = _system._memory.Read32(address);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		_registers[rn] = address + offset;
 		break;
@@ -3231,6 +3570,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rs = (instruction >> 8) & 0xF;
 		uint8_t rm = (instruction >> 0) & 0xF;
 		MLA(_registers[rn], _registers[rs], _registers[rm], _registers[rd], _hostFlags);
+		if (rd == REGPC || rm == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x039: { // MLAS <Rd>, <Rm>, <Rs>, <Rn>
@@ -3239,6 +3579,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rs = (instruction >> 8) & 0xF;
 		uint8_t rm = (instruction >> 0) & 0xF;
 		MLA_FLAGS(_registers[rn], _registers[rs], _registers[rm], _registers[rd], _hostFlags);
+		if (rd == REGPC || rm == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	// MOV
@@ -3247,12 +3588,14 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSL(instruction);
 		_registers[rd] = operand;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1A1: { // MOV <Rd>, <Rm>, LSL <Rs>
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSLReg(instruction);
 		_registers[rd] = operand;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1A2:
@@ -3260,12 +3603,14 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSR(instruction);
 		_registers[rd] = operand;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1A3: { // MOV <Rd>, <Rm>, LSR <Rs>
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSRReg(instruction);
 		_registers[rd] = operand;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1A4:
@@ -3273,12 +3618,14 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandASR(instruction);
 		_registers[rd] = operand;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1A5: { // MOV <Rd>, <Rm>, ASR <Rs>
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandASRReg(instruction);
 		_registers[rd] = operand;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1A6: // MOV <Rd>, <Rm>, RRX #<imm>
@@ -3286,12 +3633,14 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandROR(instruction);
 		_registers[rd] = operand;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1A7: { // MOV <Rd>, <Rm>, ROR <Rs>
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandRORReg(instruction);
 		_registers[rd] = operand;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1B0:
@@ -3301,11 +3650,14 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSL(instruction);
 			_registers[rd] = operand;
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSLFlags(instruction);
 			MOV_FLAGS(operand, _hostFlags);
 			_registers[rd] = operand;
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3315,11 +3667,14 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSLReg(instruction);
 			_registers[rd] = operand;
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSLRegFlags(instruction);
 			MOV_FLAGS(operand, _hostFlags);
 			_registers[rd] = operand;
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3330,11 +3685,14 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSR(instruction);
 			_registers[rd] = operand;
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSRFlags(instruction);
 			MOV_FLAGS(operand, _hostFlags);
 			_registers[rd] = operand;
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3344,11 +3702,14 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSRReg(instruction);
 			_registers[rd] = operand;
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSRRegFlags(instruction);
 			MOV_FLAGS(operand, _hostFlags);
 			_registers[rd] = operand;
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3359,11 +3720,14 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandASR(instruction);
 			_registers[rd] = operand;
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandASRFlags(instruction);
 			MOV_FLAGS(operand, _hostFlags);
 			_registers[rd] = operand;
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3373,11 +3737,14 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandASRReg(instruction);
 			_registers[rd] = operand;
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandASRRegFlags(instruction);
 			MOV_FLAGS(operand, _hostFlags);
 			_registers[rd] = operand;
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3388,11 +3755,14 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandROR(instruction);
 			_registers[rd] = operand;
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandRORFlags(instruction);
 			MOV_FLAGS(operand, _hostFlags);
 			_registers[rd] = operand;
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3402,11 +3772,14 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandRORReg(instruction);
 			_registers[rd] = operand;
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandRORRegFlags(instruction);
 			MOV_FLAGS(operand, _hostFlags);
 			_registers[rd] = operand;
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3414,6 +3787,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandImm(instruction);
 		_registers[rd] = operand;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	CASE_RANGE16(0x3B0) { // MOVS <Rd>, #<immediate>
@@ -3422,11 +3796,14 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandImm(instruction);
 			_registers[rd] = operand;
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandImmFlags(instruction);
 			MOV_FLAGS(operand, _hostFlags);
 			_registers[rd] = operand;
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3540,6 +3917,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rs = (instruction >> 8) & 0xF;
 		uint8_t rd = (instruction >> 16) & 0xF;
 		_registers[rd] = _registers[rm] * _registers[rs];
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x019: { // MULS <Rd>, <Rm>, <Rs>
@@ -3547,6 +3925,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rs = (instruction >> 8) & 0xF;
 		uint8_t rd = (instruction >> 16) & 0xF;
 		MUL_FLAGS(_registers[rm], _registers[rs], _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	// MVN
@@ -3555,12 +3934,14 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSL(instruction);
 		_registers[rd] = ~operand;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1E1: { // MVN <Rd>, <Rm>, LSL <Rs>
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSLReg(instruction);
 		_registers[rd] = ~operand;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1E2:
@@ -3568,12 +3949,14 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSR(instruction);
 		_registers[rd] = ~operand;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1E3: { // MVN <Rd>, <Rm>, LSR <Rs>
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSRReg(instruction);
 		_registers[rd] = ~operand;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1E4:
@@ -3581,12 +3964,14 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandASR(instruction);
 		_registers[rd] = ~operand;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1E5: { // MVN <Rd>, <Rm>, ASR <Rs>
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandASRReg(instruction);
 		_registers[rd] = ~operand;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1E6: // MVN <Rd>, <Rm>, RRX #<imm>
@@ -3594,12 +3979,14 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandROR(instruction);
 		_registers[rd] = ~operand;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1E7: { // MVN <Rd>, <Rm>, ROR <Rs>
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandRORReg(instruction);
 		_registers[rd] = ~operand;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x1F0:
@@ -3609,11 +3996,14 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSL(instruction);
 			_registers[rd] = ~operand;
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSLFlags(instruction);
 			MVN_FLAGS(operand, _hostFlags);
 			_registers[rd] = ~operand;
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3623,11 +4013,14 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSLReg(instruction);
 			_registers[rd] = ~operand;
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSLRegFlags(instruction);
 			MVN_FLAGS(operand, _hostFlags);
 			_registers[rd] = ~operand;
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3638,11 +4031,14 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSR(instruction);
 			_registers[rd] = ~operand;
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSRFlags(instruction);
 			MVN_FLAGS(operand, _hostFlags);
 			_registers[rd] = ~operand;
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3652,6 +4048,8 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSRReg(instruction);
 			_registers[rd] = ~operand;
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSRRegFlags(instruction);
@@ -3667,11 +4065,14 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandASR(instruction);
 			_registers[rd] = ~operand;
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandASRFlags(instruction);
 			MVN_FLAGS(operand, _hostFlags);
 			_registers[rd] = ~operand;
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3681,11 +4082,14 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandASRReg(instruction);
 			_registers[rd] = ~operand;
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandASRRegFlags(instruction);
 			MVN_FLAGS(operand, _hostFlags);
 			_registers[rd] = ~operand;
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3696,11 +4100,14 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandROR(instruction);
 			_registers[rd] = ~operand;
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandRORFlags(instruction);
 			MVN_FLAGS(operand, _hostFlags);
 			_registers[rd] = ~operand;
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3710,11 +4117,14 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandRORReg(instruction);
 			_registers[rd] = ~operand;
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandRORRegFlags(instruction);
 			MVN_FLAGS(operand, _hostFlags);
 			_registers[rd] = ~operand;
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3722,6 +4132,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandImm(instruction);
 		_registers[rd] = ~operand;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	CASE_RANGE16(0x3F0) { // MVNS <Rd>, #<immediate>
@@ -3730,11 +4141,14 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandImm(instruction);
 			_registers[rd] = ~operand;
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandImmFlags(instruction);
 			MVN_FLAGS(operand, _hostFlags);
 			_registers[rd] = ~operand;
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3745,6 +4159,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSL(instruction);
 		ORR(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x181: { // ORR <Rd>, <Rn>, <Rm>, LSL <Rs>
@@ -3752,6 +4167,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSLReg(instruction);
 		ORR(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x182:
@@ -3760,6 +4176,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSR(instruction);
 		ORR(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x183: { // ORR <Rd>, <Rn>, <Rm>, LSR <Rs>
@@ -3767,6 +4184,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSRReg(instruction);
 		ORR(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x184:
@@ -3775,6 +4193,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandASR(instruction);
 		ORR(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x185: { // ORR <Rd>, <Rn>, <Rm>, ASR <Rs>
@@ -3782,6 +4201,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandASRReg(instruction);
 		ORR(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x186: // ORR <Rd>, <Rn>, <Rm>, RRX #<imm>
@@ -3790,6 +4210,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandROR(instruction);
 		ORR(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x187: { // ORR <Rd>, <Rn>, <Rm>, ROR <Rs>
@@ -3797,6 +4218,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandRORReg(instruction);
 		ORR(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x190:
@@ -3807,10 +4229,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSL(instruction);
 			ORR(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSLFlags(instruction);
 			ORR_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3821,10 +4246,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSLReg(instruction);
 			ORR(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSLRegFlags(instruction);
 			ORR_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3836,10 +4264,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSR(instruction);
 			ORR(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSRFlags(instruction);
 			ORR_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3850,10 +4281,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSRReg(instruction);
 			ORR(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSRRegFlags(instruction);
 			ORR_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3865,10 +4299,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandASR(instruction);
 			ORR(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandASRFlags(instruction);
 			ORR_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3879,10 +4316,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandASRReg(instruction);
 			ORR(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandASRRegFlags(instruction);
 			ORR_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3894,10 +4334,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandROR(instruction);
 			ORR(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandRORFlags(instruction);
 			ORR_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3908,10 +4351,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandRORReg(instruction);
 			ORR(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandRORRegFlags(instruction);
 			ORR_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3920,6 +4366,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandImm(instruction);
 		ORR(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	CASE_RANGE16(0x390) { // ORRS <Rd>, <Rn>, #<immediate>
@@ -3929,10 +4376,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandImm(instruction);
 			ORR(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandImmFlags(instruction);
 			ORR_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -3943,6 +4393,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSL(instruction);
 		SUB(operand, _registers[rn], _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x061: { // RSB <Rd>, <Rn>, <Rm>, LSL <Rs>
@@ -3950,6 +4401,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSLReg(instruction);
 		SUB(operand, _registers[rn], _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x062:
@@ -3958,6 +4410,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSR(instruction);
 		SUB(operand, _registers[rn], _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x063: { // RSB <Rd>, <Rn>, <Rm>, LSR <Rs>
@@ -3965,6 +4418,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSRReg(instruction);
 		SUB(operand, _registers[rn], _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x064:
@@ -3973,6 +4427,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandASR(instruction);
 		SUB(operand, _registers[rn], _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x065: { // RSB <Rd>, <Rn>, <Rm>, ASR <Rs>
@@ -3980,6 +4435,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandASRReg(instruction);
 		SUB(operand, _registers[rn], _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x066: // RSB <Rd>, <Rn>, <Rm>, RRX #<imm>
@@ -3988,6 +4444,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandROR(instruction);
 		SUB(operand, _registers[rn], _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x067: { // RSB <Rd>, <Rn>, <Rm>, ROR <Rs>
@@ -3995,6 +4452,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandRORReg(instruction);
 		SUB(operand, _registers[rn], _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x070:
@@ -4005,10 +4463,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSL(instruction);
 			SUB(operand, _registers[rn], _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSLFlags(instruction);
 			SUB_FLAGS(operand, _registers[rn], _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4019,10 +4480,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSLReg(instruction);
 			SUB(operand, _registers[rn], _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSLRegFlags(instruction);
 			SUB_FLAGS(operand, _registers[rn], _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4034,10 +4498,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSR(instruction);
 			SUB(operand, _registers[rn], _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSRFlags(instruction);
 			SUB_FLAGS(operand, _registers[rn], _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4048,10 +4515,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSRReg(instruction);
 			SUB(operand, _registers[rn], _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSRRegFlags(instruction);
 			SUB_FLAGS(operand, _registers[rn], _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4063,10 +4533,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandASR(instruction);
 			SUB(operand, _registers[rn], _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandASRFlags(instruction);
 			SUB_FLAGS(operand, _registers[rn], _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4077,10 +4550,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandASRReg(instruction);
 			SUB(operand, _registers[rn], _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandASRRegFlags(instruction);
 			SUB_FLAGS(operand, _registers[rn], _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4092,10 +4568,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandROR(instruction);
 			SUB(operand, _registers[rn], _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandRORFlags(instruction);
 			SUB_FLAGS(operand, _registers[rn], _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4106,10 +4585,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandRORReg(instruction);
 			SUB(operand, _registers[rn], _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandRORRegFlags(instruction);
 			SUB_FLAGS(operand, _registers[rn], _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4118,6 +4600,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandImm(instruction);
 		SUB(operand, _registers[rn], _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	CASE_RANGE16(0x270) { // RSBS <Rd>, <Rn>, #<immediate>
@@ -4127,10 +4610,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandImm(instruction);
 			SUB(operand, _registers[rn], _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandImmFlags(instruction);
 			SUB_FLAGS(operand, _registers[rn], _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4141,6 +4627,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSL(instruction);
 		SBC(operand, _registers[rn], _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0E1: { // RSC <Rd>, <Rn>, <Rm>, LSL <Rs>
@@ -4148,6 +4635,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSLReg(instruction);
 		SBC(operand, _registers[rn], _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0E2:
@@ -4156,6 +4644,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSR(instruction);
 		SBC(operand, _registers[rn], _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0E3: { // RSC <Rd>, <Rn>, <Rm>, LSR <Rs>
@@ -4163,6 +4652,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSRReg(instruction);
 		SBC(operand, _registers[rn], _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0E4:
@@ -4171,6 +4661,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandASR(instruction);
 		SBC(operand, _registers[rn], _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0E5: { // RSC <Rd>, <Rn>, <Rm>, ASR <Rs>
@@ -4178,6 +4669,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandASRReg(instruction);
 		SBC(operand, _registers[rn], _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0E6: // RSC <Rd>, <Rn>, <Rm>, RRX #<imm>
@@ -4186,6 +4678,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandROR(instruction);
 		SBC(operand, _registers[rn], _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0E7: { // RSC <Rd>, <Rn>, <Rm>, ROR <Rs>
@@ -4193,6 +4686,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandRORReg(instruction);
 		SBC(operand, _registers[rn], _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0F0:
@@ -4203,10 +4697,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSL(instruction);
 			SBC(operand, _registers[rn], _registers[rd], _hostFlags);;
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSLFlags(instruction);
 			SBC_FLAGS(operand, _registers[rn], _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4217,10 +4714,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSLReg(instruction);
 			SBC(operand, _registers[rn], _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSLRegFlags(instruction);
 			SBC_FLAGS(operand, _registers[rn], _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4232,10 +4732,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSR(instruction);
 			SBC(operand, _registers[rn], _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSRFlags(instruction);
 			SBC_FLAGS(operand, _registers[rn], _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4246,10 +4749,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSRReg(instruction);
 			SBC(operand, _registers[rn], _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSRRegFlags(instruction);
 			SBC_FLAGS(operand, _registers[rn], _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4261,10 +4767,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandASR(instruction);
 			SBC(operand, _registers[rn], _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandASRFlags(instruction);
 			SBC_FLAGS(operand, _registers[rn], _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4275,10 +4784,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandASRReg(instruction);
 			SBC(operand, _registers[rn], _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandASRRegFlags(instruction);
 			SBC_FLAGS(operand, _registers[rn], _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4290,10 +4802,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandROR(instruction);
 			SBC(operand, _registers[rn], _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandRORFlags(instruction);
 			SBC_FLAGS(operand, _registers[rn], _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4304,10 +4819,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandRORReg(instruction);
 			SBC(operand, _registers[rn], _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandRORRegFlags(instruction);
 			SBC_FLAGS(operand, _registers[rn], _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4316,6 +4834,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandImm(instruction);
 		SBC(operand, _registers[rn], _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	CASE_RANGE16(0x2F0) { // RSCS <Rd>, <Rn>, #<immediate>
@@ -4325,10 +4844,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandImm(instruction);
 			SBC(operand, _registers[rn], _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandImmFlags(instruction);
 			SBC_FLAGS(operand, _registers[rn], _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4339,6 +4861,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSL(instruction);
 		SBC(_registers[rn], operand, _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0C1: { // SBC <Rd>, <Rn>, <Rm>, LSL <Rs>
@@ -4346,6 +4869,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSLReg(instruction);
 		SBC(_registers[rn], operand, _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0C2:
@@ -4354,6 +4878,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSR(instruction);
 		SBC(_registers[rn], operand, _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0C3: { // SBC <Rd>, <Rn>, <Rm>, LSR <Rs>
@@ -4361,6 +4886,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSRReg(instruction);
 		SBC(_registers[rn], operand, _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0C4:
@@ -4369,6 +4895,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandASR(instruction);
 		SBC(_registers[rn], operand, _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0C5: { // SBC <Rd>, <Rn>, <Rm>, ASR <Rs>
@@ -4376,6 +4903,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandASRReg(instruction);
 		SBC(_registers[rn], operand, _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0C6: // SBC <Rd>, <Rn>, <Rm>, RRX #<imm>
@@ -4384,6 +4912,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandROR(instruction);
 		SBC(_registers[rn], operand, _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0C7: { // SBC <Rd>, <Rn>, <Rm>, ROR <Rs>
@@ -4391,6 +4920,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandRORReg(instruction);
 		SBC(_registers[rn], operand, _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0D0:
@@ -4401,10 +4931,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSL(instruction);
 			SBC(_registers[rn], operand, _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSLFlags(instruction);
 			SBC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4415,10 +4948,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSLReg(instruction);
 			SBC(_registers[rn], operand, _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSLRegFlags(instruction);
 			SBC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4430,10 +4966,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSR(instruction);
 			SBC(_registers[rn], operand, _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSRFlags(instruction);
 			SBC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4444,10 +4983,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSRReg(instruction);
 			SBC(_registers[rn], operand, _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSRRegFlags(instruction);
 			SBC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4459,10 +5001,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandASR(instruction);
 			SBC(_registers[rn], operand, _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandASRFlags(instruction);
 			SBC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4473,10 +5018,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandASRReg(instruction);
 			SBC(_registers[rn], operand, _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandASRRegFlags(instruction);
 			SBC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4488,10 +5036,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandROR(instruction);
 			SBC(_registers[rn], operand, _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandRORFlags(instruction);
 			SBC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4502,10 +5053,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandRORReg(instruction);
 			SBC(_registers[rn], operand, _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandRORRegFlags(instruction);
 			SBC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4514,6 +5068,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandImm(instruction);
 		SBC(_registers[rn], operand, _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	CASE_RANGE16(0x2D0) { // SBCS <Rd>, <Rn>, #<immediate>
@@ -4523,10 +5078,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandImm(instruction);
 			SBC(_registers[rn], operand, _registers[rd], _hostFlags);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandImmFlags(instruction);
 			SBC_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -4537,6 +5095,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rs = (instruction >> 8) & 0xF;
 		uint8_t rm = (instruction >> 8) & 0xF;
 		SMLAL(_registers[rm], _registers[rs], _registers[rdLo], _registers[rdHi]);
+		if (rdLo == REGPC || rdHi == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0F9: { // SMLALS <RdLo>, <RdHi>, <Rm>, <Rs>
@@ -4545,6 +5104,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rs = (instruction >> 8) & 0xF;
 		uint8_t rm = (instruction >> 8) & 0xF;
 		SMLAL_FLAGS(_registers[rm], _registers[rs], _registers[rdLo], _registers[rdHi], _hostFlags);
+		if (rdLo == REGPC || rdHi == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	// SMULL
@@ -4554,6 +5114,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rs = (instruction >> 8) & 0xF;
 		uint8_t rm = (instruction >> 8) & 0xF;
 		SMULL(_registers[rm], _registers[rs], _registers[rdLo], _registers[rdHi]);
+		if (rdLo == REGPC || rdHi == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0D9: { // SMULLS <RdLo>, <RdHi>, <Rm>, <Rs>
@@ -4562,6 +5123,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rs = (instruction >> 8) & 0xF;
 		uint8_t rm = (instruction >> 8) & 0xF;
 		SMULL_FLAGS(_registers[rm], _registers[rs], _registers[rdLo], _registers[rdHi], _hostFlags);
+		if (rdLo == REGPC || rdHi == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	// STM
@@ -4633,11 +5195,11 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn];
 		for (int i = 15; i >= 0; i--) {
 			if ((registerList & (1 << i)) != 0) {
-				_system._memory.Write32(address, _registers[i]);
 				address -= 4;
+				_system._memory.Write32(address, _registers[i]);
 			}
 		}
-		_registers[rn] = address + 4;
+		_registers[rn] = address;
 		break;
 	}
 	CASE_RANGE16(0x980) { // STMIB <Rn>, <registers>
@@ -4646,8 +5208,8 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn];
 		for (int i = 0; i >= 15; i++) {
 			if ((registerList & (1 << i)) != 0) {
-				_system._memory.Write32(address, _registers[i]);
 				address += 4;
+				_system._memory.Write32(address, _registers[i]);
 			}
 		}
 		break;
@@ -4658,11 +5220,11 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn];
 		for (int i = 0; i <= 15; i++) {
 			if ((registerList & (1 << i)) != 0) {
-				_system._memory.Write32(address, _registers[i]);
 				address += 4;
+				_system._memory.Write32(address, _registers[i]);
 			}
 		}
-		_registers[rn] = address - 4;
+		_registers[rn] = address;
 		break;
 	}
 	CASE_RANGE16(0x840) { // STMDA <Rn>, <registers>^
@@ -5430,7 +5992,7 @@ void Cpu::TickARM(bool step) {
 		break;
 	}
 	case 0x6C6:
-	case 0x6CE: { // LDRB <Rd>, [<Rn>], +<Rm>, ROR #<shift_imm>
+	case 0x6CE: { // STRB <Rd>, [<Rn>], +<Rm>, ROR #<shift_imm>
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t address = _registers[rn];
@@ -6101,6 +6663,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSL(instruction);
 		SUB(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x041: { // SUB <Rd>, <Rn>, <Rm>, LSL <Rs>
@@ -6108,6 +6671,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSLReg(instruction);
 		SUB(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x042:
@@ -6116,6 +6680,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSR(instruction);
 		SUB(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x043: { // SUB <Rd>, <Rn>, <Rm>, LSR <Rs>
@@ -6123,6 +6688,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandLSRReg(instruction);
 		SUB(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x044:
@@ -6131,6 +6697,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandASR(instruction);
 		SUB(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x045: { // SUB <Rd>, <Rn>, <Rm>, ASR <Rs>
@@ -6138,6 +6705,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandASRReg(instruction);
 		SUB(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x046: // SUB <Rd>, <Rn>, <Rm>, RRX #<imm>
@@ -6146,6 +6714,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandROR(instruction);
 		SUB(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x047: { // SUB <Rd>, <Rn>, <Rm>, ROR <Rs>
@@ -6153,6 +6722,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandRORReg(instruction);
 		SUB(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x050:
@@ -6163,10 +6733,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSL(instruction);
 			SUB(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSLFlags(instruction);
 			SUB_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -6177,10 +6750,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSLReg(instruction);
 			SUB(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSLRegFlags(instruction);
 			SUB_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -6192,10 +6768,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSR(instruction);
 			SUB(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSRFlags(instruction);
 			SUB_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -6206,10 +6785,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandLSRReg(instruction);
 			SUB(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandLSRRegFlags(instruction);
 			SUB_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -6221,10 +6803,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandASR(instruction);
 			SUB(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandASRFlags(instruction);
 			SUB_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -6235,10 +6820,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandASRReg(instruction);
 			SUB(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandASRRegFlags(instruction);
 			SUB_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -6250,10 +6838,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandROR(instruction);
 			SUB(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandRORFlags(instruction);
 			SUB_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -6264,10 +6855,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandRORReg(instruction);
 			SUB(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandRORRegFlags(instruction);
 			SUB_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -6276,6 +6870,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rd = (instruction >> 12) & 0xF;
 		uint32_t operand = GetShifterOperandImm(instruction);
 		SUB(_registers[rn], operand, _registers[rd]);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	CASE_RANGE16(0x250) { // SUBS <Rd>, <Rn>, #<immediate>
@@ -6285,10 +6880,13 @@ void Cpu::TickARM(bool step) {
 			uint32_t operand = GetShifterOperandImm(instruction);
 			SUB(_registers[rn], operand, _registers[rd]);
 			_cpsr = _spsr;
+			UpdateMode();
+			_pipelineInstruction = ARM_NOP;
 		}
 		else {
 			uint32_t operand = GetShifterOperandImmFlags(instruction);
 			SUB_FLAGS(_registers[rn], operand, _registers[rd], _hostFlags);
+			if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
@@ -6308,6 +6906,7 @@ void Cpu::TickARM(bool step) {
 		ROR(temp, (address & 0x3) * 8, temp);
 		_system._memory.Write32(address, _registers[rm]);
 		_registers[rd] = temp;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	// SWPB
@@ -6319,6 +6918,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t temp = _system._memory.Read8(address);
 		_system._memory.Write8(address, _registers[rm]);
 		_registers[rd] = temp;
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	// TEQ
@@ -6446,6 +7046,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rs = (instruction >> 8) & 0xF;
 		uint8_t rm = (instruction >> 8) & 0xF;
 		UMLAL(_registers[rm], _registers[rs], _registers[rdLo], _registers[rdHi]);
+		if (rdLo == REGPC || rdHi == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x0B9: { // UMLALS <RdLo>, <RdHi>, <Rm>, <Rs>
@@ -6454,6 +7055,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rs = (instruction >> 8) & 0xF;
 		uint8_t rm = (instruction >> 8) & 0xF;
 		UMLAL_FLAGS(_registers[rm], _registers[rs], _registers[rdLo], _registers[rdHi], _hostFlags);
+		if (rdLo == REGPC || rdHi == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	// UMULL
@@ -6463,6 +7065,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rs = (instruction >> 8) & 0xF;
 		uint8_t rm = (instruction >> 8) & 0xF;
 		UMULL(_registers[rm], _registers[rs], _registers[rdLo], _registers[rdHi]);
+		if (rdLo == REGPC || rdHi == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x099: { // UMULLS <RdLo>, <RdHi>, <Rm>, <Rs>
@@ -6471,6 +7074,7 @@ void Cpu::TickARM(bool step) {
 		uint8_t rs = (instruction >> 8) & 0xF;
 		uint8_t rm = (instruction >> 8) & 0xF;
 		UMULL_FLAGS(_registers[rm], _registers[rs], _registers[rdLo], _registers[rdHi], _hostFlags);
+		if (rdLo == REGPC || rdHi == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	default: {

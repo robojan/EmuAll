@@ -12,7 +12,7 @@
 
 
 Memory::Memory(Gba &gba) :
-	_system(gba), _bios(nullptr), _wram(nullptr), _chipWram(nullptr), _ioRegisters(nullptr), 
+	_system(gba), _events(), _bios(nullptr), _wram(nullptr), _chipWram(nullptr), _ioRegisters(nullptr), 
 	_pram(nullptr), _vram(nullptr), _oram(nullptr), _sram(nullptr), 
 	_sramLength(0), _rom(nullptr), _romLength(0)
 {
@@ -135,45 +135,27 @@ int Memory::Load(const SaveData_t *data)
 		_romLength = 0x2000000;
 	}
 	if (_romLength > 0) {
-		_rom = new uint8_t[_romLength];
+		uint32_t romMemSize = _romLength > 0x1000000 ? 0x2000000 : 0x1000000;
+		_rom = new uint8_t[romMemSize];
 		memcpy(_rom, data->romData, _romLength);
+		// Fill unused space
+		for (uint32_t address = _romLength; address < romMemSize; address += 2) {
+			*(uint16_t *)(_rom + address) = (address & 0x1FFFE) >> 1;
+		}
+
 		_memmap[0x8] = _rom;
 		_memmap[0xA] = _rom;
 		_memmap[0xC] = _rom;
-		if (_romLength >= 0x1000000) {
-			_memMask[0x8] = 0xFFFFFF;
-			_memMask[0xA] = 0xFFFFFF;
-			_memMask[0xC] = 0xFFFFFF;
-		}
-		else {
-			if(!isPowerOf2(_romLength)) {
-				Log(Error, "Rom length is not a power of 2");
-				return 0;
-			}
-			uint32_t romMask = _romLength - 1;
-			_memMask[0x8] = romMask;
-			_memMask[0xA] = romMask;
-			_memMask[0xC] = romMask;
-		}
-	}
-	if (_romLength > 0x1000000) {
-		_memmap[0x9] = _rom + 0x1000000;
-		_memmap[0xB] = _rom + 0x1000000;
-		_memmap[0xD] = _rom + 0x1000000;
-		if (_romLength == 0x2000000) {
-			_memMask[0x9] = 0xFFFFFF;
-			_memMask[0xB] = 0xFFFFFF;
-			_memMask[0xD] = 0xFFFFFF;
-		}
-		else {
-			if (!isPowerOf2(_romLength-0x1000000)) {
-				Log(Error, "Rom length is not a power of 2");
-				return 0;
-			}
-			uint32_t romMask = _romLength - 1;
-			_memMask[0x9] = romMask;
-			_memMask[0xB] = romMask;
-			_memMask[0xD] = romMask;
+		_memMask[0x8] = 0xFFFFFF;
+		_memMask[0xA] = 0xFFFFFF;
+		_memMask[0xC] = 0xFFFFFF;
+		_memMask[0x9] = 0xFFFFFF;
+		_memMask[0xB] = 0xFFFFFF;
+		_memMask[0xD] = 0xFFFFFF;
+		if (_romLength > 0x1000000) {
+			_memmap[0x9] = _rom + 0x1000000;
+			_memmap[0xB] = _rom + 0x1000000;
+			_memmap[0xD] = _rom + 0x1000000;
 		}
 	}
 
@@ -205,9 +187,23 @@ uint8_t Memory::Read8(uint32_t address)
 	uint8_t index = (address >> 24) & 0xF;
 	address &= _memMask[index];
 	if (_memmap[index] == nullptr) {
-		throw DataAbortARMException();
-	}
-	if (index == 6 && address > 0x17FFF) {
+		// Comment from gbxemu source
+		// reads beyond the ROM data seem to be filled with:
+		// 0xx00000: 0000 0001 0002 .. FFFF: 0xx1FFFE
+		// 0xx20000: 0000 0001 0002 .. FFFF: 0xx3FFFE
+		// (Incrementing 16 bit values, mirrored each 128 KiB)
+		// [Verified on EZ-Flash IV]
+		if (index >= 8 && index <= 0xd) {
+			// cartridge 
+			
+			int value = (address & 0x1FFFE) >> 1;
+			if ((address & 1) != 0) {
+				return (value >> 8) & 0xFF;
+			}
+			else {
+				return value & 0xFF;
+			}
+		}
 		throw DataAbortARMException();
 	}
 	return _memmap[index][address];
@@ -218,9 +214,10 @@ uint16_t Memory::Read16(uint32_t address)
 	uint8_t index = (address >> 24) & 0xF;
 	address &= _memMask[index];
 	if (_memmap[index] == nullptr) {
-		throw DataAbortARMException();
-	}
-	if (index == 6 && address > 0x17FFF) {
+		if (index >= 8 && index <= 0xd) {
+			// cartridge 
+			return (address & 0x1FFFE) >> 1;
+		}
 		throw DataAbortARMException();
 	}
 	return *((uint16_t *)&_memmap[index][address]);
@@ -231,60 +228,75 @@ uint32_t Memory::Read32(uint32_t address)
 	uint8_t index = (address >> 24) & 0xF;
 	address &= _memMask[index];
 	if (_memmap[index] == nullptr) {
-		throw DataAbortARMException();
-	}
-	if (index == 6 && address > 0x17FFF) {
+		if (index >= 8 && index <= 0xd) {
+			// cartridge 
+			if (index >= 8 && index <= 0xd) {
+				// cartridge 
+				uint32_t value = (address & 0x1FFFE) >> 1;
+				value |= value << 16;
+				return value;
+			}
+		}
 		throw DataAbortARMException();
 	}
 	return *((uint32_t *)&_memmap[index][address]);
 }
 
-void Memory::Write8(uint32_t address, uint8_t value)
+void Memory::Write8(uint32_t address, uint8_t value, bool event)
 {
 	uint8_t index = (address >> 24) & 0xF;
-	address &= _memMask[index];
 	if (_memmap[index] == nullptr) {
-		throw DataAbortARMException();
-	}
-	if (index == 6 && address > 0x17FFF) {
 		throw DataAbortARMException();
 	}
 	if (index == 0 || (index >= 8 && index <= 0xD)) {
 		throw DataAbortARMException();
 	}
-	_memmap[index][address] = value;
+	_memmap[index][address & _memMask[index]] = value;
+	if (event) {
+		auto &it = _events.Find(address & ~3);
+		while (it != _events.End()) {
+			it->HandleEvent(address, 1);
+			it++;
+		}
+	}
 }
 
-void Memory::Write16(uint32_t address, uint16_t value)
+void Memory::Write16(uint32_t address, uint16_t value, bool event)
 {
 	uint8_t index = (address >> 24) & 0xF;
-	address &= _memMask[index];
 	if (_memmap[index] == nullptr) {
-		throw DataAbortARMException();
-	}
-	if (index == 6 && address > 0x17FFF) {
 		throw DataAbortARMException();
 	}
 	if (index == 0 || (index >= 8 && index <= 0xD)) {
 		throw DataAbortARMException();
 	}
-	*((uint16_t *)&_memmap[index][address]) = value;
+	*((uint16_t *)&_memmap[index][address & _memMask[index]]) = value;
+	if (event) {
+		auto &it = _events.Find(address & ~3);
+		while (it != _events.End()) {
+			it->HandleEvent(address, 2);
+			it++;
+		}
+	}
 }
 
-void Memory::Write32(uint32_t address, uint32_t value)
+void Memory::Write32(uint32_t address, uint32_t value, bool event)
 {
 	uint8_t index = (address >> 24) & 0xF;
-	address &= _memMask[index];
 	if (_memmap[index] == nullptr) {
-		throw DataAbortARMException();
-	}
-	if (index == 6 && address > 0x17FFF) {
 		throw DataAbortARMException();
 	}
 	if (index == 0 || (index >= 8 && index <= 0xD)) {
 		throw DataAbortARMException();
 	}
-	*((uint32_t *)&_memmap[index][address]) = value;
+	*((uint32_t *)&_memmap[index][address & _memMask[index]]) = value;
+	if (event) {
+		auto &it = _events.Find(address & ~3);
+		while (it != _events.End()) {
+			it->HandleEvent(address, 4);
+			it++;
+		}
+	}
 }
 
 void Memory::ManagedWrite32(uint32_t address, uint32_t value)
@@ -292,9 +304,6 @@ void Memory::ManagedWrite32(uint32_t address, uint32_t value)
 	uint8_t index = (address >> 24) & 0xF;
 	address &= _memMask[index];
 	if (_memmap[index] == nullptr) {
-		throw DataAbortARMException();
-	}
-	if (index == 6 && address > 0x17FFF) {
 		throw DataAbortARMException();
 	}
 	*((uint32_t *)&_memmap[index][address]) = value;
@@ -362,4 +371,14 @@ uint8_t Memory::ReadROM8(uint32_t address)
 {
 	assert(address < _romLength);
 	return _rom[address];
+}
+
+void Memory::RegisterEvent(uint32_t address, MemoryEventHandler *evt)
+{
+	assert((address & 3) == 0);
+	_events.Insert(address, evt);
+}
+uint8_t * Memory::GetRegisters()
+{
+	return _ioRegisters;
 }

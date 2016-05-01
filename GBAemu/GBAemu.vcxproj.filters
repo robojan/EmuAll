@@ -28,6 +28,12 @@
     <Filter Include="Header Files\cpu">
       <UniqueIdentifier>{4770a3a0-5ce2-42dd-9a6b-ec4e583b8fc3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\gpu">
+      <UniqueIdentifier>{2054274e-abb3-4e8a-a6ad-5b078fa99201}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gpu">
+      <UniqueIdentifier>{9e73a568-ca37-42fb-b957-ec4290d7604d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="emu.cpp">
@@ -56,6 +62,9 @@
     </ClCompile>
     <ClCompile Include="cpu\armException.cpp">
       <Filter>Source Files\cpu</Filter>
+    </ClCompile>
+    <ClCompile Include="gpu\gpu.cpp">
+      <Filter>Source Files\gpu</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -98,6 +107,9 @@
     </ClInclude>
     <ClInclude Include="include\GBAemu\cpu\armException.h">
       <Filter>Header Files\cpu</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GBAemu\gpu\gpu.h">
+      <Filter>Header Files\gpu</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -25,8 +25,15 @@ Disassembler::~Disassembler()
 
 int Disassembler::Disassemble(uint32_t address, const char **raw, const char **instr)
 {
+	uint32_t opcode;
+	if (_system.GetCpu().IsBreakpoint(address)) {
+		opcode = _system.GetCpu().GetBreakpointInstruction(address);
+	}
+	else {
+		opcode = _system.GetMemory().Read32(address);
+	}
 	if (_system.GetCpu().IsInThumbMode()) {
-		uint16_t opcode = _system.GetMemory().Read16(address);
+		opcode &= 0xFFFF;
 		if (raw != nullptr) {
 			*raw = HexToString(opcode, 4);
 		}
@@ -36,13 +43,6 @@ int Disassembler::Disassemble(uint32_t address, const char **raw, const char **i
 		return 2;
 	}
 	else {
-		uint32_t opcode;
-		if (_system.GetCpu().IsBreakpoint(address)) {
-			opcode = _system.GetCpu().GetBreakpointInstruction(address);
-		}
-		else {
-			opcode = _system.GetMemory().Read32(address);
-		}
 		if (raw != nullptr) {
 			*raw = HexToString(opcode, 8);
 		}
@@ -178,8 +178,169 @@ const char * Disassembler::DisassembleArm(uint32_t address, uint32_t instruction
 
 const char * Disassembler::DisassembleThumb(uint32_t address, uint32_t instruction)
 {
+	char tempBuffer[64];
+	tempBuffer[0] = '0';
+	tempBuffer[1] = 'x';
 	const char *formatStr = GetThumbFormatString(instruction);
-	return formatStr;
+	int pos = 0;
+	int formatPos = 0;
+	while (pos < 255 && formatStr[formatPos] != '\0') {
+		if (formatStr[formatPos] == '<') {
+			// Find len
+			int argLen = 1;
+			formatPos += 1;
+			while (formatStr[formatPos + argLen] != '>') {
+				assert(formatStr[formatPos + argLen] != '\0');
+				argLen += 1;
+			}
+			const char *dataStr = nullptr;
+			if (formatStr[formatPos] == 'R') {
+				if (formatStr[formatPos+1] <= '9') {
+					int offset = formatStr[formatPos + 1] - '0';
+					uint8_t reg = (instruction >> offset) & 0x7;
+					dataStr = registerNames[reg];
+				}
+				else if(formatStr[formatPos + 1] == 'd' || formatStr[formatPos + 1] == 'n') {
+					uint8_t reg = (instruction & 0x7) | ((instruction >> 4) & 0x8);
+					dataStr = registerNames[reg];
+				}
+				else if (formatStr[formatPos + 1] == 'm') {
+					uint8_t reg = ((instruction >> 3) & 0xF);
+					dataStr = registerNames[reg];
+				}
+				else {
+					dataStr = "<Unk>";
+				}
+			}
+			else if (strncmp(formatStr + formatPos, "cond", argLen) == 0) {
+				uint8_t cond = (instruction >> 8) & 0xF;
+				dataStr = condNames[cond];
+			}
+			else if (strncmp(formatStr + formatPos, "immed_8", argLen) == 0) {
+				uint8_t immed_8 = instruction & 0xFF;
+				HexToString(tempBuffer + 2, immed_8);
+				dataStr = tempBuffer;
+			}
+			else if (strncmp(formatStr + formatPos, "immed_3", argLen) == 0) {
+				uint8_t immed_3 = (instruction >> 6) & 0x7;
+				HexToString(tempBuffer + 2, immed_3);
+				dataStr = tempBuffer;
+			}
+			else if (strncmp(formatStr + formatPos, "immed_7", argLen) == 0) {
+				uint8_t immed_7 = instruction & 0x7F;
+				HexToString(tempBuffer + 2, immed_7);
+				dataStr = tempBuffer;
+			}
+			else if (strncmp(formatStr + formatPos, "immed_5", argLen) == 0) {
+				uint8_t immed_5 = (instruction >> 6) & 0x1F;
+				HexToString(tempBuffer + 2, immed_5);
+				dataStr = tempBuffer;
+			}
+			else if (strncmp(formatStr + formatPos, "signed_immed_11", argLen) == 0) {
+				int32_t imm = instruction & 0x7FF;
+				if ((imm & 0x400) != 0) {
+					imm |= 0xFFFFF800;
+				}
+				imm <<= 1;
+				uint32_t b = address + 4 + imm;
+				HexToString(tempBuffer + 2, b, 8);
+				dataStr = tempBuffer;
+			}
+			else if (strncmp(formatStr + formatPos, "signed_immed_8", argLen) == 0) {
+				int32_t imm = instruction & 0xFF;
+				if ((imm & 0x80) != 0) {
+					imm |= 0xFFFFFF00;
+				}
+				imm <<= 1;
+				uint32_t b = address + 4 + imm;
+				HexToString(tempBuffer + 2, b, 8);
+				dataStr = tempBuffer;
+			}
+			else if (strncmp(formatStr + formatPos, "offset_11", argLen) == 0) {
+				uint16_t offset = instruction & 0x7FF;
+				HexToString(tempBuffer + 2, offset);
+				dataStr = tempBuffer;
+			}
+			else if (strncmp(formatStr + formatPos, "registers", argLen) == 0) {
+				uint16_t registers = instruction & 0xFF;
+				tempBuffer[2] = '{';
+				int tempPos = 3;
+				for (int i = 0; i < 8; i++) {
+					if ((registers & (1 << i)) != 0) {
+						const char *reg = registerNames[i];
+						strcpy(tempBuffer + tempPos, reg);
+						tempPos += strlen(reg);
+						tempBuffer[tempPos++] = ',';
+					}
+				}
+				tempBuffer[tempPos - 1] = '}';
+				tempBuffer[tempPos] = '\0';
+				dataStr = tempBuffer + 2;
+			}
+			else if (strncmp(formatStr + formatPos, "registers_pc", argLen) == 0) {
+				uint16_t registers = instruction & 0x1FF;
+				tempBuffer[2] = '{';
+				int tempPos = 3;
+				for (int i = 0; i < 8; i++) {
+					if ((registers & (1 << i)) != 0) {
+						const char *reg = registerNames[i];
+						strcpy(tempBuffer + tempPos, reg);
+						tempPos += strlen(reg);
+						tempBuffer[tempPos++] = ',';
+					}
+				}
+				if ((registers & (1 << 8)) != 0) {
+					const char *reg = registerNames[15];
+					strcpy(tempBuffer + tempPos, reg);
+					tempPos += strlen(reg);
+					tempBuffer[tempPos++] = ',';
+				}
+				tempBuffer[tempPos - 1] = '}';
+				tempBuffer[tempPos] = '\0';
+				dataStr = tempBuffer + 2;
+			}
+			else if (strncmp(formatStr + formatPos, "registers_lr", argLen) == 0) {
+				uint16_t registers = instruction & 0x1FF;
+				tempBuffer[2] = '{';
+				int tempPos = 3;
+				for (int i = 0; i < 8; i++) {
+					if ((registers & (1 << i)) != 0) {
+						const char *reg = registerNames[i];
+						strcpy(tempBuffer + tempPos, reg);
+						tempPos += strlen(reg);
+						tempBuffer[tempPos++] = ',';
+					}
+				}
+				if ((registers & (1 << 8)) != 0) {
+					const char *reg = registerNames[14];
+					strcpy(tempBuffer + tempPos, reg);
+					tempPos += strlen(reg);
+					tempBuffer[tempPos++] = ',';
+				}
+				tempBuffer[tempPos - 1] = '}';
+				tempBuffer[tempPos] = '\0';
+				dataStr = tempBuffer + 2;
+			}
+			else {
+				dataStr = "<Unk>";
+			}
+
+			// Copy the argument to the result
+			for (int dataPos = 0; dataStr[dataPos] != '\0'; dataPos++, pos++) {
+				assert(pos < 255);
+				_buffer[pos] = dataStr[dataPos];
+			}
+
+			formatPos += argLen + 1;
+		}
+		else {
+			_buffer[pos] = formatStr[formatPos];
+			formatPos++;
+			pos++;
+		}
+	}
+	_buffer[pos] = '\0';
+	return _buffer;
 }
 
 const char * Disassembler::GetARMFormatString(uint32_t instruction)
@@ -1174,7 +1335,75 @@ const char * Disassembler::GetARMFormatString(uint32_t instruction)
 
 const char * Disassembler::GetThumbFormatString(uint16_t instruction)
 {
-	switch (instruction >> 8) {
+	switch ((instruction >> 6) & 0x3FF) {
+	case 0x105: return "ADC <R0>, <R3>";
+	CASE_RANGE8(0x070) return "ADD <R0>, <R3>, #<immed_3>";
+	CASE_RANGE32(0x0C0) return "ADD <R8>, #<immed_8>";
+	CASE_RANGE8(0x060) return "ADD <R0>, <R3>, <R6>";
+	CASE_RANGE4(0x110) return "ADD <Rd>, <Rm>";
+	CASE_RANGE32(0x280) return "ADD <Rd>, PC, #<immed_8> * 4";
+	CASE_RANGE32(0x2A0) return "ADD <Rd>, SP, #<immed_8> * 4";
+	CASE_RANGE2(0x2C0) return "ADD SP, #<immed_7> * 4";
+	case 0x100: return "AND <R0>, <R3>";
+	CASE_RANGE32(0x040) return "ASR <R0>, <R3>, #<immed_5>";
+	case 0x104: return "ASR <R0>, <R3>";
+	CASE_RANGE64(0x340) {
+		if ((instruction & 0xF00) == 0xF00) {
+			return "SWI <immed_8>";
+		}
+		else {
+			return "B<cond> <signed_immed_8>";
+		}
+	}
+	CASE_RANGE32(0x380) return "B <signed_immed_11>";
+	case 0x10E: return "BIC <R0>, <R3>";
+	CASE_RANGE4(0x2F8) return "BKPT <immed_8>";
+	CASE_RANGE32(0x3C0) return "BL <offset_11>";
+	CASE_RANGE32(0x3E0) return "BL <offset_11>";
+	CASE_RANGE2(0x11C) return "BX <Rm>";
+	case 0x10B: return "CMN <R0>, <R3>";
+	CASE_RANGE32(0x0A0) return "CMP <immed_8>";
+	case 0x10A: return "CMP <R0>, <R3>";
+	CASE_RANGE4(0x114) return "CMP <Rn>, <Rm>";
+	case 0x101: return "EOR <R0>, <R3>";
+	CASE_RANGE32(0x320) return "LDMIA <R8>!, <registers>";
+	CASE_RANGE32(0x1A0) return "LDR <R0>, [<R3>, #<immed_5> * 4]";
+	CASE_RANGE8(0x160) return "LDR <R0>, [<R3>, <R6>]";
+	CASE_RANGE32(0x120) return "LDR <R8>, [PC, #<immed_8> * 4]";
+	CASE_RANGE32(0x260) return "LDR <R8>, [SP, #<immed_8> * 4]";
+	CASE_RANGE32(0x1E0) return "LDRB <R0>, [<R3>, #<immed_5>]";
+	CASE_RANGE8(0x170) return "LDRB <R0>, [<R3>, <R6>]";
+	CASE_RANGE32(0x220) return "LDRH <R0>, [<R3>, #<immed_5> * 2]";
+	CASE_RANGE8(0x168) return "LDRH <R0>, [<R3>, <R6>]";
+	CASE_RANGE8(0x158) return "LDRSB <R0>, [<R3>, <R6>]";
+	CASE_RANGE8(0x178) return "LDRSH <R0>, [<R3>, <R6>]";
+	CASE_RANGE32(0x000) return "LSL <R0>, <R3>, #<immed_5>";
+	case 0x102: return "LSL <R0>, <R3>";
+	CASE_RANGE32(0x020) return "LSR <R0>, <R3>, #<immed_5>";
+	case 0x103: return "LSR <R0>, <R3>";
+	CASE_RANGE32(0x080) return "MOV <R8>, #<immed_8>";
+	CASE_RANGE4(0x118) return "MOV <Rd>, <Rm>";
+	case 0x10D: return "MUL <R0>, <R3>";
+	case 0x10F: return "MVN <R0>, <R3>";
+	case 0x109: return "NEG <R0>, <R3>";
+	case 0x10C: return "ORR <R0>, <R3>";
+	CASE_RANGE8(0x2F0) return "POP <registers_pc>";
+	CASE_RANGE8(0x2D0) return "PUSH <registers_lr>";
+	case 0x107: return "ROR <R0>, <R3>";
+	case 0x106: return "SBC <R0>, <R3>";
+	CASE_RANGE32(0x300) return "STMIA <R8>!, <registers>";
+	CASE_RANGE32(0x180) return "STR <R0>, [<R3>, #<immed_5> * 4]";
+	CASE_RANGE8(0x140) return "STR <R0>, [<R3>, <R6>]";
+	CASE_RANGE32(0x240) return "STR <R8>, [SP, #<immed_8> * 4]";
+	CASE_RANGE32(0x1C0) return "STRB <R0>, [<R3>, #<immed_5>]";
+	CASE_RANGE8(0x150) return "STRB <R0>, [<R3>, <R6>]";
+	CASE_RANGE32(0x200) return "STRH <R0>, [<R3>, #<immed_5> * 2]";
+	CASE_RANGE8(0x148) return "STRH <R0>, [<R3>, <R6>]";
+	CASE_RANGE8(0x078) return "SUB <R0>, <R3>, #<immed_3>";
+	CASE_RANGE32(0x0E0) return "SUB <R8>, #<immed_8>";
+	CASE_RANGE8(0x068) return "SUB <R0>, <R3>, <R6>";
+	CASE_RANGE2(0x2C2) return "SUB SP, #<immed_7> * 4";
+	case 0x108: return "TST <R0>, <R3>";
 	default:
 		return "Unknown instruction";
 	}

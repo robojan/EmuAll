@@ -1,5 +1,6 @@
 
 #include <GBAemu/cpu/hostInstructions.h>
+#include <GBAemu/cpu/armException.h>
 #include <GBAemu/cpu/cpu.h>
 #include <GBAemu/gba.h>
 #include <GBAemu/util/log.h>
@@ -201,7 +202,7 @@ void Cpu::TickThumb(bool step)
 	case 0x44: { // Add rd, rm
 		uint8_t rd = (instruction & 0x7) | ((instruction >> 4) & 0x8);
 		uint8_t rm = (instruction >> 3) & 0xF;
-		ADD_FLAGS(_registers[rd], _registers[rm], _registers[rd], _hostFlags);
+		ADD(_registers[rd], _registers[rm], _registers[rd]);
 		break;
 	}
 	case 0x45: { // CMP rn, rm
@@ -213,7 +214,6 @@ void Cpu::TickThumb(bool step)
 	case 0x46: { // MOV rd, rm
 		uint8_t rd = (instruction & 0x7) | ((instruction >> 4) & 0x8);
 		uint8_t rm = (instruction >> 3) & 0xF;
-		MOV_FLAGS(_registers[rm], _hostFlags);
 		_registers[rd] = _registers[rm];
 		break;
 	}
@@ -432,7 +432,7 @@ void Cpu::TickThumb(bool step)
 	case 0xA7: { // ADD rd, PC, imm8 * 4
 		uint8_t rd = (instruction >> 8) & 0x7;
 		uint8_t imm = instruction & 0xFF;
-		ADD_FLAGS(_registers[REGPC] & 0xFFFFFFFC, imm * 4, _registers[rd], _hostFlags);
+		ADD(_registers[REGPC] & 0xFFFFFFFC, imm * 4, _registers[rd]);
 		break;
 	}
 	case 0xA8:
@@ -445,16 +445,16 @@ void Cpu::TickThumb(bool step)
 	case 0xAF: { // ADD rd, SP, imm8 * 4
 		uint8_t rd = (instruction >> 8) & 0x7;
 		uint8_t imm = instruction & 0xFF;
-		ADD_FLAGS(_registers[REGSP], imm * 4, _registers[rd], _hostFlags);
+		ADD(_registers[REGSP], imm * 4, _registers[rd]);
 		break;
 	}
 	case 0xB0: { // Adjust stack pointer
 		uint8_t imm = instruction & 0x7F;
 		if ((instruction & 0x80) != 0) {
-			SUB_FLAGS(_registers[REGSP], imm * 4, _registers[REGSP], _hostFlags);
+			SUB(_registers[REGSP], imm * 4, _registers[REGSP]);
 		}
 		else {
-			ADD_FLAGS(_registers[REGSP], imm * 4, _registers[REGSP], _hostFlags);
+			ADD(_registers[REGSP], imm * 4, _registers[REGSP]);
 		}
 		break;
 	}
@@ -486,9 +486,13 @@ void Cpu::TickThumb(bool step)
 			_registers[REGPC] = _system._memory.Read32(_registers[REGSP]);
 			_registers[REGPC] &= 0xFFFFFFFE;
 			_registers[REGSP] += 4;
-			_pipelineInstruction = THUMB_NOP;
+			_pipelineInstruction = ARM_NOP;
 		}
 		break;
+	}
+	case 0xBE: { // BKPT
+		uint8_t imm = instruction & 0xFF;
+		throw BreakPointARMException(imm);
 	}
 	case 0xC0:
 	case 0xC1:
@@ -550,13 +554,12 @@ void Cpu::TickThumb(bool step)
 			addr <<= 1;
 			if ((addr & 0x100) != 0) addr |= 0xFFFFFE00;
 			_registers[REGPC] += addr;
-			_pipelineInstruction = THUMB_NOP;
+			_pipelineInstruction = ARM_NOP;
 		}
 		break;
 	}
 	case 0xDF: { // Software interrupt
 		uint8_t imm = instruction & 0xFF;
-		_registers[REGLR] = _registers[REGPC] - 2;
 		SoftwareInterrupt(imm);
 		break;
 	}
@@ -572,7 +575,7 @@ void Cpu::TickThumb(bool step)
 		imm <<= 1;
 		if ((imm & 0x800) != 0) imm |= 0xFFFFF000;
 		_registers[REGPC] += imm;
-		_pipelineInstruction = THUMB_NOP;
+		_pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0xF0:
@@ -601,7 +604,7 @@ void Cpu::TickThumb(bool step)
 		uint32_t pc = _registers[REGPC];
 		_registers[REGPC] = _registers[REGLR] + (imm << 1);
 		_registers[REGLR] = (pc - 2) | 1;
-		_pipelineInstruction = THUMB_NOP;
+		_pipelineInstruction = ARM_NOP;
 		break;
 	}
 	}

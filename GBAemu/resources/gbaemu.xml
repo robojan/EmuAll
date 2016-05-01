@@ -59,7 +59,7 @@
         <enabled>true</enabled>
         <breakpoint>true</breakpoint>
         <size>0x10000000</size>
-        <curLineId>1015</curLineId>
+        <curLineId>1025</curLineId>
       </disassembler>
       <step>true</step>
       <stepOut>false</stepOut>

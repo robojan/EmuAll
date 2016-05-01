@@ -4,8 +4,8 @@
 #define FCPU                16780000
 
 // CPU defines
-#define ARM_NOP             0xF0001C00
-#define THUMB_NOP           0x1C00
+#define THUMB_NOP           0xB000
+#define ARM_NOP             (0xF0000000 | THUMB_NOP)
 
 // Memory sizes
 #define BIOSSIZE            (16 * 1024)
@@ -13,7 +13,7 @@
 #define WRAMCHIPSIZE        (32 * 1024)
 #define IOREGISTERSSIZE     (1024)
 #define PRAMSIZE            (1024)
-#define VRAMSIZE            (96 * 1024)
+#define VRAMSIZE            (128 * 1024) // 96 kB is the actual vram
 #define ORAMSIZE            (1024)
 
 // Memory masks
@@ -60,3 +60,77 @@
 #define CPSR_F_MASK         (1<<CPSR_F)
 #define CPSR_T_MASK         (1<<CPSR_T)
 
+// IRQ bits
+#define IRQ_VBLANK_NO       0
+#define IRQ_HBLANK_NO       1
+#define IRQ_VMATCH_NO       2
+#define IRQ_TIM0_NO         3
+#define IRQ_TIM1_NO         4
+#define IRQ_TIM2_NO         5
+#define IRQ_TIM3_NO         6
+#define IRQ_SERIAL_NO       7
+#define IRQ_DMA0_NO         8
+#define IRQ_DMA1_NO         9
+#define IRQ_DMA2_NO         10
+#define IRQ_DMA3_NO         11
+#define IRQ_KEYPAD_NO       12
+#define IRQ_EXT_NO          13
+// IRQ masks
+#define IRQ_VBLANK          (1<<IRQ_VBLANK_NO )
+#define IRQ_HBLANK          (1<<IRQ_HBLANK_NO )
+#define IRQ_VMATCH          (1<<IRQ_VMATCH_NO )
+#define IRQ_TIM0            (1<<IRQ_TIM0_NO   )
+#define IRQ_TIM1            (1<<IRQ_TIM1_NO   )
+#define IRQ_TIM2            (1<<IRQ_TIM2_NO   )
+#define IRQ_TIM3            (1<<IRQ_TIM3_NO   )
+#define IRQ_SERIAL          (1<<IRQ_SERIAL_NO )
+#define IRQ_DMA0            (1<<IRQ_DMA0_NO   )
+#define IRQ_DMA1            (1<<IRQ_DMA1_NO   )
+#define IRQ_DMA2            (1<<IRQ_DMA2_NO   )
+#define IRQ_DMA3            (1<<IRQ_DMA3_NO   )
+#define IRQ_KEYPAD          (1<<IRQ_KEYPAD_NO )
+#define IRQ_EXT             (1<<IRQ_EXT_NO    )
+#define IRQ_MASK            0x3FFF
+
+// Registers
+// LCD
+#define DISPCNT             0x4000000
+#define DISPSTAT            0x4000004
+#define VCOUNT              0x4000006
+#define BG0CNT              0x4000008
+#define BG1CNT              0x400000A
+#define BG2CNT              0x400000C
+#define BG3CNT              0x400000E
+#define BG0HOFS             0x4000010
+#define BG0VOFS             0x4000012
+#define BG1HOFS             0x4000014
+#define BG1VOFS             0x4000016
+#define BG2HOFS             0x4000018
+#define BG2VOFS             0x400001A
+#define BG3HOFS             0x400001C
+#define BG3VOFS             0x400001E
+#define BG2PA               0x4000020
+#define BG2PB               0x4000022
+#define BG2PC               0x4000024
+#define BG2PD               0x4000026
+#define BG2X_L              0x4000028
+#define BG2X_H              0x400002A
+#define BG2Y_L              0x400002C
+#define BG2Y_H              0x400002E
+#define BG3PA               0x4000030
+#define BG3PB               0x4000032
+#define BG3PC               0x4000034
+#define BG3PD               0x4000036
+#define BG3X_L              0x4000038
+#define BG3X_H              0x400003A
+#define BG3Y_L              0x400003C
+#define BG3Y_H              0x400003E
+
+// Interrupt control
+#define IE                  0x4000200
+#define IF                  0x4000202
+#define IME                 0x4000208
+
+// Control
+#define POSTFLG             0x4000300
+#define HALTCNT             0x4000301

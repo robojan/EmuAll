@@ -5,6 +5,7 @@
 #include <GBAemu/gba.h>
 #include <GBAemu/defines.h>
 #include <GBAemu/util/preprocessor.h>
+#include <GBAemu/cpu/armException.h>
 #include "resources/resources.h"
 
 void(*Log)(enum loglevel, char *, ...);
@@ -86,25 +87,39 @@ uint8_t __stdcall Disassemble(EMUHANDLE handle, uint32_t pos, const uint8_t **ra
 	Gba *emulator = reinterpret_cast<Gba *>(handle);
 	if (emulator == nullptr)
 		return -1;
-	return emulator->GetDisassembler().Disassemble(pos, (const char **)raw, (const char **)instr);
+
+	try {
+		return emulator->GetDisassembler().Disassemble(pos, (const char **)raw, (const char **)instr);
+	}
+	catch (DataAbortARMException &) {
+		*((const char **)raw) = "xxxx";
+		*((const char **)instr) = "DataAbort exception";
+		emulator->Run(false);
+		return 2;
+	}
 }
 
 uint8_t __stdcall GetMemoryData(EMUHANDLE handle, int32_t memory, uint32_t address) {
 	Gba *emulator = reinterpret_cast<Gba *>(handle);
 	if (emulator == nullptr)
 		return 0;
-	switch (memory) {
-	case 2000: return emulator->GetMemory().Read8(address);
-	case 2001: return emulator->GetMemory().ReadBios8(address);
-	case 2002: return emulator->GetMemory().ReadWRAM8(address);
-	case 2003: return emulator->GetMemory().ReadChipWRAM8(address);
-	case 2004: return emulator->GetMemory().ReadRegister8(address);
-	case 2005: return emulator->GetMemory().ReadPRAM8(address);
-	case 2006: return emulator->GetMemory().ReadVRAM8(address);
-	case 2007: return emulator->GetMemory().ReadORAM8(address);
-	case 2008: return emulator->GetMemory().ReadSRAM8(address);
-	case 2010: return emulator->GetMemory().ReadROM8(address);
-	default: return 0;
+	try {
+		switch (memory) {
+		case 2000: return emulator->GetMemory().Read8(address);
+		case 2001: return emulator->GetMemory().ReadBios8(address);
+		case 2002: return emulator->GetMemory().ReadWRAM8(address);
+		case 2003: return emulator->GetMemory().ReadChipWRAM8(address);
+		case 2004: return emulator->GetMemory().ReadRegister8(address);
+		case 2005: return emulator->GetMemory().ReadPRAM8(address);
+		case 2006: return emulator->GetMemory().ReadVRAM8(address);
+		case 2007: return emulator->GetMemory().ReadORAM8(address);
+		case 2008: return emulator->GetMemory().ReadSRAM8(address);
+		case 2010: return emulator->GetMemory().ReadROM8(address);
+		default: return 0;
+		}
+	}
+	catch (DataAbortARMException &) {
+		return 0x00;
 	}
 }
 
@@ -138,7 +153,7 @@ uint32_t __stdcall GetValU(EMUHANDLE handle, int32_t id) {
 	if (emulator == NULL)
 		return 0;
 	switch (id) {
-	CASE_RANGE16(1000)
+		CASE_RANGE16(1000)
 	case 1016:
 	case 1017:
 		emulator->GetCpu().SaveHostFlagsToCPSR();
@@ -164,6 +179,25 @@ uint32_t __stdcall GetValU(EMUHANDLE handle, int32_t id) {
 	case 1024:
 		emulator->GetCpu().SaveHostFlagsToCPSR();
 		return (emulator->GetCpu().GetRegisterValue(16) & CPSR_F_MASK) != 0 ? 1 : 0;
+	case 1025:
+		if (emulator->GetCpu().IsInThumbMode()) {
+			uint32_t pc = emulator->GetCpu().GetRegisterValue(REGPC);
+			if (emulator->GetCpu().IsStalled()) {
+				return pc;
+			}
+			else {
+				return pc - 2;
+			}
+		}
+		else {
+			uint32_t pc = emulator->GetCpu().GetRegisterValue(REGPC);
+			if (emulator->GetCpu().IsStalled()) {
+				return pc;
+			}
+			else {
+				return pc - 4;
+			}
+		}
 	case 2009: // SRAM size
 		return emulator->GetMemory().GetSRAMSize();
 	case 2011: // ROM size

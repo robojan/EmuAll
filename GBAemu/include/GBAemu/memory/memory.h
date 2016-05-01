@@ -2,7 +2,18 @@
 
 #include <stdint.h>
 #include <emu.h>
+#include <emuall/util/tree.h>
+
+#define IOREG32(registers, addr) (*(uint32_t *)(((uint8_t *)registers) + (addr & IOREGISTERSMASK)))
+#define IOREG16(registers, addr) (*(uint16_t *)(((uint8_t *)registers) + (addr & IOREGISTERSMASK)))
+#define IOREG8(registers, addr) (registers[addr & IOREGISTERSMASK])
+
 class Gba;
+
+class MemoryEventHandler {
+public:
+	virtual void HandleEvent(uint32_t address, int size) = 0;
+};
 
 class Memory {
 public:
@@ -16,9 +27,9 @@ public:
 	uint8_t Read8(uint32_t address);
 	uint16_t Read16(uint32_t address);
 	uint32_t Read32(uint32_t address);
-	void Write8(uint32_t address, uint8_t value);
-	void Write16(uint32_t address, uint16_t value);
-	void Write32(uint32_t address, uint32_t value);
+	void Write8(uint32_t address, uint8_t value, bool event = true);
+	void Write16(uint32_t address, uint16_t value, bool event = true);
+	void Write32(uint32_t address, uint32_t value, bool event = true);
 	void ManagedWrite32(uint32_t address, uint32_t value);
 
 	uint32_t GetRomSize();
@@ -32,11 +43,18 @@ public:
 	uint8_t ReadORAM8(uint32_t address);
 	uint8_t ReadSRAM8(uint32_t address);
 	uint8_t ReadROM8(uint32_t address);
+
+	void RegisterEvent(uint32_t address, MemoryEventHandler *evt);
+
+	uint8_t *GetRegisters();
 private:
+
 	// Memory map Should be first in the class memory
 	uint8_t *_memmap[16]; 
 	// Mask for invalid addresses
 	uint32_t _memMask[16];
+	// Event callbacks
+	AATree<uint32_t, MemoryEventHandler *> _events;
 	// system
 	Gba &_system;
 	// 16 kB bios

@@ -431,7 +431,6 @@
     <ClCompile Include="gb\sound\GbChannel4.cpp" />
     <ClCompile Include="gb\sound\GbSound.cpp" />
     <ClCompile Include="resources\resources.c" />
-    <ClCompile Include="types\tree.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Emuall\include\emu.h" />
@@ -451,7 +450,6 @@
     <ClInclude Include="gb\sound\GbSound.h" />
     <ClInclude Include="resources\resources.h" />
     <ClInclude Include="types\EventQueue.h" />
-    <ClInclude Include="types\tree.h" />
     <ClInclude Include="util\exceptions.h" />
     <ClInclude Include="util\log.h" />
     <ClInclude Include="util\memDbg.h" />

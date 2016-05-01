@@ -72,9 +72,6 @@
     <ClCompile Include="emu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="types\tree.cpp">
-      <Filter>Source Files\types</Filter>
-    </ClCompile>
     <ClCompile Include="gb\Gameboy.cpp">
       <Filter>Source Files\gb</Filter>
     </ClCompile>
@@ -160,9 +157,6 @@
     </ClInclude>
     <ClInclude Include="resources\resources.h">
       <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="types\tree.h">
-      <Filter>Header Files\types</Filter>
     </ClInclude>
     <ClInclude Include="util\exceptions.h">
       <Filter>Header Files\util</Filter>

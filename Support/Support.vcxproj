@@ -192,6 +192,7 @@
     <ClInclude Include="include\emuall\util\endian.h" />
     <ClInclude Include="include\emuall\util\file.h" />
     <ClInclude Include="include\emuall\util\string.h" />
+    <ClInclude Include="include\emuall\util\tree.h" />
     <ClInclude Include="include\emuall\util\wavaudiofile.h" />
     <ClInclude Include="resources\resources.h" />
   </ItemGroup>

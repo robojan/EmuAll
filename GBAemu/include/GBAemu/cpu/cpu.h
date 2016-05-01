@@ -7,7 +7,7 @@ class Gba;
 
 class Cpu {
 public:
-	enum Mode {
+	enum class Mode {
 		User,
 		FIQ, 
 		IRQ, 
@@ -46,6 +46,7 @@ public:
 	void RemoveBreakpoint(uint32_t address);
 	bool IsBreakpoint(uint32_t address);
 	uint32_t GetBreakpointInstruction(uint32_t address);
+	bool IsStalled();
 private:
 	void TickARM(bool step);
 	void TickThumb(bool step);
@@ -69,7 +70,7 @@ private:
 	uint32_t GetShifterOperandImmFlags(uint32_t instruction);
 
 	void SoftwareInterrupt(uint32_t value);
-
+	void IRQ();
 	Gba &_system;
 	uint32_t _hostFlags;
 	uint32_t _registers[16];
