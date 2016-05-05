@@ -202,22 +202,6 @@ void ShaderProgram::SetUniform(const char *name, int val)
 	}
 }
 
-void ShaderProgram::SetUniform(const char *name, float val)
-{
-	int loc = GetUniformLocation(name);
-	if (loc != -1) {
-		GL_CHECKED(glUniform1f(loc, val));
-	}
-}
-
-void ShaderProgram::SetUniform(const char *name, double val)
-{
-	int loc = GetUniformLocation(name);
-	if (loc != -1) {
-		GL_CHECKED(glUniform1d(loc, val));
-	}
-}
-
 void ShaderProgram::SetUniform(const char *name, int val0, int val1)
 {
 	int loc = GetUniformLocation(name);
@@ -241,6 +225,55 @@ void ShaderProgram::SetUniform(const char *name, int val0, int val1, int val2, i
 		GL_CHECKED(glUniform4i(loc, val0, val1, val2, val3));
 	}
 }
+
+void ShaderProgram::SetUniform(const char *name, unsigned int val)
+{
+	int loc = GetUniformLocation(name);
+	if (loc != -1) {
+		GL_CHECKED(glUniform1ui(loc, val));
+	}
+}
+
+void ShaderProgram::SetUniform(const char *name, unsigned int val0, unsigned int val1)
+{
+	int loc = GetUniformLocation(name);
+	if (loc != -1) {
+		GL_CHECKED(glUniform2ui(loc, val0, val1));
+	}
+}
+
+void ShaderProgram::SetUniform(const char *name, unsigned int val0, unsigned int val1, unsigned int val2)
+{
+	int loc = GetUniformLocation(name);
+	if (loc != -1) {
+		GL_CHECKED(glUniform3ui(loc, val0, val1, val2));
+	}
+}
+
+void ShaderProgram::SetUniform(const char *name, unsigned int val0, unsigned int val1, unsigned int val2, unsigned int val3)
+{
+	int loc = GetUniformLocation(name);
+	if (loc != -1) {
+		GL_CHECKED(glUniform4ui(loc, val0, val1, val2, val3));
+	}
+}
+
+void ShaderProgram::SetUniform(const char *name, float val)
+{
+	int loc = GetUniformLocation(name);
+	if (loc != -1) {
+		GL_CHECKED(glUniform1f(loc, val));
+	}
+}
+
+void ShaderProgram::SetUniform(const char *name, double val)
+{
+	int loc = GetUniformLocation(name);
+	if (loc != -1) {
+		GL_CHECKED(glUniform1d(loc, val));
+	}
+}
+
 
 void ShaderProgram::SetUniform(const char *name, float val0, float val1)
 {

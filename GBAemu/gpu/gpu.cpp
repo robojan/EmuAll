@@ -18,10 +18,9 @@ Gpu::Gpu(Gba &system) :
 	_debugTilesGridEnabled{ true, true, true },
 	_system(system), _vcount(0), _hcount(0),
 	_paletteInitialized{false, false}, _paletteVao{nullptr, nullptr},
-	_tilesInitialized{false, false, false}, _tilesVao{nullptr, nullptr, nullptr}
+	_tilesInitialized{false, false, false}, _tilesVao{nullptr, nullptr, nullptr},
+	_oamInitialized(false), _oamVao(nullptr)
 {
-	uint8_t *registers = _system.GetMemory().GetRegisters();
-
 	RegisterEvents();
 }
 
@@ -105,6 +104,7 @@ bool Gpu::InitGL(int id)
 	case 3006: return InitTilesGL(0);
 	case 3007: return InitTilesGL(1);
 	case 3008: return InitTilesGL(2);
+	case 3009: return InitOAMGL();
 	}
 	return false;
 }
@@ -126,6 +126,9 @@ void Gpu::DestroyGL(int id)
 		break;
 	case 3008:
 		DestroyTilesGL(2);
+		break;
+	case 3009:
+		DestroyOAMGL();
 		break;
 	}
 }
@@ -152,6 +155,9 @@ void Gpu::Draw(int id)
 		break;
 	case 3008:
 		DrawTiles(2);
+		break;
+	case 3009:
+		DrawOAM();
 		break;
 	}
 }
@@ -380,7 +386,117 @@ void Gpu::DrawTiles(int idx)
 		_tilesShader->End();
 	}
 	catch (GraphicsException  &e) {
-		Log(Error, "Graphics exception in drawing palettes: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
+		Log(Error, "Graphics exception in drawing tiles: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
+	}
+}
+
+bool Gpu::InitOAMGL()
+{
+	const float vertexData[] = {
+		// x     y    u    v
+		-1.0,  1.0, 0.0, 0.0,
+		1.0,  1.0, 1.0, 0.0,
+		-1.0, -1.0, 0.0, 1.0,
+		1.0, -1.0, 1.0, 1.0
+	};
+	try {
+		if (_oamInitialized) {
+			DestroyOAMGL();
+		}
+		// Create Shader program
+		_oamShader.IncRef();
+		if (_oamShader.GetRefCount() == 1) {
+			if (!_oamShader->AddShader(ShaderProgram::Vertex, (char *)resource_oam_vert_glsl,
+					resource_oam_vert_glsl_len)) {
+				Log(Error, "Could not Compile oam vertex shader\n");
+				throw GraphicsException(0, _oamShader->GetLog());
+			}
+			if (!_oamShader->AddShader(ShaderProgram::Fragment, (char *)resource_oam_frag_glsl,
+					resource_oam_frag_glsl_len)) {
+				Log(Error, "Could not Compile oam fragment shader\n");
+				throw GraphicsException(0, _oamShader->GetLog());
+			}
+			if (!_oamShader->Link()) {
+				Log(Error, "Could not Link tiles shader program\n");
+				throw GraphicsException(0, _oamShader->GetLog());
+			}
+		}
+
+		// Create vertex data buffer
+		_oamVertexData.IncRef(BufferObject::Type::Array);
+		if (_oamVertexData.GetRefCount() == 1) {
+			_oamVertexData->BufferData(BufferObject::Usage::StaticDraw, sizeof(vertexData), vertexData);
+		}
+
+		// create VAO
+		_oamVao = new VertexArrayObject();
+		_oamVao->Begin();
+		_oamVao->BindBuffer(0, *_oamVertexData, 2, VertexArrayObject::Float,
+			false, 4 * sizeof(float), 0 * sizeof(float));
+		_oamVao->BindBuffer(1, *_oamVertexData, 2, VertexArrayObject::Float,
+			false, 4 * sizeof(float), 2 * sizeof(float));
+		_oamVao->End();
+
+		// Create tile buffer data
+		InitVRAMDataGL();
+		InitPaletteDataGL();
+		InitOAMAttributeDataGL();
+	}
+	catch (GraphicsException &e) {
+		Log(Error, "Error while creating graphics oam objects: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
+		return false;
+	}
+	_oamInitialized = true;
+	return true;
+}
+
+void Gpu::DestroyOAMGL()
+{
+	if (_oamInitialized == false) return;
+	_oamInitialized = false;
+	_oamShader.DecRef();
+	_paletteData.DecRef();
+	_vramBT.DecRef();
+	_oamVertexData.DecRef();
+	_oamBT.DecRef();
+	if (_oamVao != nullptr) {
+		delete _oamVao;
+		_oamVao = nullptr;
+	}
+}
+
+void Gpu::DrawOAM()
+{
+	try {
+		GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT));
+		GL_CHECKED(glViewport(0, 0, 768, 384));
+
+		uint8_t *palettes = _system.GetMemory().GetPalettes();
+		_paletteData->UpdateData(0, 0, 16, 32, (char *)palettes, Texture::USHORT_1_5_5_5);
+
+		uint8_t *vram = _system.GetMemory().GetVRAM() + 0x10000;
+		_vramBT->GetBufferObject().BufferSubData(0x10000, 0x8000, vram);
+		
+		uint8_t *oam = _system.GetMemory().GetOAM();
+		_oamBT->GetBufferObject().BufferSubData(0, 0x400, oam);
+
+		uint8_t *registers = _system.GetMemory().GetRegisters();
+
+		_oamShader->Begin();
+		_oamVao->Begin();
+		_oamShader->SetUniform("oamData", 2, *_oamBT);
+		_oamShader->SetUniform("paletteData", 1, *_paletteData);
+		_oamShader->SetUniform("vramData", 0, *_vramBT);
+		_oamShader->SetUniform("DISPCNT", IOREG32(registers, DISPCNT));
+		_oamShader->SetUniform("windowSize", 768.0f, 384.0f);
+
+		GL_CHECKED(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
+
+		_oamVao->End();
+		_oamShader->End();
+	}
+	catch (GraphicsException  &e) {
+		Log(Error, "Graphics exception in drawing oam: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
 	}
 }
 
@@ -398,5 +514,10 @@ void Gpu::InitPaletteDataGL()
 void Gpu::InitVRAMDataGL()
 {
 	_vramBT.IncRef(0x18000, nullptr, BufferTexture::Format::R8UI, BufferObject::Usage::StreamDraw);
+}
+
+void Gpu::InitOAMAttributeDataGL()
+{
+	_oamBT.IncRef(0x400, nullptr, BufferTexture::Format::R16UI, BufferObject::Usage::StreamDraw);
 }
 

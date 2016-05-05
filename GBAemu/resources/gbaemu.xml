@@ -316,6 +316,14 @@
                 </ver>
               </hor>
             </tab>
+            <tab name="OAM">
+              <ver prop="1">
+                <screen id="3009" contextShare="0">
+                  <width>768</width>
+                  <height>384</height>
+                </screen>
+              </ver>
+            </tab>
             <tab name="Palette">
               <ver prop="1">
                 <grid name="Background Palette">

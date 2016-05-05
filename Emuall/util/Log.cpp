@@ -10,13 +10,14 @@
 #include <Windows.h>
 
 std::vector<LogDest *> _loggers;
-char _LogBuffer[1024];
+std::vector<char>_LogBuffer;
 enum loglevel _loglevel;
 
 
 void InitLog(LogDest *dst)
 {
 	_loglevel = Message;
+	_LogBuffer.resize(1024);
 	_loggers.clear();
 	if (dst != 0)
 		_loggers.push_back(dst);
@@ -39,12 +40,16 @@ void Log(enum loglevel level, char *fmtstr, ...)
 	{
 		va_list args;
 		va_start(args, fmtstr);
-		vsnprintf(_LogBuffer, sizeof(_LogBuffer), fmtstr, args);
+		int len = vsnprintf(_LogBuffer.data(), _LogBuffer.size(), fmtstr, args);
+		if (len > _LogBuffer.size()) {
+			_LogBuffer.resize(len+1);
+			vsnprintf(_LogBuffer.data(), _LogBuffer.size(), fmtstr, args);
+		}
 		std::vector<LogDest *>::iterator it;
 		for (it = _loggers.begin(); it != _loggers.end(); it++)
 		{
 			assert(*it != 0);
-			(*it)->log(_LogBuffer);
+			(*it)->log(_LogBuffer.data());
 		}
 		va_end(args);
 	}

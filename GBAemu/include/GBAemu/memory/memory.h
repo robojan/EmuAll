@@ -49,7 +49,7 @@ public:
 	uint8_t *GetRegisters();
 	uint8_t *GetPalettes();
 	uint8_t *GetVRAM();
-
+	uint8_t *GetOAM();
 private:
 
 	// Memory map Should be first in the class memory

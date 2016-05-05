@@ -208,6 +208,8 @@
     <ClInclude Include="resources\resources.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="resources\oam.frag.glsl" />
+    <None Include="resources\oam.vert.glsl" />
     <None Include="resources\palette.frag.glsl" />
     <None Include="resources\palette.vert.glsl" />
     <CustomBuild Include="resources\tiles.frag.glsl">

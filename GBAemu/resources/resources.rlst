@@ -3,3 +3,5 @@ palette.vert.glsl
 palette.frag.glsl
 tiles.vert.glsl
 tiles.frag.glsl
+oam.vert.glsl
+oam.frag.glsl

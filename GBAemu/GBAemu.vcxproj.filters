@@ -125,5 +125,11 @@
     <None Include="resources\tiles.vert.glsl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="resources\oam.frag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\oam.vert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

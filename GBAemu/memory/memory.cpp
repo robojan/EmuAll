@@ -395,3 +395,8 @@ uint8_t * Memory::GetVRAM()
 {
 	return _vram;
 }
+
+uint8_t * Memory::GetOAM()
+{
+	return _oram;
+}

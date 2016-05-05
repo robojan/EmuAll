@@ -41,10 +41,15 @@ private:
 	bool InitTilesGL(int idx);
 	void DestroyTilesGL(int idx);
 	void DrawTiles(int idx);
+
+	// OAM drawing
+	bool InitOAMGL();
+	void DestroyOAMGL();
+	void DrawOAM();
 	
 	void InitPaletteDataGL();
 	void InitVRAMDataGL();
-
+	void InitOAMAttributeDataGL();
 	Gba &_system;
 	uint_fast8_t _vcount;
 	uint_fast16_t _hcount;
@@ -62,4 +67,10 @@ private:
 	CounterPtr<BufferTexture> _vramBT;
 	CounterPtr<BufferObject> _tilesVertexData;
 	VertexArrayObject *_tilesVao[3];
+	// OAM drawing
+	bool _oamInitialized;
+	CounterPtr<ShaderProgram> _oamShader;
+	CounterPtr<BufferTexture> _oamBT;
+	CounterPtr<BufferObject> _oamVertexData;
+	VertexArrayObject *_oamVao;
 };

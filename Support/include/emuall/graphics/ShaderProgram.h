@@ -37,6 +37,10 @@ public:
 	void SetUniform(const char *name, int val0, int val1);
 	void SetUniform(const char *name, int val0, int val1, int val2);
 	void SetUniform(const char *name, int val0, int val1, int val2, int val3);
+	void SetUniform(const char *name, unsigned int val);
+	void SetUniform(const char *name, unsigned int val0, unsigned int val1);
+	void SetUniform(const char *name, unsigned int val0, unsigned int val1, unsigned int val2);
+	void SetUniform(const char *name, unsigned int val0, unsigned int val1, unsigned int val2, unsigned int val3);
 	void SetUniform(const char *name, float val);
 	void SetUniform(const char *name, float val0, float val1);
 	void SetUniform(const char *name, float val0, float val1, float val2);
