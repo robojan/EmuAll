@@ -73,6 +73,9 @@ Memory::Memory(Gba &gba) :
 	// Load bios from file
 	FILE *biosFile;
 	fopen_s(&biosFile, "D:\\Dropbox\\Visual studio\\Projects\\emuall\\rom\\gba\\GBA.BIOS", "rb");
+	if (biosFile == nullptr) {
+		fopen_s(&biosFile, "C:\\Dropbox\\Visual studio\\Projects\\emuall\\rom\\gba\\GBA.BIOS", "rb");
+	}
 	fread(_bios, 16 * 1024, 1, biosFile);
 	fclose(biosFile);
 
@@ -381,4 +384,14 @@ void Memory::RegisterEvent(uint32_t address, MemoryEventHandler *evt)
 uint8_t * Memory::GetRegisters()
 {
 	return _ioRegisters;
+}
+
+uint8_t * Memory::GetPalettes()
+{
+	return _pram;
+}
+
+uint8_t * Memory::GetVRAM()
+{
+	return _vram;
 }

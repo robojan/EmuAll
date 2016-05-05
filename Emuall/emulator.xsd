@@ -1,0 +1,132 @@
+﻿<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="emulator">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="name" type="xs:string" />
+        <xs:element name="description" type="xs:string" />
+        <xs:element name="about" type="xs:string" />
+        <xs:element name="fileFilter" type="xs:string" />
+        <xs:element name="screen" type ="screenType" />
+        <xs:element name="audio">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="sources" type="xs:nonNegativeInteger" default="0" minOccurs="0" maxOccurs="1" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="input">
+          <xs:complexType>
+            <xs:choice maxOccurs="unbounded">
+              <xs:element name="key" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="name" type="xs:string" />
+                    <xs:element name="defaultKey" type="xs:nonNegativeInteger"/>
+                  </xs:sequence>
+                  <xs:attribute name="key" type="xs:nonNegativeInteger"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:choice>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="debugging">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="cpu">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="disassembler">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="enabled" type="xs:boolean" />
+                          <xs:element name="breakpoint" type="xs:boolean" />
+                          <xs:element name="size" type="xs:string" />
+                          <xs:element name="curLineId" type="xs:nonNegativeInteger" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="step" type="xs:boolean" />
+                    <xs:element name="stepOut" type="xs:boolean" />
+                    <xs:element name="stepOver" type="xs:boolean" />
+                    <xs:element name="registers">
+                      <xs:complexType>
+                        <xs:choice minOccurs="0" maxOccurs="unbounded">
+                          <xs:element name="register">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="name" type="xs:string" />
+                                <xs:element name="size" type="xs:integer" />
+                              </xs:sequence>
+                              <xs:attribute name="id" type="xs:nonNegativeInteger" />
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="flag">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="name" type="xs:string" />
+                                <xs:element name="readOnly" type="xs:string" fixed="" minOccurs="0"/>
+                              </xs:sequence>
+                              <xs:attribute name="id" type="xs:nonNegativeInteger" />
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:choice>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="mem">
+                <xs:complexType>
+                  <xs:choice maxOccurs="unbounded">
+                    <xs:element name="memory" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="name" type="xs:string" />
+                          <xs:element name="size">
+                            <xs:complexType>
+                              <xs:simpleContent>
+                                <xs:extension base="xs:string">
+                                  <xs:attribute name="var" type="xs:boolean" default="false" use="optional"/>
+                                </xs:extension>
+                              </xs:simpleContent>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                        <xs:attribute name="id" type="xs:nonNegativeInteger" />
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="info" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="name" type="xs:string"/>
+                        </xs:sequence>
+                        <xs:attribute name="id" type="xs:nonNegativeInteger"/>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="readOnly" minOccurs="0" maxOccurs="1" type="xs:boolean"/>
+                  </xs:choice>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="gpu" type="debuggerElement"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="screenType">
+    <xs:sequence>
+      <xs:element name="width" type="xs:integer" default="-1" maxOccurs="1" minOccurs="0"/>
+      <xs:element name="height" type="xs:integer" default="-1" maxOccurs="1" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:nonNegativeInteger" />
+  </xs:complexType>
+  <xs:complexType name="debuggerElement">
+    <xs:attribute name="prop" type="xs:nonNegativeInteger"/>
+  </xs:complexType>
+  <xs:complexType name="horType">
+    
+  </xs:complexType>
+</xs:schema>
+

@@ -69,6 +69,16 @@ void Texture::LoadTexture(int width, int height, const char *data, Format format
 		glFormat = GL_RED;
 		glInternalFormat = GL_RED;
 		break;
+	case USHORT_5_5_5_1:
+		elementSize = 2;
+		glFormat = GL_UNSIGNED_SHORT_5_5_5_1;
+		glInternalFormat = GL_RGBA;
+		break;
+	case USHORT_1_5_5_5:
+		elementSize = 2;
+		glFormat = GL_UNSIGNED_SHORT_1_5_5_5_REV;
+		glInternalFormat = GL_RGBA;
+		break;
 	default:
 		throw GraphicsException(GL_INVALID_ENUM, "Texture format not recognized");
 		break;
@@ -80,11 +90,11 @@ void Texture::LoadTexture(int width, int height, const char *data, Format format
 	// Generate an texture	
 	GL_CHECKED(glGenTextures(1, &_id));
 
-	Begin();
+	Bind();
 	GL_CHECKED(glPixelStorei(GL_UNPACK_ROW_LENGTH, stride));
 	GL_CHECKED(glTexImage2D(_type, 0, glInternalFormat, width, height, 0, glFormat, GL_UNSIGNED_BYTE, data));
 	GL_CHECKED(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
-	End();
+	UnBind();
 }
 
 void Texture::Clean()
@@ -167,12 +177,12 @@ bool Texture::IsValid() const
 	return glIsTexture(_id) == GL_TRUE;
 }
 
-void Texture::Begin()
+void Texture::Bind()
 {
 	GL_CHECKED(glBindTexture(_type, _id));
 }
 
-void Texture::End()
+void Texture::UnBind()
 {
 	GL_CHECKED(glBindTexture(_type, 0));
 }
@@ -180,15 +190,27 @@ void Texture::End()
 void Texture::UpdateData(int x, int y, int width, int height, const char *data, Format format, int stride /*= -1*/)
 {
 	GLint glFormat;
+	GLint glDataFormat;
 	switch (format) {
 	case RGB:
 		glFormat = GL_RGB;
+		glDataFormat = GL_UNSIGNED_BYTE;
 		break;
 	case RGBA:
 		glFormat = GL_RGBA;
+		glDataFormat = GL_UNSIGNED_BYTE;
 		break;
 	case Red:
 		glFormat = GL_RED;
+		glDataFormat = GL_UNSIGNED_BYTE;
+		break;
+	case USHORT_5_5_5_1:
+		glFormat = GL_RGBA;
+		glDataFormat = GL_UNSIGNED_SHORT_5_5_5_1;
+		break;
+	case USHORT_1_5_5_5:
+		glFormat = GL_RGBA;
+		glDataFormat = GL_UNSIGNED_SHORT_1_5_5_5_REV;
 		break;
 	default:
 		throw GraphicsException(GL_INVALID_ENUM, "Texture format not recognized");
@@ -198,12 +220,12 @@ void Texture::UpdateData(int x, int y, int width, int height, const char *data, 
 		stride = width;
 	}
 
-	Begin();
+	Bind();
 	GL_CHECKED(glPixelStorei(GL_UNPACK_ROW_LENGTH, stride));
 	GL_CHECKED(glPixelStorei(GL_UNPACK_ALIGNMENT, 1));
-	GL_CHECKED(glTexSubImage2D(_type, 0, x, y, width, height,glFormat, GL_UNSIGNED_BYTE, data));
+	GL_CHECKED(glTexSubImage2D(_type, 0, x, y, width, height, glFormat, glDataFormat, data));
 	GL_CHECKED(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
-	End();
+	UnBind();
 }
 
 void Texture::SetGLType(Type type)

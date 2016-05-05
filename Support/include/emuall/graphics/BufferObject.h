@@ -5,8 +5,10 @@
 
 class DLLEXPORT BufferObject
 {
+	friend class ShaderProgram;
+	friend class BufferTexture;
 public:
-	enum Type {
+	enum class Type {
 		PixelPack,
 		PixelUnpack,
 		Uniform,
@@ -19,7 +21,7 @@ public:
 		ShaderStorage,
 		TransfromFeedback
 	};
-	enum Usage {
+	enum class Usage {
 		StreamDraw,
 		StreamRead,
 		StreamCopy,

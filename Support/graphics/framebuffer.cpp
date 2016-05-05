@@ -65,7 +65,7 @@ void FrameBuffer::AttachColorBuffer(int level, bool rectangle /*= false*/)
 	Texture texture(_width, _height, NULL, Texture::RGBA, -1, 
 		rectangle ? Texture::TextureRectangle : Texture::Texture2D);
 	assert(texture.IsValid());
-	texture.Begin();
+	texture.Bind();
 	texture.SetFilter(Texture::Nearest, Texture::Nearest);
 
 	Begin();
@@ -80,7 +80,7 @@ void FrameBuffer::AttachColorBuffer(int level, bool rectangle /*= false*/)
 	(*_textures)[level] = texture;
 
 	End();
-	texture.End();
+	texture.UnBind();
 }
 
 void FrameBuffer::AttachDepthBuffer()

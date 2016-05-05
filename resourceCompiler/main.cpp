@@ -18,7 +18,7 @@ string toHex(char c)
 
 void usage(const char *progname)
 {
-	cerr << "Usage: " << progname << " [-l listFile] [-p working_path] -o output resource1 resource2 resourceN" << endl;
+	cerr << "Usage: " << progname << " [-l listFile] [-p working_path] [-u] -o output resource1 resource2 resourceN" << endl;
 }
 
 void printInfo(ostream &out, list<string> &inFiles) {
@@ -130,11 +130,59 @@ void writeData(ostream &out, list<string> &inFiles, string headerFileName) {
 	}
 }
 
+uint64_t GetFileModificationTime(const string &file) {
+	HANDLE fhandle = CreateFile(file.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL, NULL);
+	if (fhandle == INVALID_HANDLE_VALUE) {
+		return 0;
+	}
+	FILETIME fileTime;
+	if (!GetFileTime(fhandle, NULL, NULL, &fileTime)) {
+		CloseHandle(fhandle);
+		return 0;
+	}
+
+	ULARGE_INTEGER intCast;
+	intCast.LowPart = fileTime.dwLowDateTime;
+	intCast.HighPart = fileTime.dwHighDateTime;
+	uint64_t time = intCast.QuadPart;
+	CloseHandle(fhandle);
+	return time;
+}
+
+int CompareFileTimes(uint64_t a, uint64_t b) {
+	FILETIME fta, ftb;
+	ULARGE_INTEGER intcast;
+	intcast.QuadPart = a;
+	fta.dwHighDateTime = intcast.HighPart;
+	fta.dwLowDateTime = intcast.LowPart;
+	intcast.QuadPart = b;
+	ftb.dwHighDateTime = intcast.HighPart;
+	ftb.dwLowDateTime = intcast.LowPart;
+	return CompareFileTime(&fta, &ftb);
+}
+
+void UpdateFileTime(const string &file) {
+	FILETIME ft;
+	SYSTEMTIME st;
+	HANDLE fhandle = CreateFile(file.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL, NULL);
+	if (fhandle == INVALID_HANDLE_VALUE) {
+		return;
+	}
+	GetSystemTime(&st);
+	SystemTimeToFileTime(&st, &ft);
+	SetFileTime(fhandle, NULL, NULL, &ft);
+	CloseHandle(fhandle);
+}
+
 int main(int argc, char *argv[])
 {
 	string outFileName;
 	list<string> inputFiles;
 	ifstream listfile;
+	bool update = true;
+	string listFileName;
 
 	for (int i = 1; i < argc; i++)
 	{
@@ -148,6 +196,9 @@ int main(int argc, char *argv[])
 			// Starts with - so option
 			switch (argv[i][1])
 			{
+			case 'u': // Update resource file
+				update = false;
+				break;
 			case 'l':
 				if (argc == i + 1)
 				{
@@ -155,7 +206,8 @@ int main(int argc, char *argv[])
 					return -1;
 				}
 				i++;
-				listfile.open(argv[i], ios::in);
+				listFileName = argv[i];
+				listfile.open(listFileName, ios::in);
 				if (listfile.is_open())
 				{
 					while (!listfile.eof())
@@ -204,10 +256,32 @@ int main(int argc, char *argv[])
 		usage(argv[0]);
 		return -1;
 	}
+
 	string headerFileName = outFileName;
 	string dataFileName = outFileName;
 	headerFileName.append(".h");
 	dataFileName.append(".c");
+
+	if (!update) {
+		// Check if the input files are newer than the list file
+		uint64_t outTime = GetFileModificationTime(dataFileName);
+		uint64_t outTime2 = GetFileModificationTime(headerFileName);
+		if (CompareFileTimes(outTime, outTime2) < 0) outTime = outTime2;
+		uint64_t listTime = GetFileModificationTime(listFileName);
+		auto inFile = inputFiles.cbegin();
+		uint64_t newestInputFile = GetFileModificationTime(*inFile);
+		while (++inFile != inputFiles.cend()) {
+			uint64_t modTime = GetFileModificationTime(*inFile);
+			if (CompareFileTimes(modTime, newestInputFile) > 0) {
+				newestInputFile = modTime;
+			}
+		}
+		if (CompareFileTimes(outTime, newestInputFile) > 0 && CompareFileTimes(outTime, listTime) > 0) {
+			cerr << "No update necessary" << endl;
+			return 0;
+		}
+	}
+
 
 	ofstream headerFile(headerFileName, ios::out | ios::trunc);
 	if (!headerFile.is_open()) {
@@ -226,5 +300,6 @@ int main(int argc, char *argv[])
 
 	headerFile.close();
 	dataFile.close();
+	
 	return 0;
 }

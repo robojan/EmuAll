@@ -115,11 +115,6 @@ bool Gba::IsRunning() const
 	return _running;
 }
 
-void Gba::Draw(int id)
-{
-
-}
-
 void Gba::RequestIRQ(int mask)
 {
 	uint8_t *registers = _memory.GetRegisters();

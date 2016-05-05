@@ -1,7 +1,7 @@
 #include <emuall/graphics/rectangle.h>
 
 GuiRectangle::GuiRectangle(int x, int y, int w, int h, unsigned int color) :
-	_x((float)x), _y((float)y), _w((float)w), _h((float)h), _bo(BufferObject::Array)
+	_x((float)x), _y((float)y), _w((float)w), _h((float)h), _bo(BufferObject::Type::Array)
 {
 	_r = (color & 0xFF) / 255.0f;
 	_g = ((color >> 8) & 0xFF) / 255.0f;
@@ -14,7 +14,7 @@ GuiRectangle::GuiRectangle(int x, int y, int w, int h, unsigned int color) :
 		0, 0, _r, _g, _b, _a,
 		1, 0, _r, _g, _b, _a,
 	};
-	_bo.BufferData(BufferObject::StaticDraw, sizeof(data), data);
+	_bo.BufferData(BufferObject::Usage::StaticDraw, sizeof(data), data);
 }
 
 GuiRectangle::~GuiRectangle()

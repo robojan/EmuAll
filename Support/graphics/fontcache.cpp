@@ -89,7 +89,7 @@ FontCache::~FontCache()
 
 FontCache::GlyphData::GlyphData(int width, int height) :
 	texture(nextPowerOf2(width), nextPowerOf2(height), nullptr, Texture::Red),
-	uv(BufferObject::Array), width(width), height(height)
+	uv(BufferObject::Type::Array), width(width), height(height)
 {
 	float textWidth = (float)nextPowerOf2(width);
 	float textHeight = (float)nextPowerOf2(height);
@@ -107,11 +107,11 @@ FontCache::GlyphData::GlyphData(int width, int height) :
 		uvData[1] = 1.0f;
 		uvData[3] = 1.0f;
 	}
-	uv.BufferData(BufferObject::StaticDraw, sizeof(uvData), uvData);
+	uv.BufferData(BufferObject::Usage::StaticDraw, sizeof(uvData), uvData);
 }
 
 FontCache::GlyphData::GlyphData() :
-	texture(), uv(BufferObject::Array)
+	texture(), uv(BufferObject::Type::Array)
 {
 
 }

@@ -47,6 +47,9 @@ public:
 	void RegisterEvent(uint32_t address, MemoryEventHandler *evt);
 
 	uint8_t *GetRegisters();
+	uint8_t *GetPalettes();
+	uint8_t *GetVRAM();
+
 private:
 
 	// Memory map Should be first in the class memory

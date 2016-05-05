@@ -76,6 +76,9 @@
     <CustomBuild Include="resources\resources.rlst">
       <Filter>Resource Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="resources\tiles.frag.glsl">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resources\resources.h">
@@ -111,5 +114,16 @@
     <ClInclude Include="include\GBAemu\gpu\gpu.h">
       <Filter>Header Files\gpu</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\palette.vert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\palette.frag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\tiles.vert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

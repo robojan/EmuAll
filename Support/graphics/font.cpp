@@ -127,7 +127,7 @@ void Font::DrawText(GuiRenderer &renderer, float x, float y,
 			texture = &cache.CreateTexture(id, glyphIndex, _face->glyph->bitmap.width, _face->glyph->bitmap.rows);
 			texture->UpdateData(0, 0, _face->glyph->bitmap.width, _face->glyph->bitmap.rows,
 				(const char *)_face->glyph->bitmap.buffer, Texture::Red, _face->glyph->bitmap.pitch);
-			texture->Begin();
+			texture->Bind();
 			texture->SetFilter(Texture::Linear, Texture::Linear);
 		}
 		renderer.SetTQTexture(*texture);

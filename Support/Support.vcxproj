@@ -107,6 +107,13 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Dbghelp.lib;glew32s.lib;opengl32.lib;glu32.lib;freetype26.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Processing resources</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -119,6 +126,13 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>Dbghelp.lib;glew32s.lib;opengl32.lib;glu32.lib;freetype26.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Processing resources</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -135,6 +149,13 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>Dbghelp.lib;glew32s.lib;opengl32.lib;glu32.lib;freetype26.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Processing resources</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -151,10 +172,18 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>Dbghelp.lib;glew32s.lib;opengl32.lib;glu32.lib;freetype26.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Processing resources</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="exception.cpp" />
     <ClCompile Include="graphics\BufferObject.cpp" />
+    <ClCompile Include="graphics\bufferTexture.cpp" />
     <ClCompile Include="graphics\font.cpp" />
     <ClCompile Include="graphics\fontcache.cpp" />
     <ClCompile Include="graphics\fontException.cpp" />
@@ -178,6 +207,7 @@
   <ItemGroup>
     <ClInclude Include="include\emuall\common.h" />
     <ClInclude Include="include\emuall\exception.h" />
+    <ClInclude Include="include\emuall\graphics\bufferTexture.h" />
     <ClInclude Include="include\emuall\graphics\guiRenderer.h" />
     <ClInclude Include="include\emuall\graphics\rectangle.h" />
     <ClInclude Include="include\emuall\graphics\VertexArrayObject.h" />
@@ -197,62 +227,86 @@
     <ClInclude Include="resources\resources.h" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="resources\tq.frag.glsl">
+    <None Include="resources\tq.frag.glsl">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy /b "%(RootDir)%(Directory)/resources.rlst" +,,</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">touching resourceList</Message>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy /b "%(RootDir)%(Directory)/resources.rlst" +,,</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">touching resourceList</Message>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy /b "%(RootDir)%(Directory)/resources.rlst" +,,</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">touching resourceList</Message>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy /b "%(RootDir)%(Directory)/resources.rlst" +,,</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">touching resourceList</Message>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(RootDir)%(Directory)/resources.rlst</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RootDir)%(Directory)/resources.rlst</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RootDir)%(Directory)/resources.rlst</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RootDir)%(Directory)/resources.rlst</Outputs>
-    </CustomBuild>
-    <CustomBuild Include="resources\tq.vert.glsl">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </Outputs>
+    </None>
+    <None Include="resources\tq.vert.glsl">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">copy /b "%(RootDir)%(Directory)/resources.rlst" +,,</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">copy /b "%(RootDir)%(Directory)/resources.rlst" +,,</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy /b "%(RootDir)%(Directory)/resources.rlst" +,,</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy /b "%(RootDir)%(Directory)/resources.rlst" +,,</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">touching resourceList</Message>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">touching resourceList</Message>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">touching resourceList</Message>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">touching resourceList</Message>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(RootDir)%(Directory)/resources.rlst</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RootDir)%(Directory)/resources.rlst</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RootDir)%(Directory)/resources.rlst</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RootDir)%(Directory)/resources.rlst</Outputs>
-    </CustomBuild>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </Outputs>
+    </None>
     <CustomBuild Include="resources\resources.rlst">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename)</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename)</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename)</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -u -o %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -u -o %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -u -o %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -u -o %(Filename)</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Preproces resource %(FullPath) into %(RootDir)%(Directory)%(Filename).h</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Preproces resource %(FullPath) into %(RootDir)%(Directory)%(Filename).h</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Preproces resource %(FullPath) into %(RootDir)%(Directory)%(Filename).h</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Preproces resource %(FullPath) into %(RootDir)%(Directory)%(Filename).h</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(RootDir)%(Directory)%(Filename).c</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AlwaysRun</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RootDir)%(Directory)%(Filename).c</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AlwaysRun</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RootDir)%(Directory)%(Filename).c</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AlwaysRun</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RootDir)%(Directory)%(Filename).c</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AlwaysRun</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </AdditionalInputs>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

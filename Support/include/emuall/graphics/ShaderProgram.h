@@ -6,6 +6,8 @@
 #include <vector>
 
 class Texture;
+class BufferObject;
+class BufferTexture;
 
 class DLLEXPORT ShaderProgram {
 public:
@@ -44,10 +46,13 @@ public:
 	void SetUniform(const char *name, double val0, double val1, double val2);
 	void SetUniform(const char *name, double val0, double val1, double val2, double val3);
 	void SetUniform(const char *name, int pos, Texture &texture);
+	void SetUniform(const char *name, int pos, BufferTexture &texture);
+	void SetUniform(const char *name, int pos, BufferObject &object);
 
 protected:
 	bool Compile(unsigned int shader, const char *source, int len);
 	int GetUniformLocation(const char *name);
+	int GetUniformBlockLocation(const char *name);
 private:
 	std::string *_log;
 	unsigned int _program;

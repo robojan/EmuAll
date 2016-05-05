@@ -10,6 +10,8 @@ public:
 		RGB,
 		RGBA,
 		Red,
+		USHORT_5_5_5_1,
+		USHORT_1_5_5_5,
 	};
 
 	enum Filter {
@@ -53,8 +55,8 @@ public:
 
 	bool IsValid() const;
 
-	void Begin();
-	void End();
+	void Bind();
+	void UnBind();
 
 	void UpdateData(int x, int y, int width, int height, const char *data, Format format, int stride = -1);
 

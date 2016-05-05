@@ -204,6 +204,205 @@
     </mem>
     <gpu>
       <hor prop="1">
+        <hor prop="1">
+          <notebook prop="1">
+            <tab name="BG0">
+              <hor prop="1">
+                <ver prop="1">
+                  <screen id="3000" contextShare="0">
+                    <width>512</width>
+                    <height>512</height>
+                  </screen>
+                </ver>
+                <ver>
+                  <infolist prop="1">
+                  </infolist>
+                </ver>
+              </hor>
+            </tab>
+            <tab name="BG1">
+              <hor prop="1">
+                <ver prop="1">
+                  <screen id="3001" contextShare="0">
+                    <width>512</width>
+                    <height>512</height>
+                  </screen>
+                </ver>
+                <ver>
+                  <infolist prop="1">
+                  </infolist>
+                </ver>
+              </hor>
+            </tab>
+            <tab name="BG2">
+              <hor prop="1">
+                <ver prop="1">
+                  <screen id="3002" contextShare="0">
+                    <width>512</width>
+                    <height>512</height>
+                  </screen>
+                </ver>
+                <ver>
+                  <infolist prop="1">
+                  </infolist>
+                </ver>
+              </hor>
+            </tab>
+            <tab name="BG3">
+              <hor prop="1">
+                <ver prop="1">
+                  <screen id="3003" contextShare="0">
+                    <width>512</width>
+                    <height>512</height>
+                  </screen>
+                </ver>
+                <ver>
+                  <infolist prop="1">
+                  </infolist>
+                </ver>
+              </hor>
+            </tab>
+            <tab name="Tiles 1">
+              <hor prop="1">
+                <screen prop="1" id="3006" contextShare="0">
+                  <width>512</width>
+                  <height>512</height>
+                </screen>
+                <ver>
+                  <checkbox id="3053">
+                    <name>Grid</name>
+                  </checkbox>
+                  <radio id="3050">
+                    <name>Depth</name>
+                    <option val="0">8 bit</option>
+                    <option val="1">4 bit</option>
+                  </radio>
+                </ver>
+              </hor>
+            </tab>
+            <tab name="Tiles 2">
+              <hor prop="1">
+                <screen prop="1" id="3007" contextShare="0">
+                  <width>512</width>
+                  <height>512</height>
+                </screen>
+                <ver>
+                  <checkbox id="3054">
+                    <name>Grid</name>
+                  </checkbox>
+                  <radio id="3051">
+                    <name>Depth</name>
+                    <option val="0">8 bit</option>
+                    <option val="1">4 bit</option>
+                  </radio>
+                </ver>
+              </hor>
+            </tab>
+            <tab name="OBJ Tiles">
+              <hor prop="1">
+                <screen prop="1" id="3008" contextShare="0">
+                  <width>512</width>
+                  <height>512</height>
+                </screen>
+                <ver>
+                  <checkbox id="3055">
+                    <name>Grid</name>
+                  </checkbox>
+                  <radio id="3052">
+                    <name>Depth</name>
+                    <option val="0">8 bit</option>
+                    <option val="1">4 bit</option>
+                  </radio>
+                </ver>
+              </hor>
+            </tab>
+            <tab name="Palette">
+              <ver prop="1">
+                <grid name="Background Palette">
+                  <columns>1</columns>
+                  <screen id ="3004" contextShare="0">
+                    <width>512</width>
+                    <height>256</height>
+                  </screen>
+                </grid>
+                <grid name="Object Palette">
+                  <columns>1</columns>
+                  <screen id ="3005" contextShare="0">
+                    <width>512</width>
+                    <height>256</height>
+                  </screen>
+                </grid>
+              </ver>
+            </tab>
+          </notebook>
+        </hor>
+        <ver>
+          <infolist prop="1" width="185">
+            <info id="3000">
+              <name>BG Mode</name>
+            </info>
+            <info id="3001">
+              <name>Frame</name>
+            </info>
+            <flag id="3002">
+              <name>CGB mode</name>
+            </flag>
+            <flag id="3003">
+              <name>H-Blank Interval Free</name>
+            </flag>
+            <flag id="3004">
+              <name>OBJ char VRAM mapping</name>
+            </flag>
+            <flag id="3005">
+              <name>Forced Blank</name>
+            </flag>
+            <flag id="3006">
+              <name>BG0 enabled</name>
+            </flag>
+            <flag id="3007">
+              <name>BG1 enabled</name>
+            </flag>
+            <flag id="3008">
+              <name>BG2 enabled</name>
+            </flag>
+            <flag id="3009">
+              <name>BG3 enabled</name>
+            </flag>
+            <flag id="3010">
+              <name>OBJ enabled</name>
+            </flag>
+            <flag id="3011">
+              <name>Window 0 enabled</name>
+            </flag>
+            <flag id="3012">
+              <name>Window 1 enabled</name>
+            </flag>
+            <flag id="3013">
+              <name>OBJ window enabled</name>
+            </flag>
+            <flag id="3014">
+              <name>V-Blank IRQ</name>
+            </flag>
+            <flag id="3015">
+              <name>H-Blank IRQ</name>
+            </flag>
+            <flag id="3016">
+              <name>V-Match IRQ</name>
+            </flag>
+            <flag id="3017">
+              <name>V-Blank IE</name>
+            </flag>
+            <flag id="3018">
+              <name>H-Blank IE</name>
+            </flag>
+            <flag id="3019">
+              <name>V-Match IE</name>
+            </flag>
+            <info id="3020">
+              <name>V-Match</name>
+            </info>
+          </infolist>
+        </ver>
       </hor>
     </gpu>
     <sound>

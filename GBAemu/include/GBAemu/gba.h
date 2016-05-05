@@ -21,13 +21,11 @@ public:
 	int Tick(unsigned int time);
 	void Run(bool run = true);
 	bool IsRunning() const;
-
-	// Graphics functions
-	void Draw(int id);
 	
 	// access functions
 	Memory &GetMemory() { return _memory; }
 	Cpu &GetCpu() { return _cpu; }
+	Gpu &GetGpu() { return _gpu; }
 	Disassembler &GetDisassembler() { return _disassembler; }
 
 	// execution functions

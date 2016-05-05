@@ -55,7 +55,7 @@ void EmulatorScreen::InitGL()
 			_vao = new VertexArrayObject();
 		}
 		if (_vbo == nullptr) {
-			_vbo = new BufferObject(BufferObject::Array);
+			_vbo = new BufferObject(BufferObject::Type::Array);
 		}
 		if (_guiRenderer == nullptr) {
 			_guiRenderer = new GuiRenderer();
@@ -68,7 +68,7 @@ void EmulatorScreen::InitGL()
 			_messageBackground = new GuiRectangle(0, 0, 200, 50, 0x80000000);
 		}
 		_vao->Begin();
-		_vbo->BufferData(BufferObject::StaticDraw, sizeof(fboData), fboData);
+		_vbo->BufferData(BufferObject::Usage::StaticDraw, sizeof(fboData), fboData);
 		_vao->BindBuffer(0, *_vbo, 3, VertexArrayObject::Float, false, 5 * sizeof(float), 0);
 		_vao->BindBuffer(1, *_vbo, 2, VertexArrayObject::Float, false, 5 * sizeof(float), 3 * sizeof(float));
 		_vao->End();
@@ -229,7 +229,7 @@ void EmulatorScreen::Render(wxPaintEvent &evt)
 		// Draw the screen
 		GL_CHECKED(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
 
-		frame.End();
+		frame.UnBind();
 		_vao->End();
 		_shader.End();
 

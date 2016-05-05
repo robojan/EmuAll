@@ -4,10 +4,10 @@
 	<description>Gameboy color emulator.</description>
 	<about>Gameboy color emulator made by Robbert-Jan "robojan" de Jager.</about>
 	<fileFilter>*.gb;*.gbc;*.cgb</fileFilter>
-	<screen id="0">
-		<width>160</width>
-		<height>140</height>
-	</screen>
+  <screen id="0">
+    <width>160</width>
+    <height>140</height>
+  </screen>
 	<audio>
 		<sources>4</sources>
 	</audio>

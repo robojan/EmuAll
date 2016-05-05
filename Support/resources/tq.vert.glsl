@@ -23,6 +23,6 @@ void main() {
 	gl_Position.w = 1.0;
 	gl_Position.z = 0.0;
 
-	// Set the output uv 
+	// Set the output uv
 	UV = vertexUV;
 }

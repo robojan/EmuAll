@@ -38,6 +38,7 @@ namespace Debugger {
 		Emulator *_emu;
 		wxListCtrl *_widget;
 		std::map<int, Item> _items;
+		int _width;
 
 	};
 }

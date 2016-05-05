@@ -1,5 +1,10 @@
+
+#include <GL/glew.h>
+#include <GL/wglew.h>
+
 #include <string>
 #include <algorithm>
+#include <cassert>
 
 #include <emu.h>
 #include <GBAemu/gba.h>
@@ -9,6 +14,14 @@
 #include "resources/resources.h"
 
 void(*Log)(enum loglevel, char *, ...);
+
+void __stdcall InitPlugin()
+{
+	// Initialize GLEW
+	glewExperimental = true;
+	GLenum result = glewInit();
+	assert(result == GLEW_OK);
+}
 
 // General functions
 const uint8_t * __stdcall GetDescription(uint32_t *size) {
@@ -81,6 +94,34 @@ int32_t __stdcall IsRunning(EMUHANDLE handle) {
 	if (emulator == nullptr)
 		return 0;
 	return emulator->IsRunning() ? 1 : 0;
+}
+
+uint32_t __stdcall InitGL(EMUHANDLE handle, int32_t id) {
+	Gba *emulator = reinterpret_cast<Gba *>(handle);
+	if (emulator == nullptr)
+		return 0;
+	return emulator->GetGpu().InitGL(id) ? 1 : 0;
+}
+void __stdcall DestroyGL(EMUHANDLE handle, int32_t id) {
+	Gba *emulator = reinterpret_cast<Gba *>(handle);
+	if (emulator == nullptr)
+		return;
+	emulator->GetGpu().DestroyGL(id);
+}
+
+void __stdcall Reshape(EMUHANDLE handle, int32_t id, int32_t width, int32_t height, int32_t keepAspect)
+{
+	Gba *emulator = reinterpret_cast<Gba *>(handle);
+	if (emulator == nullptr)
+		return;
+	emulator->GetGpu().Reshape(id, width, height, keepAspect != 0);
+}
+
+void __stdcall Draw(EMUHANDLE handle, int32_t id) {
+	Gba *emulator = reinterpret_cast<Gba *>(handle);
+	if (emulator == nullptr)
+		return;
+	emulator->GetGpu().Draw(id);
 }
 
 uint8_t __stdcall Disassemble(EMUHANDLE handle, uint32_t pos, const uint8_t **raw, const uint8_t **instr) {
@@ -202,7 +243,91 @@ uint32_t __stdcall GetValU(EMUHANDLE handle, int32_t id) {
 		return emulator->GetMemory().GetSRAMSize();
 	case 2011: // ROM size
 		return emulator->GetMemory().GetRomSize();
+	case 3000: // BG mode
+		return emulator->GetMemory().Read32(DISPCNT) & 0x7;
+	case 3001: // Active frame
+		return (emulator->GetMemory().Read32(DISPCNT) >> 4) & 0x1;
+	case 3002: // CGB mode
+		return (emulator->GetMemory().Read32(DISPCNT) & 0x8) ? 1 : 0;
+	case 3003: // H-Blank interval free
+		return (emulator->GetMemory().Read32(DISPCNT) & 0x20) ? 1 : 0;
+	case 3004: // OBJ Character VRAM Mapping
+		return (emulator->GetMemory().Read32(DISPCNT) & 0x40) ? 1 : 0;
+	case 3005: // Forced blank
+		return (emulator->GetMemory().Read32(DISPCNT) & 0x80) ? 1 : 0;
+	case 3006: // BG0 Enabled
+		return (emulator->GetMemory().Read32(DISPCNT) & 0x100) ? 1 : 0;
+	case 3007: // BG1 Enabled
+		return (emulator->GetMemory().Read32(DISPCNT) & 0x200) ? 1 : 0;
+	case 3008: // BG2 Enabled
+		return (emulator->GetMemory().Read32(DISPCNT) & 0x400) ? 1 : 0;
+	case 3009: // BG3 Enabled
+		return (emulator->GetMemory().Read32(DISPCNT) & 0x800) ? 1 : 0;
+	case 3010: // OBJ Enabled
+		return (emulator->GetMemory().Read32(DISPCNT) & 0x1000) ? 1 : 0;
+	case 3011: // Window 0 Enabled
+		return (emulator->GetMemory().Read32(DISPCNT) & 0x2000) ? 1 : 0;
+	case 3012: // Window 1 Enabled
+		return (emulator->GetMemory().Read32(DISPCNT) & 0x4000) ? 1 : 0;
+	case 3013: // OBJ window Enabled
+		return (emulator->GetMemory().Read32(DISPCNT) & 0x8000) ? 1 : 0;
+	case 3014: // V-Blank IRQ
+		return (emulator->GetMemory().Read32(DISPSTAT) & 0x1) ? 1 : 0;
+	case 3015: // H-Blank IRQ
+		return (emulator->GetMemory().Read32(DISPSTAT) & 0x2) ? 1 : 0;
+	case 3016: // V-Match IRQ
+		return (emulator->GetMemory().Read32(DISPSTAT) & 0x4) ? 1 : 0;
+	case 3017: // V-Blank IE
+		return (emulator->GetMemory().Read32(DISPSTAT) & 0x8) ? 1 : 0;
+	case 3018: // H-Blank IE
+		return (emulator->GetMemory().Read32(DISPSTAT) & 0x10) ? 1 : 0;
+	case 3019: // V-Match IE
+		return (emulator->GetMemory().Read32(DISPSTAT) & 0x20) ? 1 : 0;
+	case 3020: // V-Match
+		return (emulator->GetMemory().Read32(DISPSTAT) >> 8) & 0xFF;
+	case 3050: // bit depth tiles 1
+		return (emulator->GetGpu()._debugTiles8BitDepth[0] ? 0 : 1);
+	case 3051: // bit depth tiles 2
+		return (emulator->GetGpu()._debugTiles8BitDepth[1] ? 0 : 1);
+	case 3052: // bit depth obj tiles
+		return (emulator->GetGpu()._debugTiles8BitDepth[2] ? 0 : 1);
+	case 3053: // grid enabled tiles 1
+		return (emulator->GetGpu()._debugTilesGridEnabled[0] ? 1 :0);
+	case 3054: // grid enabled tiles 2
+		return (emulator->GetGpu()._debugTilesGridEnabled[1] ? 1 : 0);
+	case 3055: // grid enabled obj tiles
+		return (emulator->GetGpu()._debugTilesGridEnabled[2] ? 1 : 0);
 	default:
 		return 0;
+	}
+}
+
+void __stdcall SetValI(EMUHANDLE handle, int32_t id, int32_t val) {
+	SetValU(handle, id, val);
+}
+
+void __stdcall SetValU(EMUHANDLE handle, int32_t id, uint32_t val) {
+	Gba *emulator = (Gba *)handle;
+	if (emulator == NULL)
+		return;
+	switch (id) {
+	case 3050: // bit depth tiles 1
+		emulator->GetGpu()._debugTiles8BitDepth[0] = (val == 0);
+		break;
+	case 3051: // bit depth tiles 2
+		emulator->GetGpu()._debugTiles8BitDepth[1] = (val == 0);
+		break;
+	case 3052: // bit depth obj tiles
+		emulator->GetGpu()._debugTiles8BitDepth[2] = (val == 0);
+		break;
+	case 3053: // grid enabled tiles 1
+		emulator->GetGpu()._debugTilesGridEnabled[0] = (val != 0);
+		break;
+	case 3054: // grid enabled tiles 2
+		emulator->GetGpu()._debugTilesGridEnabled[1] = (val != 0);
+		break;
+	case 3055: // grid enabled obj tiles
+		emulator->GetGpu()._debugTilesGridEnabled[2] = (val != 0);
+		break;
 	}
 }

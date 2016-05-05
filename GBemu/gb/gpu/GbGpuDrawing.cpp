@@ -49,7 +49,7 @@ bool GbGpu::InitGL(int user)
 		case 0: {// main screen
 				 // Generate texture for drawing
 			_texture.LoadTexture(256, 256, NULL, Texture::RGB);
-			_texture.Begin();
+			_texture.Bind();
 			_texture.SetFilter(Texture::Nearest, Texture::Nearest);
 			
 			if (_surfaceVAO == nullptr) {
@@ -59,8 +59,8 @@ bool GbGpu::InitGL(int user)
 				delete _surfaceBO;
 			}
 			_surfaceVAO = new VertexArrayObject();
-			_surfaceBO = new BufferObject(BufferObject::Array);
-			_surfaceBO->BufferData(BufferObject::StaticDraw, sizeof(screenData), screenData);
+			_surfaceBO = new BufferObject(BufferObject::Type::Array);
+			_surfaceBO->BufferData(BufferObject::Usage::StaticDraw, sizeof(screenData), screenData);
 			_surfaceVAO->Begin();
 			_surfaceVAO->BindBuffer(0, *_surfaceBO, 3, VertexArrayObject::Float, false, 5 * sizeof(GLfloat), 0);
 			_surfaceVAO->BindBuffer(1, *_surfaceBO, 2, VertexArrayObject::Float, false, 5 * sizeof(GLfloat), 3 * sizeof(GLfloat));
@@ -89,7 +89,7 @@ bool GbGpu::InitGL(int user)
 		}
 		case 1: {// Background screen
 			_BGTexture.LoadTexture(256, 256, NULL, Texture::RGB);
-			_BGTexture.Begin();
+			_BGTexture.Bind();
 			_BGTexture.SetFilter(Texture::Nearest, Texture::Nearest);
 			if (_BGVAO == nullptr) {
 				delete _BGVAO;
@@ -98,8 +98,8 @@ bool GbGpu::InitGL(int user)
 				delete _BGBO;
 			}
 			_BGVAO = new VertexArrayObject();
-			_BGBO = new BufferObject(BufferObject::Array);
-			_BGBO->BufferData(BufferObject::StaticDraw, sizeof(bgData), bgData);
+			_BGBO = new BufferObject(BufferObject::Type::Array);
+			_BGBO->BufferData(BufferObject::Usage::StaticDraw, sizeof(bgData), bgData);
 			_BGVAO->Begin();
 			_BGVAO->BindBuffer(0, *_BGBO, 3, VertexArrayObject::Float, false, 5 * sizeof(GLfloat), 0);
 			_BGVAO->BindBuffer(1, *_BGBO, 2, VertexArrayObject::Float, false, 5 * sizeof(GLfloat), 3 * sizeof(GLfloat));
@@ -124,7 +124,7 @@ bool GbGpu::InitGL(int user)
 		}
 		case 2: {// Tiles screen
 			_TiTexture.LoadTexture(512, 512, NULL, Texture::RGB);
-			_TiTexture.Begin();
+			_TiTexture.Bind();
 			_TiTexture.SetFilter(Texture::Nearest, Texture::Nearest);
 			if (_TiVAO == nullptr) {
 				delete _TiVAO;
@@ -133,8 +133,8 @@ bool GbGpu::InitGL(int user)
 				delete _TiBO;
 			}
 			_TiVAO = new VertexArrayObject();
-			_TiBO = new BufferObject(BufferObject::Array);
-			_TiBO->BufferData(BufferObject::StaticDraw, sizeof(tilesData), tilesData);
+			_TiBO = new BufferObject(BufferObject::Type::Array);
+			_TiBO->BufferData(BufferObject::Usage::StaticDraw, sizeof(tilesData), tilesData);
 			_TiVAO->Begin();
 			_TiVAO->BindBuffer(0, *_TiBO, 3, VertexArrayObject::Float, false, 5 * sizeof(GLfloat), 0);
 			_TiVAO->BindBuffer(1, *_TiBO, 2, VertexArrayObject::Float, false, 5 * sizeof(GLfloat), 3 * sizeof(GLfloat));
@@ -160,7 +160,7 @@ bool GbGpu::InitGL(int user)
 		}
 		case 3: {// OAM screen
 			_OAMTexture.LoadTexture(128, 128, NULL, Texture::RGB);
-			_OAMTexture.Begin();
+			_OAMTexture.Bind();
 			_OAMTexture.SetFilter(Texture::Nearest, Texture::Nearest);
 			if (_OAMVAO == nullptr) {
 				delete _OAMVAO;
@@ -169,8 +169,8 @@ bool GbGpu::InitGL(int user)
 				delete _OAMBO;
 			}
 			_OAMVAO = new VertexArrayObject();
-			_OAMBO = new BufferObject(BufferObject::Array);
-			_OAMBO->BufferData(BufferObject::StaticDraw, sizeof(oamData), oamData);
+			_OAMBO = new BufferObject(BufferObject::Type::Array);
+			_OAMBO->BufferData(BufferObject::Usage::StaticDraw, sizeof(oamData), oamData);
 			_OAMVAO->Begin();
 			_OAMVAO->BindBuffer(0, *_OAMBO, 3, VertexArrayObject::Float, false, 5 * sizeof(GLfloat), 0);
 			_OAMVAO->BindBuffer(1, *_OAMBO, 2, VertexArrayObject::Float, false, 5 * sizeof(GLfloat), 3 * sizeof(GLfloat));
@@ -280,11 +280,11 @@ void GbGpu::drawGL(int user)
 			// Enable shader and load buffers
 			_shader.Begin();
 			_surfaceVAO->Begin();
-			_texture.Begin();
+			_texture.Bind();
 
 			// Draw the screen
 			GL_CHECKED(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
-			_texture.End();
+			_texture.UnBind();
 
 			_surfaceVAO->End();
 			_shader.End();
@@ -369,14 +369,14 @@ void GbGpu::DrawDebugBackground()
 	// Enable shader and load buffers
 	_BGShader.Begin();
 	_BGVAO->Begin();
-	_BGTexture.Begin();
+	_BGTexture.Bind();
 
 
 	// Draw the screen
 	GL_CHECKED(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
 
 	// Unload the buffers
-	_BGTexture.End();
+	_BGTexture.UnBind();
 	_BGVAO->End();
 	_BGShader.End();
 }
@@ -423,11 +423,11 @@ void GbGpu::DrawDebugTiles()
 	// Enable shader and load buffers
 	_TiShader.Begin();
 	_TiVAO->Begin();
-	_TiTexture.Begin();
+	_TiTexture.Bind();
 
 	// Draw the screen
 	GL_CHECKED(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
-	_TiTexture.End();
+	_TiTexture.UnBind();
 	_TiVAO->End();
 	_TiShader.End();
 }
@@ -502,12 +502,12 @@ void GbGpu::DrawDebugOAM()
 	// Enable shader and load buffers
 	_OAMShader.Begin();
 	_OAMVAO->Begin();
-	_OAMTexture.Begin();
+	_OAMTexture.Bind();
 
 	// Draw the screen
 	GL_CHECKED(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
 
-	_OAMTexture.End();
+	_OAMTexture.UnBind();
 	_OAMVAO->End();
 	_OAMShader.End();
 }

@@ -1,6 +1,8 @@
 
 #include <emuall/graphics/ShaderProgram.h>
 #include <emuall/graphics/texture.h>
+#include <emuall/graphics/BufferObject.h>
+#include <emuall/graphics/bufferTexture.h>
 #include <emuall/graphics/graphicsException.h>
 
 #include <GL/glew.h>
@@ -216,16 +218,6 @@ void ShaderProgram::SetUniform(const char *name, double val)
 	}
 }
 
-void ShaderProgram::SetUniform(const char *name, int pos, Texture &texture)
-{
-	int loc = GetUniformLocation(name);
-	if (loc != -1) {
-		GL_CHECKED(glUniform1i(loc, pos));
-		GL_CHECKED(glActiveTexture(GL_TEXTURE0 + pos));
-		texture.Begin();
-	}
-}
-
 void ShaderProgram::SetUniform(const char *name, int val0, int val1)
 {
 	int loc = GetUniformLocation(name);
@@ -298,6 +290,35 @@ void ShaderProgram::SetUniform(const char *name, double val0, double val1, doubl
 	}
 }
 
+void ShaderProgram::SetUniform(const char *name, int pos, BufferObject &object)
+{
+	int loc = GetUniformBlockLocation(name);
+	if (loc != -1) {
+		GL_CHECKED(glUniformBlockBinding(_program, loc, pos));
+		GL_CHECKED(glBindBufferBase(GL_UNIFORM_BUFFER, pos, object._bo));
+	}
+}
+
+void ShaderProgram::SetUniform(const char *name, int pos, Texture &texture)
+{
+	int loc = GetUniformLocation(name);
+	if (loc != -1) {
+		GL_CHECKED(glActiveTexture(GL_TEXTURE0 + pos));
+		texture.Bind();
+		GL_CHECKED(glUniform1i(loc, pos));
+	}
+}
+
+void ShaderProgram::SetUniform(const char *name, int pos, BufferTexture &texture)
+{
+	int loc = GetUniformLocation(name);
+	if (loc != -1) {
+		GL_CHECKED(glActiveTexture(GL_TEXTURE0 + pos));
+		texture.Bind();
+		GL_CHECKED(glUniform1i(loc, pos));
+	}
+}
+
 bool ShaderProgram::Compile(unsigned int shader, const char *source, int len)
 {
 	assert(glIsShader(shader) == GL_TRUE);
@@ -330,5 +351,12 @@ int ShaderProgram::GetUniformLocation(const char *name)
 {
 	int loc;
 	GL_CHECKED(loc = glGetUniformLocation(_program, name));
+	return loc;
+}
+
+int ShaderProgram::GetUniformBlockLocation(const char *name)
+{
+	int loc;
+	GL_CHECKED(loc = glGetUniformBlockIndex(_program, name));
 	return loc;
 }

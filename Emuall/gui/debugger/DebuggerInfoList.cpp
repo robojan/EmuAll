@@ -5,11 +5,12 @@
 using namespace Debugger;
 
 DebuggerInfoList::DebuggerInfoList(Emulator *emu, const pugi::xml_node &node) :
-	_emu(emu), _widget(NULL)
+	_emu(emu), _widget(NULL), _width(-1)
 {
 	// Create an internal representation of the data
 	wxASSERT(strcmp(node.name(), "infolist") == 0);
 	wxASSERT(emu != NULL);
+	_width = node.attribute("width").as_int(-1);
 	pugi::xml_object_range<pugi::xml_node_iterator> children = node.children();
 	int i = 0;
 	for (pugi::xml_node_iterator iChild = children.begin(); iChild != children.end(); ++iChild)
@@ -79,9 +80,11 @@ wxListCtrl *DebuggerInfoList::GetWidget(wxWindow *parent, wxWindowID id)
 
 	// Create the widget
 	std::map<int, Item> newMap;
-	_widget = new wxListCtrl(parent, id, wxDefaultPosition, wxDefaultSize, wxLC_HRULES | wxLC_NO_SORT_HEADER | wxLC_REPORT | wxLC_SINGLE_SEL | wxHSCROLL);
+	wxSize size(_width, -1);
+	_widget = new wxListCtrl(parent, id, wxDefaultPosition, size, wxLC_HRULES | wxLC_NO_SORT_HEADER | wxLC_REPORT | wxLC_SINGLE_SEL | wxHSCROLL);
 	_widget->AppendColumn("Name");
 	_widget->AppendColumn("Value", wxLIST_FORMAT_LEFT);
+	_widget->SetMinClientSize(size);
 
 	std::map<int, Item>::iterator iItem;
 	for (iItem = _items.begin(); iItem != _items.end(); ++iItem)

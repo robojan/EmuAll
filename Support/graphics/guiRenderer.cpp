@@ -104,7 +104,7 @@ void GuiRenderer::DrawSolid(int numVertices)
 }
 
 GuiRenderer::GuiRenderer() :
-	_TQVertices(BufferObject::Array)
+	_TQVertices(BufferObject::Type::Array)
 {
 	static float verticesData[] = {
 		0.0f, 1.0f,
@@ -113,7 +113,7 @@ GuiRenderer::GuiRenderer() :
 		1.0f, 0.0f
 	};
 
-	_TQVertices.BufferData(BufferObject::StaticDraw, sizeof(verticesData), verticesData);
+	_TQVertices.BufferData(BufferObject::Usage::StaticDraw, sizeof(verticesData), verticesData);
 
 	_TQVao.Begin();
 	_TQVao.BindBuffer(0, _TQVertices, 2, VertexArrayObject::Float);

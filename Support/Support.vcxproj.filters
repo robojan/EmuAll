@@ -96,6 +96,9 @@
     <ClCompile Include="util\string.cpp">
       <Filter>Source Files\util</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\bufferTexture.cpp">
+      <Filter>Source Files\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\emuall\common.h">
@@ -155,17 +158,9 @@
     <ClInclude Include="include\emuall\util\tree.h">
       <Filter>Header Files\util</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="resources\resources.rlst">
-      <Filter>Resource Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="resources\tq.frag.glsl">
-      <Filter>Resource Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="resources\tq.vert.glsl">
-      <Filter>Resource Files</Filter>
-    </CustomBuild>
+    <ClInclude Include="include\emuall\graphics\bufferTexture.h">
+      <Filter>Header Files\graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\solid.frag.glsl">
@@ -174,5 +169,16 @@
     <None Include="resources\solid.vert.glsl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="resources\tq.frag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\tq.vert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="resources\resources.rlst">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

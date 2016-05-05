@@ -463,30 +463,30 @@
     </Text>
     <CustomBuild Include="resources\resources.rlst">
       <FileType>Text</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename)</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename)</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename)</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename)</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename)</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release wx|x64'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename)</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename)</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug inline|x64'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -o %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -u -o %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -u -o %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -u -o %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -u -o %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -u -o %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release wx|x64'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -u -o %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -u -o %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug inline|x64'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -u -o %(Filename)</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Preproces resource %(FullPath) into %(RootDir)%(Directory)%(Filename).h</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Preproces resource %(FullPath) into %(RootDir)%(Directory)%(Filename).h</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(RootDir)%(Directory)%(Filename).c</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RootDir)%(Directory)%(Filename).c</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AlwaysRun</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AlwaysRun</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Preproces resource %(FullPath) into %(RootDir)%(Directory)%(Filename).h</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Preproces resource %(FullPath) into %(RootDir)%(Directory)%(Filename).h</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RootDir)%(Directory)%(Filename).c</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RootDir)%(Directory)%(Filename).c</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AlwaysRun</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AlwaysRun</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">Preproces resource %(FullPath) into %(RootDir)%(Directory)%(Filename).h</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release wx|x64'">Preproces resource %(FullPath) into %(RootDir)%(Directory)%(Filename).h</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">%(RootDir)%(Directory)%(Filename).c</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release wx|x64'">%(RootDir)%(Directory)%(Filename).c</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">AlwaysRun</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release wx|x64'">AlwaysRun</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">Preproces resource %(FullPath) into %(RootDir)%(Directory)%(Filename).h</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug inline|x64'">Preproces resource %(FullPath) into %(RootDir)%(Directory)%(Filename).h</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">%(RootDir)%(Directory)%(Filename).c</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug inline|x64'">%(RootDir)%(Directory)%(Filename).c</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">AlwaysRun</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug inline|x64'">AlwaysRun</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
