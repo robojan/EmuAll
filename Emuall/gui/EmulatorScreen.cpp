@@ -18,7 +18,7 @@ static GLfloat fboData[] = {
 
 EmulatorScreen::EmulatorScreen(wxWindow *parent, GLPaneI *callback, int user, wxWindowID id, const wxPoint &pos,
 	const wxSize &size, long style, const wxGLAttributes &attr, const wxGLContextAttrs &ctxAttr) :
-	GLPane(parent, callback, user, id, pos, size, style, attr, ctxAttr),
+	GLPane(parent, callback, user, id, pos, size, style, attr, ctxAttr, 0),
 	_fbo(nullptr), _vbo(nullptr), _vao(nullptr), _initialized(false), _guiRenderer(nullptr), _messageFont(nullptr),
 	_messageBackground(nullptr)
 {

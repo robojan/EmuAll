@@ -165,6 +165,9 @@
     <ClCompile Include="Emulator\Sound\AudioStream.cpp">
       <Filter>Source Files\Emulator\Sound</Filter>
     </ClCompile>
+    <ClCompile Include="gui\GLContextManager.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="keyhandler.h">
@@ -301,6 +304,9 @@
     </ClInclude>
     <ClInclude Include="Emulator\Sound\AudioStream.h">
       <Filter>Header Files\Emulator\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\GLContextManager.h">
+      <Filter>Header Files\gui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -324,6 +324,7 @@
     <ClCompile Include="gui\debugger\debuggerScreen.cpp" />
     <ClCompile Include="gui\DisView.cpp" />
     <ClCompile Include="gui\EmulatorScreen.cpp" />
+    <ClCompile Include="gui\GLContextManager.cpp" />
     <ClCompile Include="gui\GLPane.cpp" />
     <ClCompile Include="gui\gpuDebugger.cpp" />
     <ClCompile Include="gui\HexView.cpp" />
@@ -365,6 +366,7 @@
     <ClInclude Include="gui\debugger\DebuggerScreen.h" />
     <ClInclude Include="gui\DisView.h" />
     <ClInclude Include="gui\EmulatorScreen.h" />
+    <ClInclude Include="gui\GLContextManager.h" />
     <ClInclude Include="gui\GLPane.h" />
     <ClInclude Include="gui\gpuDebugger.h" />
     <ClInclude Include="gui\HexView.h" />

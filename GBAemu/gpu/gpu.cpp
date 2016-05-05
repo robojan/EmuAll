@@ -17,11 +17,8 @@ Gpu::Gpu(Gba &system) :
 	_debugTiles8BitDepth{ false, false, false },
 	_debugTilesGridEnabled{ true, true, true },
 	_system(system), _vcount(0), _hcount(0),
-	_paletteShader{nullptr, nullptr}, _paletteData{nullptr, nullptr}, 
-	_paletteVertexData{nullptr, nullptr}, _paletteVao{nullptr, nullptr},
-	_tilesShader{nullptr, nullptr, nullptr}, _tilesPaletteData{nullptr, nullptr, nullptr},
-	_tilesData{nullptr, nullptr, nullptr}, _tilesVertexData{nullptr, nullptr, nullptr},
-	_tilesVao{nullptr, nullptr, nullptr}
+	_paletteInitialized{false, false}, _paletteVao{nullptr, nullptr},
+	_tilesInitialized{false, false, false}, _tilesVao{nullptr, nullptr, nullptr}
 {
 	uint8_t *registers = _system.GetMemory().GetRegisters();
 
@@ -183,96 +180,94 @@ bool Gpu::InitPalettesGL(bool background)
 	};
 	int index = background ? 0 : 1;
 	try {
-		DestroyPalettesGL(background);
 		// Clear
 		GL_CHECKED(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
 
+		if (_paletteInitialized[index]) {
+			DestroyPalettesGL(background);
+		}
+
+		// Create Shader program
+		_paletteShader.IncRef();
+		if (_paletteShader.GetRefCount() == 1) {
+			if (!_paletteShader->AddShader(ShaderProgram::Vertex, (char *)resource_palette_vert_glsl,
+				resource_palette_vert_glsl_len)) {
+				Log(Error, "Could not Compile palette vertex shader\n");
+				throw GraphicsException(0, _paletteShader->GetLog());
+			}
+			if (!_paletteShader->AddShader(ShaderProgram::Fragment, (char *)resource_palette_frag_glsl,
+				resource_palette_frag_glsl_len)) {
+				Log(Error, "Could not Compile palette fragment shader\n");
+				throw GraphicsException(0, _paletteShader->GetLog());
+			}
+			if (!_paletteShader->Link()) {
+				Log(Error, "Could not Link palette shader program\n");
+				throw GraphicsException(0, _paletteShader->GetLog());
+			}
+		}
+
 		// Create Vertex buffer object
-		_paletteVertexData[index] = new BufferObject(BufferObject::Type::Array);
-		_paletteVertexData[index]->BufferData(BufferObject::Usage::StaticDraw, sizeof(vertexData), vertexData);
+		_paletteVertexData.IncRef(BufferObject::Type::Array);
+		if (_paletteVertexData.GetRefCount() == 1) {
+			_paletteVertexData->BufferData(BufferObject::Usage::StaticDraw, sizeof(vertexData), vertexData);
+		}
 
 		// Create buffer for palette data
-		_paletteData[index] = new Texture(16, 16, nullptr, Texture::RGBA);
-		_paletteData[index]->Bind();
-		_paletteData[index]->SetFilter(Texture::Nearest, Texture::Nearest);
-		_paletteData[index]->SetWrap(Texture::Repeat, Texture::Repeat);
-		_paletteData[index]->UnBind();
+		InitPaletteDataGL();
 
 		// Create Vertex array object
 		_paletteVao[index] = new VertexArrayObject;
 		_paletteVao[index]->Begin();
-		_paletteVao[index]->BindBuffer(0, *_paletteVertexData[index], 2,
+		_paletteVao[index]->BindBuffer(0, *_paletteVertexData, 2,
 			VertexArrayObject::Float, false, 4 * sizeof(float), 0 * sizeof(float));
-		_paletteVao[index]->BindBuffer(1, *_paletteVertexData[index], 2,
+		_paletteVao[index]->BindBuffer(1, *_paletteVertexData, 2,
 			VertexArrayObject::Float, false, 4 * sizeof(float), 2 * sizeof(float));
 		_paletteVao[index]->End();
-
-		// Create Shader program
-		_paletteShader[index] = new ShaderProgram;
-		if (!_paletteShader[index]->AddShader(ShaderProgram::Vertex, (char *)resource_palette_vert_glsl,
-			resource_palette_vert_glsl_len)) {
-			Log(Error, "Could not Compile palette vertex shader\n");
-			throw GraphicsException(0, _paletteShader[index]->GetLog());
-		}
-		if (!_paletteShader[index]->AddShader(ShaderProgram::Fragment, (char *)resource_palette_frag_glsl,
-			resource_palette_frag_glsl_len)) {
-			Log(Error, "Could not Compile palette fragment shader\n");
-			throw GraphicsException(0, _paletteShader[index]->GetLog());
-		}
-		if (!_paletteShader[index]->Link()) {
-			Log(Error, "Could not Link palette shader program\n");
-			throw GraphicsException(0, _paletteShader[index]->GetLog());
-		}
 	}
 	catch (GraphicsException &e) {
 		Log(Error, "Error while creating palette graphics objects: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
 		DestroyPalettesGL(background);
 		return false;
 	}
+	_paletteInitialized[index] = true;
 	return true;
 }
 
 void Gpu::DestroyPalettesGL(bool background)
 {
 	int index = background ? 0 : 1;
-	if (_paletteShader[index] != nullptr) {
-		delete _paletteShader[index];
-		_paletteShader[index] = nullptr;
-	}
+	if (_paletteInitialized[index] == false) return;
+	_paletteInitialized[index] = false;
+	_paletteShader.DecRef();
 	if (_paletteVao[index] != nullptr) {
 		delete _paletteVao[index];
 		_paletteVao[index] = nullptr;
 	}
-	if (_paletteData[index] != nullptr) {
-		delete _paletteData[index];
-		_paletteData[index] = nullptr;
-	}
-	if (_paletteVertexData[index] != nullptr) {
-		delete _paletteVertexData[index];
-		_paletteVertexData[index] = nullptr;
-	}
+	_paletteData.DecRef();
+	_paletteVertexData.DecRef();
 }
 
 void Gpu::DrawPalettes(bool background)
 {
 	int index = background ? 0 : 1;
 	try {
+		if (!_paletteInitialized) throw GraphicsException(GL_INVALID_OPERATION, "Tried to draw palette without initializing");
 		GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT));
 		GL_CHECKED(glViewport(0, 0, 512, 256));
 
 		uint8_t *palettes = _system.GetMemory().GetPalettes();
-		if (!background) palettes += 0x200;
-		_paletteData[index]->UpdateData(0, 0, 16, 16, (char *)palettes, Texture::USHORT_1_5_5_5);
+		_paletteData->UpdateData(0, 0, 16, 32, (char *)palettes, Texture::USHORT_1_5_5_5);
 
-		_paletteShader[index]->Begin();
+		_paletteShader->Begin();
 		_paletteVao[index]->Begin();
-		_paletteShader[index]->SetUniform("paletteData", 0, *_paletteData[index]);
-		_paletteShader[index]->SetUniform("windowSize", 512.0f, 256.0f);
+		_paletteShader->SetUniform("paletteData", 0, *_paletteData);
+		_paletteShader->SetUniform("windowSize", 512.0f, 256.0f);
+		_paletteShader->SetUniform("objPalette", !background);
 
 		GL_CHECKED(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
 
 		_paletteVao[index]->End();
-		_paletteShader[index]->End();
+		_paletteShader->End();
 	}
 	catch (GraphicsException  &e) {
 		Log(Error, "Graphics exception in drawing palettes: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
@@ -289,73 +284,63 @@ bool Gpu::InitTilesGL(int idx)
 		1.0, -1.0, 1.0, 1.0
 	};
 	try {
-		DestroyTilesGL(idx);
+		if (_tilesInitialized[idx]) {
+			DestroyTilesGL(idx);
+		}
 		// Create Shader program
-		_tilesShader[idx] = new ShaderProgram;
-		if (!_tilesShader[idx]->AddShader(ShaderProgram::Vertex, (char *)resource_tiles_vert_glsl,
-			resource_tiles_vert_glsl_len)) {
-			Log(Error, "Could not Compile tiles vertex shader\n");
-			throw GraphicsException(0, _tilesShader[idx]->GetLog());
+		_tilesShader.IncRef();
+		if (_tilesShader.GetRefCount() == 1) {
+			if (!_tilesShader->AddShader(ShaderProgram::Vertex, (char *)resource_tiles_vert_glsl,
+				resource_tiles_vert_glsl_len)) {
+				Log(Error, "Could not Compile tiles vertex shader\n");
+				throw GraphicsException(0, _tilesShader->GetLog());
+			}
+			if (!_tilesShader->AddShader(ShaderProgram::Fragment, (char *)resource_tiles_frag_glsl,
+				resource_tiles_frag_glsl_len)) {
+				Log(Error, "Could not Compile tiles fragment shader\n");
+				throw GraphicsException(0, _tilesShader->GetLog());
+			}
+			if (!_tilesShader->Link()) {
+				Log(Error, "Could not Link tiles shader program\n");
+				throw GraphicsException(0, _tilesShader->GetLog());
+			}
 		}
-		if (!_tilesShader[idx]->AddShader(ShaderProgram::Fragment, (char *)resource_tiles_frag_glsl,
-			resource_tiles_frag_glsl_len)) {
-			Log(Error, "Could not Compile tiles fragment shader\n");
-			throw GraphicsException(0, _tilesShader[idx]->GetLog());
-		}
-		if (!_tilesShader[idx]->Link()) {
-			Log(Error, "Could not Link tiles shader program\n");
-			throw GraphicsException(0, _tilesShader[idx]->GetLog());
-		}
-		// Create palette texture
-		_tilesPaletteData[idx] = new Texture(16, 32, nullptr, Texture::RGBA);
-		_tilesPaletteData[idx]->Bind();
-		_tilesPaletteData[idx]->SetFilter(Texture::Nearest, Texture::Nearest);
-		_tilesPaletteData[idx]->SetWrap(Texture::Repeat, Texture::Repeat);
-		_tilesPaletteData[idx]->UnBind();
 
 		// Create vertex data buffer
-		_tilesVertexData[idx] = new BufferObject(BufferObject::Type::Array);
-		_tilesVertexData[idx]->BufferData(BufferObject::Usage::StaticDraw, sizeof(vertexData), vertexData);
+		_tilesVertexData.IncRef(BufferObject::Type::Array);
+		if (_tilesVertexData.GetRefCount() == 1) {
+			_tilesVertexData->BufferData(BufferObject::Usage::StaticDraw, sizeof(vertexData), vertexData);
+		}
 
-		// Create tile buffer data
-		_tilesData[idx] = new BufferTexture(0x8000, nullptr, BufferTexture::Format::R8UI, 
-			BufferObject::Usage::StreamDraw);
-		
 		// create VAO
 		_tilesVao[idx] = new VertexArrayObject();
 		_tilesVao[idx]->Begin();
-		_tilesVao[idx]->BindBuffer(0, *_tilesVertexData[idx], 2, VertexArrayObject::Float, 
+		_tilesVao[idx]->BindBuffer(0, *_tilesVertexData, 2, VertexArrayObject::Float,
 			false, 4 * sizeof(float), 0 * sizeof(float));
-		_tilesVao[idx]->BindBuffer(1, *_tilesVertexData[idx], 2, VertexArrayObject::Float, 
+		_tilesVao[idx]->BindBuffer(1, *_tilesVertexData, 2, VertexArrayObject::Float,
 			false, 4 * sizeof(float), 2 * sizeof(float));
 		_tilesVao[idx]->End();
+
+		// Create tile buffer data
+		InitVRAMDataGL();		
+		InitPaletteDataGL();
 	}
 	catch (GraphicsException &e) {
 		Log(Error, "Error while creating graphics tiles objects: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
-		DestroyTilesGL(idx);
 		return false;
 	}
+	_tilesInitialized[idx] = true;
 	return true;
 }
 
 void Gpu::DestroyTilesGL(int idx)
 {
-	if (_tilesShader[idx] != nullptr) {
-		delete _tilesShader[idx];
-		_tilesShader[idx] = nullptr;
-	}
-	if (_tilesPaletteData[idx] != nullptr) {
-		delete _tilesPaletteData[idx];
-		_tilesPaletteData[idx] = nullptr;
-	}
-	if (_tilesData[idx] != nullptr) {
-		delete _tilesData[idx];
-		_tilesData[idx] = nullptr;
-	}
-	if (_tilesVertexData[idx] != nullptr) {
-		delete _tilesVertexData[idx];
-		_tilesVertexData[idx] = nullptr;
-	}
+	if (_tilesInitialized[idx] == false) return;
+	_tilesInitialized[idx] = false;
+	_tilesShader.DecRef();
+	_paletteData.DecRef();
+	_vramBT.DecRef();
+	_tilesVertexData.DecRef();
 	if (_tilesVao[idx] != nullptr) {
 		delete _tilesVao[idx];
 		_tilesVao[idx] = nullptr;
@@ -371,30 +356,47 @@ void Gpu::DrawTiles(int idx)
 		GL_CHECKED(glViewport(0, 0, 512, 512));
 
 		uint8_t *palettes = _system.GetMemory().GetPalettes();
-		_tilesPaletteData[idx]->UpdateData(0, 0, 16, 32, (char *)palettes, Texture::USHORT_1_5_5_5);
+		_paletteData->UpdateData(0, 0, 16, 32, (char *)palettes, Texture::USHORT_1_5_5_5);
 
 		uint8_t *vram = _system.GetMemory().GetVRAM() + address;
-		_tilesData[idx]->GetBufferObject().BufferSubData(0, 0x8000, vram);
+		_vramBT->GetBufferObject().BufferSubData(address, 0x8000, vram);
 
 		int paletteId = 0;
 		if (idx == 2) paletteId |= 0x10;
 
-		_tilesShader[idx]->Begin();
+		_tilesShader->Begin();
 		_tilesVao[idx]->Begin();
-		_tilesShader[idx]->SetUniform("paletteId", paletteId); // TODO: Detect palette
-		_tilesShader[idx]->SetUniform("depth8bit", _debugTiles8BitDepth[idx]);
-		_tilesShader[idx]->SetUniform("paletteData", 1, *_tilesPaletteData[idx]);
-		_tilesShader[idx]->SetUniform("tileData", 0, *_tilesData[idx]);
-		_tilesShader[idx]->SetUniform("windowSize", 512.0f, 512.0f);
-		_tilesShader[idx]->SetUniform("grid", _debugTilesGridEnabled[idx]);
+		_tilesShader->SetUniform("paletteId", paletteId); // TODO: Detect palette
+		_tilesShader->SetUniform("depth8bit", _debugTiles8BitDepth[idx]);
+		_tilesShader->SetUniform("paletteData", 1, *_paletteData);
+		_tilesShader->SetUniform("vramData", 0, *_vramBT);
+		_tilesShader->SetUniform("baseAddress", (int)address);
+		_tilesShader->SetUniform("windowSize", 512.0f, 512.0f);
+		_tilesShader->SetUniform("grid", _debugTilesGridEnabled[idx]);
 
 		GL_CHECKED(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
 
 		_tilesVao[idx]->End();
-		_tilesShader[idx]->End();
+		_tilesShader->End();
 	}
 	catch (GraphicsException  &e) {
 		Log(Error, "Graphics exception in drawing palettes: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
 	}
+}
+
+void Gpu::InitPaletteDataGL()
+{
+	_paletteData.IncRef(16, 32, nullptr, Texture::RGBA);
+	if (_paletteData.GetRefCount() == 1) {
+		_paletteData->Bind();
+		_paletteData->SetFilter(Texture::Nearest, Texture::Nearest);
+		_paletteData->SetWrap(Texture::Repeat, Texture::Repeat);
+		_paletteData->UnBind();
+	}
+}
+
+void Gpu::InitVRAMDataGL()
+{
+	_vramBT.IncRef(0x18000, nullptr, BufferTexture::Format::R8UI, BufferObject::Usage::StreamDraw);
 }
 

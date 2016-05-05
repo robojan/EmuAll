@@ -25,6 +25,7 @@ namespace Debugger {
 
 		struct Item {
 			int id;
+			int shareId;
 			int width;
 			int height;
 			int mouseX;

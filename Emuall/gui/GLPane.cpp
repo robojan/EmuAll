@@ -4,6 +4,7 @@
 #include <limits.h>
 #include "../util/log.h"
 #include <GL/glu.h>
+#include "GLContextManager.h"
 
 IMPLEMENT_CLASS(GLPane, wxGLCanvas);
 BEGIN_EVENT_TABLE(GLPane, wxGLCanvas)
@@ -11,14 +12,19 @@ BEGIN_EVENT_TABLE(GLPane, wxGLCanvas)
 END_EVENT_TABLE()
 
 GLPane::GLPane(wxWindow *parent, GLPaneI *callback, int user, wxWindowID id, const wxPoint &pos, 
-	const wxSize &size, long style, const wxGLAttributes &attr, const wxGLContextAttrs &ctxAttr) :
+	const wxSize &size, long style, const wxGLAttributes &attr, const wxGLContextAttrs &ctxAttr, 
+	int shareId) :
 wxGLCanvas(parent, attr, id, pos, size, style), _user(user), _clearR(0.0), _clearG(0.0), 
-_clearB(0.0), _clearA(1.0), _initialized(false), _GLAttr(attr), _CtxAttr(ctxAttr)
+_clearB(0.0), _clearA(1.0), _initialized(false), _GLAttr(attr), _CtxAttr(ctxAttr), _shareId(shareId)
 {
 	wxASSERT(callback != NULL);
-	_context = new wxGLContext(this, NULL, &_CtxAttr);
+	wxGLContext *shareContext = GLContextManager::GetSingleton().GetMasterContext(shareId);
+	_context = new wxGLContext(this, shareContext, &_CtxAttr);
 	if (!_context->IsOK()) {
 		Log(Error, "Could not create openGL context");
+	}
+	if (shareId >= 0) {
+		GLContextManager::GetSingleton().AddContext(shareId, _context);
 	}
 	
 	_callback = callback;
@@ -27,6 +33,7 @@ _clearB(0.0), _clearA(1.0), _initialized(false), _GLAttr(attr), _CtxAttr(ctxAttr
 
 GLPane::~GLPane()
 {
+	GLContextManager::GetSingleton().RemoveContext(_shareId, _context);
 	DestroyGL();
 	delete _context;
 }

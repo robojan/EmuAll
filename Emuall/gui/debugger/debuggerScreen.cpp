@@ -11,6 +11,7 @@ DebuggerScreen::DebuggerScreen(Emulator *emu, const pugi::xml_node &node) :
 	wxASSERT(emu != NULL);
 	// Add screen
 	_screen.id = node.attribute("id").as_int(-1);
+	_screen.shareId = node.attribute("contextShare").as_int(-1);
 	_screen.width = node.child("width").text().as_int(-1);
 	_screen.height = node.child("height").text().as_int(-1);
 	_screen.mouseX = node.child("mousex").text().as_int(-1);
@@ -71,7 +72,8 @@ GLPane *DebuggerScreen::GetWidget(wxWindow *parent, wxWindowID id)
 	ctxAttr.ForwardCompatible();
 	ctxAttr.EndList();
 	_widget = new GLPane(parent, this, _screen.id, id, wxDefaultPosition,
-		wxSize(_screen.width, _screen.height), wxFULL_REPAINT_ON_RESIZE, glAttr, ctxAttr);
+		wxSize(_screen.width, _screen.height), wxFULL_REPAINT_ON_RESIZE, glAttr, ctxAttr,
+		_screen.shareId);
 	_widget->Bind(wxEVT_MOTION, &DebuggerScreen::OnMotion, this);
 	_widget->SetMaxSize(wxSize(_screen.width, _screen.height));
 	wxColour bgColour = parent->GetBackgroundColour();

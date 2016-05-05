@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 
 #include <GBAemu/memory/memory.h>
 #include <emuall/graphics/ShaderProgram.h>
@@ -6,6 +7,7 @@
 #include <emuall/graphics/texture.h>
 #include <emuall/graphics/bufferTexture.h>
 #include <emuall/graphics/VertexArrayObject.h>
+#include <emuall/util/counterPointer.h>
 
 class Gba;
 
@@ -40,7 +42,8 @@ private:
 	void DestroyTilesGL(int idx);
 	void DrawTiles(int idx);
 	
-
+	void InitPaletteDataGL();
+	void InitVRAMDataGL();
 
 	Gba &_system;
 	uint_fast8_t _vcount;
@@ -48,14 +51,15 @@ private:
 
 	// Drawing objects
 	// Palette drawing
-	ShaderProgram *_paletteShader[2];
-	Texture *_paletteData[2];
-	BufferObject *_paletteVertexData[2];
+	bool _paletteInitialized[2];
+	CounterPtr<ShaderProgram> _paletteShader;
+	CounterPtr<Texture> _paletteData;
+	CounterPtr<BufferObject> _paletteVertexData;
 	VertexArrayObject *_paletteVao[2];
 	// Tile drawing
-	ShaderProgram *_tilesShader[3];
-	Texture *_tilesPaletteData[3];
-	BufferTexture *_tilesData[3];
-	BufferObject *_tilesVertexData[3];
+	bool _tilesInitialized[3];
+	CounterPtr<ShaderProgram> _tilesShader;
+	CounterPtr<BufferTexture> _vramBT;
+	CounterPtr<BufferObject> _tilesVertexData;
 	VertexArrayObject *_tilesVao[3];
 };

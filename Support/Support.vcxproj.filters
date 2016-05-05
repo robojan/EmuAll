@@ -161,6 +161,9 @@
     <ClInclude Include="include\emuall\graphics\bufferTexture.h">
       <Filter>Header Files\graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\emuall\util\counterPointer.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\solid.frag.glsl">

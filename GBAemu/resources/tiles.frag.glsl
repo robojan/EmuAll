@@ -8,7 +8,8 @@ out vec4 fragColor;
 
 // Uniforms
 uniform sampler2D paletteData;
-uniform usamplerBuffer tileData;
+uniform usamplerBuffer vramData;
+uniform int baseAddress;
 uniform bool depth8bit;
 // bit 0-3, palette number in 4 bit depth mode
 // bit 4, obj palette
@@ -48,8 +49,8 @@ void main() {
 
 		int tileId = tilePos.y * 16 + tilePos.x;
 		int pixelId = pixelPos.y * 8 + pixelPos.x;
-		int address = tileId * 64 + pixelId;
-		uint data = texelFetch(tileData, address).r;
+		int address = baseAddress + tileId * 64 + pixelId;
+		uint data = texelFetch(vramData, address).r;
 		if ((paletteId & 0x10) != 0) {
 			// OBJ palette
 			fragColor = vec4(getPaletteColor(data + 256u), 1.0);
@@ -71,8 +72,8 @@ void main() {
 
 		int tileId = tilePos.y * 32 + tilePos.x;
 		int pixelId = pixelPos.y * 8 + pixelPos.x;
-		int address = tileId * 32 + pixelId / 2;
-		uint data = texelFetch(tileData, address).r;
+		int address = baseAddress + tileId * 32 + pixelId / 2;
+		uint data = texelFetch(vramData, address).r;
 		if ((address & 1) != 0) data >>= 4;
 		data &= 0xFu;
 		if ((paletteId & 0x10) != 0) {
