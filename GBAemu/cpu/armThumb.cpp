@@ -10,6 +10,11 @@ void Cpu::TickThumb(bool step)
 {
 	uint16_t instruction = _pipelineInstruction;
 	_pipelineInstruction = _system._memory.Read16(_registers[REGPC] & 0xFFFFFFFE);
+	if (step && IsBreakpoint(_registers[REGPC] - 2)) {
+		_pipelineInstruction = _breakpoints.at(_registers[REGPC] - 2);
+		instruction = _pipelineInstruction & 0xFFFF;
+		_pipelineInstruction >>= 16;
+	}
 	_registers[REGPC] += 2;
 
 	switch (instruction >> 8) {
@@ -175,7 +180,7 @@ void Cpu::TickThumb(bool step)
 			TST(_registers[rd], _registers[rm], _hostFlags);
 			break;
 		case 9: // NEG, rd, rm
-			SUB_FLAGS(0, _registers[rd], _registers[rd], _hostFlags);
+			SUB_FLAGS(0, _registers[rm], _registers[rd], _hostFlags);
 			break;
 		case 10: // CMP rn, rm 
 			CMP(_registers[rd], _registers[rm], _hostFlags);

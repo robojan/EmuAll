@@ -46,6 +46,11 @@ private:
 	bool InitOAMGL();
 	void DestroyOAMGL();
 	void DrawOAM();
+
+	// BG drawing
+	bool InitBGGL(int idx);
+	void DestroyBGGL(int idx);
+	void DrawBG(int idx);
 	
 	void InitPaletteDataGL();
 	void InitVRAMDataGL();
@@ -73,4 +78,10 @@ private:
 	CounterPtr<BufferTexture> _oamBT;
 	CounterPtr<BufferObject> _oamVertexData;
 	VertexArrayObject *_oamVao;
+	// BG drawing
+	bool _bgInitialized[4];
+	CounterPtr<ShaderProgram> _bgShader;
+	CounterPtr<BufferObject> _bgVertexData;
+	VertexArrayObject *_bgVao[4];
+
 };

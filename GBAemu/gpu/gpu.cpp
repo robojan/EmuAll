@@ -19,7 +19,8 @@ Gpu::Gpu(Gba &system) :
 	_system(system), _vcount(0), _hcount(0),
 	_paletteInitialized{false, false}, _paletteVao{nullptr, nullptr},
 	_tilesInitialized{false, false, false}, _tilesVao{nullptr, nullptr, nullptr},
-	_oamInitialized(false), _oamVao(nullptr)
+	_oamInitialized(false), _oamVao(nullptr),
+	_bgInitialized{ false, false, false, false}, _bgVao{nullptr, nullptr, nullptr, nullptr}
 {
 	RegisterEvents();
 }
@@ -34,6 +35,8 @@ Gpu::~Gpu()
 	DestroyGL(3005);
 	DestroyGL(3006);
 	DestroyGL(3007);
+	DestroyGL(3008);
+	DestroyGL(3009);
 }
 
 void Gpu::Tick()
@@ -99,6 +102,10 @@ void Gpu::HandleEvent(uint32_t address, int size)
 bool Gpu::InitGL(int id)
 {
 	switch (id) {
+	case 3000: return InitBGGL(0);
+	case 3001: return InitBGGL(1);
+	case 3002: return InitBGGL(2);
+	case 3003: return InitBGGL(3);	
 	case 3004: return InitPalettesGL(true);
 	case 3005: return InitPalettesGL(false);
 	case 3006: return InitTilesGL(0);
@@ -112,6 +119,18 @@ bool Gpu::InitGL(int id)
 void Gpu::DestroyGL(int id)
 {
 	switch (id) {
+	case 3000: 
+		DestroyBGGL(0);
+		break;
+	case 3001:
+		DestroyBGGL(1);
+		break;
+	case 3002:
+		DestroyBGGL(2);
+		break;
+	case 3003:
+		DestroyBGGL(3);
+		break;
 	case 3004: 
 		DestroyPalettesGL(true);
 		break;
@@ -141,6 +160,18 @@ void Gpu::Reshape(int id, int width, int height, bool keepAspect)
 void Gpu::Draw(int id)
 {
 	switch (id) {
+	case 3000:
+		DrawBG(0);
+		break;
+	case 3001:
+		DrawBG(1);
+		break;
+	case 3002:
+		DrawBG(2);
+		break;
+	case 3003:
+		DrawBG(3);
+		break;
 	case 3004:
 		DrawPalettes(true);
 		break;
@@ -257,7 +288,7 @@ void Gpu::DrawPalettes(bool background)
 {
 	int index = background ? 0 : 1;
 	try {
-		if (!_paletteInitialized) throw GraphicsException(GL_INVALID_OPERATION, "Tried to draw palette without initializing");
+		if (!_paletteInitialized[index]) throw GraphicsException(GL_INVALID_OPERATION, "Tried to draw palette without initializing");
 		GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT));
 		GL_CHECKED(glViewport(0, 0, 512, 256));
 
@@ -358,6 +389,7 @@ void Gpu::DrawTiles(int idx)
 	const uint32_t tilesAddresses[3] = { 0x00000, 0x08000, 0x10000 };
 	uint32_t address = tilesAddresses[idx];
 	try {
+		if (!_tilesInitialized[idx]) throw GraphicsException(GL_INVALID_OPERATION, "Tried to draw tiles without initializing");
 		GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT));
 		GL_CHECKED(glViewport(0, 0, 512, 512));
 
@@ -417,7 +449,7 @@ bool Gpu::InitOAMGL()
 				throw GraphicsException(0, _oamShader->GetLog());
 			}
 			if (!_oamShader->Link()) {
-				Log(Error, "Could not Link tiles shader program\n");
+				Log(Error, "Could not Link oam shader program\n");
 				throw GraphicsException(0, _oamShader->GetLog());
 			}
 		}
@@ -468,6 +500,7 @@ void Gpu::DestroyOAMGL()
 void Gpu::DrawOAM()
 {
 	try {
+		if (!_oamInitialized) throw GraphicsException(GL_INVALID_OPERATION, "Tried to draw oam without initializing");
 		GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT));
 		GL_CHECKED(glViewport(0, 0, 768, 384));
 
@@ -497,6 +530,118 @@ void Gpu::DrawOAM()
 	}
 	catch (GraphicsException  &e) {
 		Log(Error, "Graphics exception in drawing oam: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
+	}
+}
+
+bool Gpu::InitBGGL(int idx)
+{
+	const float vertexData[] = {
+		// x     y    u    v
+		-1.0,  1.0, 0.0, 0.0,
+		1.0,  1.0, 1.0, 0.0,
+		-1.0, -1.0, 0.0, 1.0,
+		1.0, -1.0, 1.0, 1.0
+	};
+	try {
+		if (_bgInitialized[idx]) {
+			DestroyOAMGL();
+		}
+		// Create Shader program
+		_bgShader.IncRef();
+		if (_bgShader.GetRefCount() == 1) {
+			if (!_bgShader->AddShader(ShaderProgram::Vertex, (char *)resource_bg_vert_glsl,
+					resource_bg_vert_glsl_len)) {
+				Log(Error, "Could not Compile bg vertex shader\n");
+				throw GraphicsException(0, _bgShader->GetLog());
+			}
+			if (!_bgShader->AddShader(ShaderProgram::Fragment, (char *)resource_bg_frag_glsl,
+					resource_bg_frag_glsl_len)) {
+				Log(Error, "Could not Compile bg fragment shader\n");
+				throw GraphicsException(0, _bgShader->GetLog());
+			}
+			if (!_bgShader->Link()) {
+				Log(Error, "Could not Link bg shader program\n");
+				throw GraphicsException(0, _bgShader->GetLog());
+			}
+		}
+
+		// Create vertex data buffer
+		_bgVertexData.IncRef(BufferObject::Type::Array);
+		if (_bgVertexData.GetRefCount() == 1) {
+			_bgVertexData->BufferData(BufferObject::Usage::StaticDraw, sizeof(vertexData), vertexData);
+		}
+
+		// create VAO
+		_bgVao[idx] = new VertexArrayObject();
+		_bgVao[idx]->Begin();
+		_bgVao[idx]->BindBuffer(0, *_bgVertexData, 2, VertexArrayObject::Float,
+			false, 4 * sizeof(float), 0 * sizeof(float));
+		_bgVao[idx]->BindBuffer(1, *_bgVertexData, 2, VertexArrayObject::Float,
+			false, 4 * sizeof(float), 2 * sizeof(float));
+		_bgVao[idx]->End();
+
+		// Create tile buffer data
+		InitVRAMDataGL();
+		InitPaletteDataGL();
+	}
+	catch (GraphicsException &e) {
+		Log(Error, "Error while creating graphics bg objects: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
+		return false;
+	}
+	_bgInitialized[idx] = true;
+	return true;
+}
+
+void Gpu::DestroyBGGL(int idx)
+{
+	if (_bgInitialized[idx] == false) return;
+	_bgInitialized[idx] = false;
+	_bgShader.DecRef();
+	_paletteData.DecRef();
+	_vramBT.DecRef();
+	_bgVertexData.DecRef();
+	if (_bgVao[idx] != nullptr) {
+		delete _bgVao[idx];
+		_bgVao[idx] = nullptr;
+	}
+}
+
+void Gpu::DrawBG(int idx)
+{
+	try {
+		if (!_bgInitialized[idx]) throw GraphicsException(GL_INVALID_OPERATION, "Tried to draw bg without initializing");
+		GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT));
+		GL_CHECKED(glViewport(0, 0, 512, 512));
+
+		uint8_t *palettes = _system.GetMemory().GetPalettes();
+		_paletteData->UpdateData(0, 0, 16, 32, (char *)palettes, Texture::USHORT_1_5_5_5);
+
+		uint8_t *vram = _system.GetMemory().GetVRAM();
+		_vramBT->GetBufferObject().BufferSubData(0, 0x14000, vram);
+
+		uint8_t *registers = _system.GetMemory().GetRegisters();
+
+		_bgShader->Begin();
+		_bgVao[idx]->Begin();
+		_bgShader->SetUniform("paletteData", 1, *_paletteData);
+		_bgShader->SetUniform("vramData", 0, *_vramBT);
+		_bgShader->SetUniform("DISPCNT", IOREG32(registers, DISPCNT));
+		_bgShader->SetUniform("BGCNT", (uint32_t)IOREG16(registers, BG0CNT + 2 * idx));
+		_bgShader->SetUniform("BGHOFS", (uint32_t)IOREG16(registers, BG0HOFS + 4 * idx));
+		_bgShader->SetUniform("BGVOFS", (uint32_t)IOREG16(registers, BG0VOFS + 4 * idx));
+		_bgShader->SetUniform("BGX", ((uint32_t)IOREG16(registers, BG2X_H + 8 * (idx - 2)) << 16) | IOREG16(registers, BG2X_L + 8 * (idx - 2)));
+		_bgShader->SetUniform("BGY", ((uint32_t)IOREG16(registers, BG2Y_H + 8 * (idx - 2)) << 16) | IOREG16(registers, BG2Y_L + 8 * (idx - 2)));
+		_bgShader->SetUniform("backgroundId", idx);
+		_bgShader->SetUniform("windowSize", 512.0f, 512.0f);
+		_bgShader->SetUniform("grid", true);
+
+		GL_CHECKED(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
+
+		_bgVao[idx]->End();
+		_bgShader->End();
+	}
+	catch (GraphicsException  &e) {
+		Log(Error, "Graphics exception in drawing bg: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
 	}
 }
 

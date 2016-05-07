@@ -40,7 +40,7 @@ void Log(enum loglevel level, char *fmtstr, ...)
 	{
 		va_list args;
 		va_start(args, fmtstr);
-		int len = vsnprintf(_LogBuffer.data(), _LogBuffer.size(), fmtstr, args);
+		size_t len = vsnprintf(_LogBuffer.data(), _LogBuffer.size(), fmtstr, args);
 		if (len > _LogBuffer.size()) {
 			_LogBuffer.resize(len+1);
 			vsnprintf(_LogBuffer.data(), _LogBuffer.size(), fmtstr, args);

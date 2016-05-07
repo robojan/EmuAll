@@ -133,8 +133,8 @@ void Font::DrawText(GuiRenderer &renderer, float x, float y,
 		renderer.SetTQTexture(*texture);
 		renderer.SetTQPosition((float)layout.GetPosX(i) * scale + x, 
 			(float)layout.GetPosY(i) * scale + y);
-		renderer.SetTQSize(cache.GetGlyphWidth(id, glyphIndex), 
-			cache.GetGlyphHeight(id, glyphIndex));
+		renderer.SetTQSize((float)cache.GetGlyphWidth(id, glyphIndex), 
+			(float)cache.GetGlyphHeight(id, glyphIndex));
 		renderer.SetTQUVs(cache.GetUVBuffer(id, glyphIndex));
 		renderer.DrawTQ();
 	}

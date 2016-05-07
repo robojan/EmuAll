@@ -26,13 +26,19 @@ Disassembler::~Disassembler()
 int Disassembler::Disassemble(uint32_t address, const char **raw, const char **instr)
 {
 	uint32_t opcode;
-	if (_system.GetCpu().IsBreakpoint(address)) {
-		opcode = _system.GetCpu().GetBreakpointInstruction(address);
-	}
-	else {
-		opcode = _system.GetMemory().Read32(address);
-	}
 	if (_system.GetCpu().IsInThumbMode()) {
+		bool firstBreakpoint;
+		if ((firstBreakpoint = _system.GetCpu().IsBreakpoint(address)) || _system.GetCpu().IsBreakpoint(address - 2)) {
+			if (firstBreakpoint) {
+				opcode = _system.GetCpu().GetBreakpointInstruction(address);
+			}
+			else {
+				opcode = _system.GetCpu().GetBreakpointInstruction(address - 2) >> 16;
+			}
+		}
+		else {
+			opcode = _system.GetMemory().Read32(address);
+		}
 		opcode &= 0xFFFF;
 		if (raw != nullptr) {
 			*raw = HexToString(opcode, 4);
@@ -43,6 +49,12 @@ int Disassembler::Disassemble(uint32_t address, const char **raw, const char **i
 		return 2;
 	}
 	else {
+		if (_system.GetCpu().IsBreakpoint(address)) {
+			opcode = _system.GetCpu().GetBreakpointInstruction(address);
+		}
+		else {
+			opcode = _system.GetMemory().Read32(address);
+		}
 		if (raw != nullptr) {
 			*raw = HexToString(opcode, 8);
 		}

@@ -131,5 +131,11 @@
     <None Include="resources\oam.vert.glsl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="resources\bg.frag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\bg.vert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

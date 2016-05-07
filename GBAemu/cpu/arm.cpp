@@ -5133,8 +5133,8 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn];
 		for (int i = 15; i >= 0; i--) {
 			if ((registerList & (1 << i)) != 0) {
-				address -= 4;
 				_system._memory.Write32(address, _registers[i]);
+				address -= 4;
 			}
 		}
 		break;
@@ -5145,8 +5145,8 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn];
 		for (int i = 15; i >= 0; i--) {
 			if ((registerList & (1 << i)) != 0) {
-				address -= 4;
 				_system._memory.Write32(address, _registers[i]);
+				address -= 4;
 			}
 		}
 		_registers[rn] = address;
@@ -5158,8 +5158,8 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn];
 		for (int i = 0; i <= 15; i++) {
 			if ((registerList & (1 << i)) != 0) {
-				address += 4;
 				_system._memory.Write32(address, _registers[i]);
+				address += 4;
 			}
 		}
 		break;
@@ -5170,8 +5170,8 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn];
 		for (int i = 0; i <= 15; i++) {
 			if ((registerList & (1 << i)) != 0) {
-				address += 4;
 				_system._memory.Write32(address, _registers[i]);
+				address += 4;
 			}
 		}
 		_registers[rn] = address;
@@ -5183,8 +5183,8 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn];
 		for (int i = 15; i >= 0; i--) {
 			if ((registerList & (1 << i)) != 0) {
-				_system._memory.Write32(address, _registers[i]);
 				address -= 4;
+				_system._memory.Write32(address, _registers[i]);
 			}
 		}
 		break;
@@ -5233,39 +5233,39 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn];
 		if (InAPrivilegedMode()) {
 			if ((registerList & (1 << 15)) != 0) {
-				address -= 4;
 				_system._memory.Write32(address, _registers[REGPC]);
+				address -= 4;
 			}
-			address -= 4;
 			_system._memory.Write32(address, _registersUser[14-8]);
 			address -= 4;
-			_system._memory.Write32(address, _registersUser[13-8]);
+			_system._memory.Write32(address, _registersUser[13 - 8]);
+			address -= 4;
 			if (InABankedUserRegistersMode()) {
 				for (int i = 12; i >= 8; i--) {
 					if ((registerList & (1 << i)) != 0) {
+						_system._memory.Write32(address, _registersUser[i - 8]);
 						address -= 4;
-						_system._memory.Write32(address, _registersUser[i-8]);
 					}
 				}
 			}
 			else {
 				for (int i = 12; i >= 8; i--) {
 					if ((registerList & (1 << i)) != 0) {
-						address -= 4;
 						_system._memory.Write32(address, _registers[i]);
+						address -= 4;
 					}
 				}
 			}
 			for (int i = 7; i >= 0; i--) {
-				address -= 4;
 				_system._memory.Write32(address, _registers[i]);
+				address -= 4;
 			}
 		}
 		else {
 			for (int i = 15; i >= 0; i--) {
 				if ((registerList & (1 << i)) != 0) {
-					address -= 4;
 					_system._memory.Write32(address, _registers[i]);
+					address -= 4;
 				}
 			}
 		}
@@ -5277,39 +5277,39 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn];
 		if (InAPrivilegedMode()) {
 			if ((registerList & (1 << 15)) != 0) {
-				address -= 4;
 				_system._memory.Write32(address, _registers[REGPC]);
+				address -= 4;
 			}
-			address -= 4;
 			_system._memory.Write32(address, _registersUser[14 - 8]);
 			address -= 4;
 			_system._memory.Write32(address, _registersUser[13 - 8]);
+			address -= 4;
 			if (InABankedUserRegistersMode()) {
 				for (int i = 12; i >= 8; i--) {
 					if ((registerList & (1 << i)) != 0) {
-						address -= 4;
 						_system._memory.Write32(address, _registersUser[i - 8]);
+						address -= 4;
 					}
 				}
 			}
 			else {
 				for (int i = 12; i >= 8; i--) {
 					if ((registerList & (1 << i)) != 0) {
-						address -= 4;
 						_system._memory.Write32(address, _registers[i]);
+						address -= 4;
 					}
 				}
 			}
 			for (int i = 7; i >= 0; i--) {
-				address -= 4;
 				_system._memory.Write32(address, _registers[i]);
+				address -= 4;
 			}
 		}
 		else {
 			for (int i = 15; i >= 0; i--) {
 				if ((registerList & (1 << i)) != 0) {
-					address -= 4;
 					_system._memory.Write32(address, _registers[i]);
+					address -= 4;
 				}
 			}
 		}
@@ -5322,6 +5322,184 @@ void Cpu::TickARM(bool step) {
 		uint32_t address = _registers[rn];
 		if (InAPrivilegedMode()) {
 			for (int i = 0; i <= 7; i++) {
+				_system._memory.Write32(address, _registers[i]);
+				address += 4;
+			}
+			if (InABankedUserRegistersMode()) {
+				for (int i = 8; i <= 12; i++) {
+					if ((registerList & (1 << i)) != 0) {
+						_system._memory.Write32(address, _registersUser[i - 8]);
+						address += 4;
+					}
+				}
+			}
+			else {
+				for (int i = 8; i <= 12; i++) {
+					if ((registerList & (1 << i)) != 0) {
+						_system._memory.Write32(address, _registers[i]);
+						address += 4;
+					}
+				}
+			}
+			_system._memory.Write32(address, _registersUser[13 - 8]);
+			address += 4;
+			_system._memory.Write32(address, _registersUser[14 - 8]);
+			address += 4;
+			if ((registerList & (1 << 15)) != 0) {
+				_system._memory.Write32(address, _registers[REGPC]);
+				address += 4;
+			}
+		}
+		else {
+			for (int i = 0; i <= 15; i++) {
+				if ((registerList & (1 << i)) != 0) {
+					_system._memory.Write32(address, _registers[i]);
+					address += 4;
+				}
+			}
+		}
+		break;
+	}
+	CASE_RANGE16(0x8E0) { // STMIA <Rn>!, <registers>^
+		uint16_t registerList = instruction & 0xFFFF;
+		uint8_t rn = (instruction >> 16) & 0xF;
+		uint32_t address = _registers[rn];
+		if (InAPrivilegedMode()) {
+			for (int i = 0; i <= 7; i++) {
+				_system._memory.Write32(address, _registers[i]);
+				address += 4;
+			}
+			if (InABankedUserRegistersMode()) {
+				for (int i = 8; i <= 12; i++) {
+					if ((registerList & (1 << i)) != 0) {
+						_system._memory.Write32(address, _registersUser[i - 8]);
+						address += 4;
+					}
+				}
+			}
+			else {
+				for (int i = 8; i <= 12; i++) {
+					if ((registerList & (1 << i)) != 0) {
+						_system._memory.Write32(address, _registers[i]);
+						address += 4;
+					}
+				}
+			}
+			_system._memory.Write32(address, _registersUser[13 - 8]);
+			address += 4;
+			_system._memory.Write32(address, _registersUser[14 - 8]);
+			address += 4;
+			if ((registerList & (1 << 15)) != 0) {
+				address += 4;
+				_system._memory.Write32(address, _registers[REGPC]);
+			}
+		}
+		else {
+			for (int i = 0; i <= 15; i++) {
+				if ((registerList & (1 << i)) != 0) {
+					_system._memory.Write32(address, _registers[i]);
+					address += 4;
+				}
+			}
+		}
+		_registers[rn] = address;
+		break;
+	}
+	CASE_RANGE16(0x940) { // STMDB <Rn>, <registers>^
+		uint16_t registerList = instruction & 0xFFFF;
+		uint8_t rn = (instruction >> 16) & 0xF;
+		uint32_t address = _registers[rn];
+		if (InAPrivilegedMode()) {
+			if ((registerList & (1 << 15)) != 0) {
+				address -= 4;
+				_system._memory.Write32(address, _registers[REGPC]);
+			}
+			address -= 4;
+			_system._memory.Write32(address, _registersUser[14 - 8]);
+			address -= 4;
+			_system._memory.Write32(address, _registersUser[13 - 8]);
+			if (InABankedUserRegistersMode()) {
+				for (int i = 12; i >= 8; i--) {
+					if ((registerList & (1 << i)) != 0) {
+						address -= 4;
+						_system._memory.Write32(address, _registersUser[i - 8]);
+					}
+				}
+			}
+			else {
+				for (int i = 12; i >= 8; i--) {
+					if ((registerList & (1 << i)) != 0) {
+						address -= 4;
+						_system._memory.Write32(address, _registers[i]);
+					}
+				}
+			}
+			for (int i = 7; i >= 0; i--) {
+				address -= 4;
+				_system._memory.Write32(address, _registers[i]);
+			}
+		}
+		else {
+			for (int i = 15; i >= 0; i--) {
+				if ((registerList & (1 << i)) != 0) {
+					address -= 4;
+					_system._memory.Write32(address, _registers[i]);
+				}
+			}
+		}
+		break;
+	}
+	CASE_RANGE16(0x960) { // STMDB <Rn>!, <registers>^
+		uint16_t registerList = instruction & 0xFFFF;
+		uint8_t rn = (instruction >> 16) & 0xF;
+		uint32_t address = _registers[rn];
+		if (InAPrivilegedMode()) {
+			if ((registerList & (1 << 15)) != 0) {
+				address -= 4;
+				_system._memory.Write32(address, _registers[REGPC]);
+			}
+			address -= 4;
+			_system._memory.Write32(address, _registersUser[14 - 8]);
+			address -= 4;
+			_system._memory.Write32(address, _registersUser[13 - 8]);
+			if (InABankedUserRegistersMode()) {
+				for (int i = 12; i >= 8; i--) {
+					if ((registerList & (1 << i)) != 0) {
+						address -= 4;
+						_system._memory.Write32(address, _registersUser[i - 8]);
+					}
+				}
+			}
+			else {
+				for (int i = 12; i >= 8; i--) {
+					if ((registerList & (1 << i)) != 0) {
+						address -= 4;
+						_system._memory.Write32(address, _registers[i]);
+					}
+				}
+			}
+			for (int i = 7; i >= 0; i--) {
+				address -= 4;
+				_system._memory.Write32(address, _registers[i]);
+			}
+		}
+		else {
+			for (int i = 15; i >= 0; i--) {
+				if ((registerList & (1 << i)) != 0) {
+					address -= 4;
+					_system._memory.Write32(address, _registers[i]);
+				}
+			}
+		}
+		_registers[rn] = address;
+		break;
+	}
+	CASE_RANGE16(0x9C0) { // STMIB <Rn>, <registers>^
+		uint16_t registerList = instruction & 0xFFFF;
+		uint8_t rn = (instruction >> 16) & 0xF;
+		uint32_t address = _registers[rn];
+		if (InAPrivilegedMode()) {
+			for (int i = 0; i <= 7; i++) {
 				address += 4;
 				_system._memory.Write32(address, _registers[i]);
 			}
@@ -5360,7 +5538,7 @@ void Cpu::TickARM(bool step) {
 		}
 		break;
 	}
-	CASE_RANGE16(0x8E0) { // STMIA <Rn>!, <registers>^
+	CASE_RANGE16(0x9E0) { // STMIB <Rn>!, <registers>^
 		uint16_t registerList = instruction & 0xFFFF;
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint32_t address = _registers[rn];
@@ -5403,184 +5581,6 @@ void Cpu::TickARM(bool step) {
 			}
 		}
 		_registers[rn] = address;
-		break;
-	}
-	CASE_RANGE16(0x940) { // STMDB <Rn>, <registers>^
-		uint16_t registerList = instruction & 0xFFFF;
-		uint8_t rn = (instruction >> 16) & 0xF;
-		uint32_t address = _registers[rn];
-		if (InAPrivilegedMode()) {
-			if ((registerList & (1 << 15)) != 0) {
-				_system._memory.Write32(address, _registers[REGPC]);
-				address -= 4;
-			}
-			_system._memory.Write32(address, _registersUser[14 - 8]);
-			address -= 4;
-			_system._memory.Write32(address, _registersUser[13 - 8]);
-			address -= 4;
-			if (InABankedUserRegistersMode()) {
-				for (int i = 12; i >= 8; i--) {
-					if ((registerList & (1 << i)) != 0) {
-						_system._memory.Write32(address, _registersUser[i - 8]);
-						address -= 4;
-					}
-				}
-			}
-			else {
-				for (int i = 12; i >= 8; i--) {
-					if ((registerList & (1 << i)) != 0) {
-						_system._memory.Write32(address, _registers[i]);
-						address -= 4;
-					}
-				}
-			}
-			for (int i = 7; i >= 0; i--) {
-				_system._memory.Write32(address, _registers[i]);
-				address -= 4;
-			}
-		}
-		else {
-			for (int i = 15; i >= 0; i--) {
-				if ((registerList & (1 << i)) != 0) {
-					_system._memory.Write32(address, _registers[i]);
-					address -= 4;
-				}
-			}
-		}
-		break;
-	}
-	CASE_RANGE16(0x960) { // STMDB <Rn>!, <registers>^
-		uint16_t registerList = instruction & 0xFFFF;
-		uint8_t rn = (instruction >> 16) & 0xF;
-		uint32_t address = _registers[rn];
-		if (InAPrivilegedMode()) {
-			if ((registerList & (1 << 15)) != 0) {
-				_system._memory.Write32(address, _registers[REGPC]);
-				address -= 4;
-			}
-			_system._memory.Write32(address, _registersUser[14 - 8]);
-			address -= 4;
-			_system._memory.Write32(address, _registersUser[13 - 8]);
-			address -= 4;
-			if (InABankedUserRegistersMode()) {
-				for (int i = 12; i >= 8; i--) {
-					if ((registerList & (1 << i)) != 0) {
-						_system._memory.Write32(address, _registersUser[i - 8]);
-						address -= 4;
-					}
-				}
-			}
-			else {
-				for (int i = 12; i >= 8; i--) {
-					if ((registerList & (1 << i)) != 0) {
-						_system._memory.Write32(address, _registers[i]);
-						address -= 4;
-					}
-				}
-			}
-			for (int i = 7; i >= 0; i--) {
-				_system._memory.Write32(address, _registers[i]);
-				address -= 4;
-			}
-		}
-		else {
-			for (int i = 15; i >= 0; i--) {
-				if ((registerList & (1 << i)) != 0) {
-					_system._memory.Write32(address, _registers[i]);
-					address -= 4;
-				}
-			}
-		}
-		_registers[rn] = address+4;
-		break;
-	}
-	CASE_RANGE16(0x9C0) { // STMIB <Rn>, <registers>^
-		uint16_t registerList = instruction & 0xFFFF;
-		uint8_t rn = (instruction >> 16) & 0xF;
-		uint32_t address = _registers[rn];
-		if (InAPrivilegedMode()) {
-			for (int i = 0; i <= 7; i++) {
-				_system._memory.Write32(address, _registers[i]);
-				address += 4;
-			}
-			if (InABankedUserRegistersMode()) {
-				for (int i = 8; i <= 12; i++) {
-					if ((registerList & (1 << i)) != 0) {
-						_system._memory.Write32(address, _registersUser[i - 8]);
-						address += 4;
-					}
-				}
-			}
-			else {
-				for (int i = 8; i <= 12; i++) {
-					if ((registerList & (1 << i)) != 0) {
-						_system._memory.Write32(address, _registers[i]);
-						address += 4;
-					}
-				}
-			}
-			_system._memory.Write32(address, _registersUser[13 - 8]);
-			address += 4;
-			_system._memory.Write32(address, _registersUser[14 - 8]);
-			address += 4;
-			if ((registerList & (1 << 15)) != 0) {
-				_system._memory.Write32(address, _registers[REGPC]);
-				address += 4;
-			}
-		}
-		else {
-			for (int i = 0; i <= 15; i++) {
-				if ((registerList & (1 << i)) != 0) {
-					_system._memory.Write32(address, _registers[i]);
-					address += 4;
-				}
-			}
-		}
-		break;
-	}
-	CASE_RANGE16(0x9E0) { // STMIB <Rn>!, <registers>^
-		uint16_t registerList = instruction & 0xFFFF;
-		uint8_t rn = (instruction >> 16) & 0xF;
-		uint32_t address = _registers[rn];
-		if (InAPrivilegedMode()) {
-			for (int i = 0; i <= 7; i++) {
-				_system._memory.Write32(address, _registers[i]);
-				address += 4;
-			}
-			if (InABankedUserRegistersMode()) {
-				for (int i = 8; i <= 12; i++) {
-					if ((registerList & (1 << i)) != 0) {
-						_system._memory.Write32(address, _registersUser[i - 8]);
-						address += 4;
-					}
-				}
-			}
-			else {
-				for (int i = 8; i <= 12; i++) {
-					if ((registerList & (1 << i)) != 0) {
-						_system._memory.Write32(address, _registers[i]);
-						address += 4;
-					}
-				}
-			}
-			_system._memory.Write32(address, _registersUser[13 - 8]);
-			address += 4;
-			_system._memory.Write32(address, _registersUser[14 - 8]);
-			address += 4;
-			if ((registerList & (1 << 15)) != 0) {
-				_system._memory.Write32(address, _registers[REGPC]);
-				address += 4;
-			}
-		}
-		else {
-			for (int i = 0; i <= 15; i++) {
-				if ((registerList & (1 << i)) != 0) {
-					_system._memory.Write32(address, _registers[i]);
-					address += 4;
-				}
-			}
-		}
-		_registers[rn] = address - 4;
 		break;
 	}
 	// STR

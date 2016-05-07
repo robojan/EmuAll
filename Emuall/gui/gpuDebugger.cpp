@@ -14,16 +14,16 @@ GPUDebugger::GPUDebugger(wxWindow *parent, wxWindowID id, const wxString& title,
 {
 	_emu.emu = NULL;
 	_emu.handle = NULL;
-	SetEmulator(_emu);
 	_timer = new wxTimer(this, ID_Debug_Gpu_timer);
 	_timer->Start(200); // 5 Hz update rate
+	SetEmulator(_emu);
 }
 
 GPUDebugger::~GPUDebugger()
 {
+	_timer->Stop();
 	_emu.emu = NULL;
 	_emu.handle = NULL;
-	_timer->Stop();
 	if (_root != NULL)
 	{
 		delete _root;
@@ -36,6 +36,7 @@ void GPUDebugger::SetEmulator(const Emulator &emu)
 	wxBoxSizer *vbSizer1 = new wxBoxSizer(wxVERTICAL);
 	if (emu.emu == NULL)
 	{
+		_timer->Stop();
 		DestroyChildren();
 		if (_root != NULL)
 		{
@@ -65,6 +66,7 @@ void GPUDebugger::SetEmulator(const Emulator &emu)
 
 		wxPanel *panel = _root->GetWidget(this, wxID_ANY);
 		vbSizer1->Add(panel, 1, wxEXPAND | wxALL, 0);
+		_timer->Start();
 	}
 
 	SetSizerAndFit(vbSizer1);

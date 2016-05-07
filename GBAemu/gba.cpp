@@ -59,6 +59,8 @@ int Gba::Tick(unsigned int time)
 	if (!IsRunning())
 		return 0;
 	int execute = ((uint64_t)time * FCPU + 500000) / 1000000;
+	// Clear breakpoint
+	Step(); Step();
 	for (int i = execute; i != 0; --i)
 	{
 		if (!_stopped) {
