@@ -32,6 +32,10 @@ int Gba::Load(const SaveData_t *data)
 void Gba::Step()
 {
 	if (!_stopped) {
+		while (_memory.IsDMAActive()) {
+			_memory.Tick();
+			_gpu.Tick();
+		}
 		_memory.Tick();
 		if (!_halted) {
 			_cpu.Tick(true);
@@ -65,7 +69,7 @@ int Gba::Tick(unsigned int time)
 	{
 		if (!_stopped) {
 			_memory.Tick();
-			if (!_halted) {
+			if (!_halted && !_memory.IsDMAActive()) {
 				try {
 					_cpu.Tick();
 				}

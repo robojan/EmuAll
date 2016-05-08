@@ -10,12 +10,24 @@
 
 class Gba;
 
+struct DMAInternalInfo {
+	bool active;
+	bool hasRead;
+	uint16_t wc;
+	uint32_t src;
+	uint32_t dst;
+	uint32_t ctrl;
+	uint32_t value;
+	uint32_t activeSrc;
+	uint32_t activeDst;
+};
+
 class MemoryEventHandler {
 public:
 	virtual void HandleEvent(uint32_t address, int size) = 0;
 };
 
-class Memory {
+class Memory : public MemoryEventHandler {
 public:
 	Memory(Gba &gba);
 	~Memory();
@@ -23,6 +35,7 @@ public:
 	int Load(const SaveData_t *data);
 
 	void Tick();
+
 
 	uint8_t Read8(uint32_t address);
 	uint16_t Read16(uint32_t address);
@@ -50,7 +63,15 @@ public:
 	uint8_t *GetPalettes();
 	uint8_t *GetVRAM();
 	uint8_t *GetOAM();
+
+	virtual void HandleEvent(uint32_t address, int size);
+
+	bool IsDMAActive() const;
+	void DMAStartVBlank();
+	void DMAStartHBlank();
+	void DMAStartSoundFIFO();
 private:
+	void InitRegisters();
 
 	// Memory map Should be first in the class memory
 	uint8_t *_memmap[16]; 
@@ -58,6 +79,8 @@ private:
 	uint32_t _memMask[16];
 	// Event callbacks
 	AATree<uint32_t, MemoryEventHandler *> _events;
+	// DMA
+	struct DMAInternalInfo _dma[4];
 	// system
 	Gba &_system;
 	// 16 kB bios

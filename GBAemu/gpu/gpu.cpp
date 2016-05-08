@@ -54,6 +54,7 @@ void Gpu::Tick()
 			_vcount++;
 			if (_vcount == 160) {
 				dispstat |= 1;
+				_system.GetMemory().DMAStartVBlank();
 				if ((dispstat & 0x8) != 0) {
 					_system.RequestIRQ(IRQ_VBLANK);
 				}
@@ -77,6 +78,7 @@ void Gpu::Tick()
 			uint8_t *registers = _system.GetMemory().GetRegisters();
 			uint16_t dispstat = IOREG16(registers, DISPSTAT);
 			dispstat |= 1;
+			_system.GetMemory().DMAStartHBlank();
 			if ((dispstat & 0x10) != 0) {
 				_system.RequestIRQ(IRQ_HBLANK);
 			}

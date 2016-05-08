@@ -9,10 +9,13 @@
 #include <GBAemu/memory/memory.h>
 #include <GBAemu/util/log.h>
 #include <GBAemu/defines.h>
+#include <GBAemu/gba.h>
 
 
 Memory::Memory(Gba &gba) :
-	_system(gba), _events(), _bios(nullptr), _wram(nullptr), _chipWram(nullptr), _ioRegisters(nullptr), 
+	_system(gba), _events(),
+	_dma{{false, false, 0, 0},{ false, false, 0, 0 },{ false, false, 0, 0 } ,{ false, false, 0, 0 } },
+	_bios(nullptr), _wram(nullptr), _chipWram(nullptr), _ioRegisters(nullptr),
 	_pram(nullptr), _vram(nullptr), _oram(nullptr), _sram(nullptr), 
 	_sramLength(0), _rom(nullptr), _romLength(0)
 {
@@ -78,6 +81,9 @@ Memory::Memory(Gba &gba) :
 	}
 	fread(_bios, 16 * 1024, 1, biosFile);
 	fclose(biosFile);
+
+	// Init registers
+	InitRegisters();
 
 }
 
@@ -182,7 +188,82 @@ int Memory::Load(const SaveData_t *data)
 
 void Memory::Tick()
 {
+	for (int i = 0; i < 4; i++) {
+		if (_dma[i].active) {
+			bool transfer32 = (_dma[i].ctrl & (1 << 26)) != 0;
+			if (_dma[i].hasRead) {
+				if (transfer32) {
+					Write32(_dma[i].activeDst, _dma[i].value);
+					switch ((_dma[i].ctrl >> 21) & 0x3) {
+					case 0: _dma[i].activeDst += 4; break;
+					case 1: _dma[i].activeDst -= 4; break;
+					case 2: break;
+					case 3: _dma[i].activeDst += 4; break;
+					}
+				}
+				else {
+					Write16(_dma[i].activeDst, _dma[i].value);
+					switch ((_dma[i].ctrl >> 21) & 0x3) {
+					case 0: _dma[i].activeDst += 2; break;
+					case 1: _dma[i].activeDst -= 2; break;
+					case 2: break;
+					case 3: _dma[i].activeDst += 2; break;
+					}
+				}
+				_dma[i].hasRead = false;
+				_dma[i].wc--;
+			}
+			else {
+				if (transfer32) {
+					_dma[i].value = Read32(_dma[i].activeSrc);
+					switch ((_dma[i].ctrl >> 23) & 0x3) {
+					case 0: _dma[i].activeSrc += 4; break;
+					case 1: _dma[i].activeSrc -= 4; break;
+					case 2: break;
+					case 3: break;
+					}
+				}
+				else {
+					_dma[i].value = Read16(_dma[i].activeSrc);
+					switch ((_dma[i].ctrl >> 23) & 0x3) {
+					case 0: _dma[i].activeSrc += 2; break;
+					case 1: _dma[i].activeSrc -= 2; break;
+					case 2: break;
+					case 3: break;
+					}
+				}
+				_dma[i].hasRead = true;
+			}
+			if (_dma[i].wc == 0) {
+				_dma[i].active = false;
+				bool repeat = (_dma[i].ctrl & (1 << 25)) != 0;
+				bool irq = (_dma[i].ctrl & (1 << 30)) != 0;
+				if (!repeat) {
+					_dma[i].ctrl &= ~(1 << 31);
+				}
+				else {
+					if (i == 3) {
+						_dma[i].wc = 0xFFFF;
+					}
+					else {
+						_dma[i].wc = 0x7FFF;
+					}
+					_dma[i].activeSrc = _dma[i].src;
+					if ((_dma[i].ctrl & (3 << 21)) == (3 << 21)) {
+						_dma[i].activeDst = _dma[i].dst;
+					}
+				}
+				if (irq) {
+					_system.RequestIRQ(1 << (IRQ_DMA0_NO + i));
+				}
+			}
+		}
+	}
+}
 
+bool Memory::IsDMAActive() const
+{
+	return _dma[0].active || _dma[1].active || _dma[2].active || _dma[3].active;
 }
 
 uint8_t Memory::Read8(uint32_t address)
@@ -399,4 +480,166 @@ uint8_t * Memory::GetVRAM()
 uint8_t * Memory::GetOAM()
 {
 	return _oram;
+}
+
+void Memory::InitRegisters()
+{
+	IOREG32(_ioRegisters, DMA0SAD) = 0xFFFFFFFF;
+	IOREG32(_ioRegisters, DMA1SAD) = 0xFFFFFFFF;
+	IOREG32(_ioRegisters, DMA2SAD) = 0xFFFFFFFF;
+	IOREG32(_ioRegisters, DMA3SAD) = 0xFFFFFFFF;
+	IOREG32(_ioRegisters, DMA0DAD) = 0xFFFFFFFF;
+	IOREG32(_ioRegisters, DMA1DAD) = 0xFFFFFFFF;
+	IOREG32(_ioRegisters, DMA2DAD) = 0xFFFFFFFF;
+	IOREG32(_ioRegisters, DMA3DAD) = 0xFFFFFFFF;
+	IOREG32(_ioRegisters, DMA0CNT_L) = 0;
+	IOREG32(_ioRegisters, DMA1CNT_L) = 0;
+	IOREG32(_ioRegisters, DMA2CNT_L) = 0;
+	IOREG32(_ioRegisters, DMA3CNT_L) = 0;
+	RegisterEvent(DMA0SAD, this);
+	RegisterEvent(DMA0DAD, this);
+	RegisterEvent(DMA0CNT_L, this);
+	RegisterEvent(DMA1SAD, this);
+	RegisterEvent(DMA1DAD, this);
+	RegisterEvent(DMA1CNT_L, this);
+	RegisterEvent(DMA2SAD, this);
+	RegisterEvent(DMA2DAD, this);
+	RegisterEvent(DMA2CNT_L, this);
+	RegisterEvent(DMA3SAD, this);
+	RegisterEvent(DMA3DAD, this);
+	RegisterEvent(DMA3CNT_L, this);
+}
+
+void Memory::HandleEvent(uint32_t address, int size)
+{
+	if (address <= DMA0SAD + 3 && DMA0SAD < address + size) {
+		_dma[0].src = IOREG32(_ioRegisters, DMA0SAD) & 0x07FFFFFF;
+		IOREG32(_ioRegisters, DMA0SAD) = 0xFFFFFFFF;
+	}
+	if (address <= DMA1SAD + 3 && DMA1SAD < address + size) {
+		_dma[1].src = IOREG32(_ioRegisters, DMA1SAD) & 0x07FFFFFF;
+		IOREG32(_ioRegisters, DMA1SAD) = 0xFFFFFFFF;
+	}
+	if (address <= DMA2SAD + 3 && DMA2SAD < address + size) {
+		_dma[2].src = IOREG32(_ioRegisters, DMA2SAD) & 0x07FFFFFF;
+		IOREG32(_ioRegisters, DMA2SAD) = 0xFFFFFFFF;
+	}
+	if (address <= DMA3SAD + 3 && DMA3SAD < address + size) {
+		_dma[3].src = IOREG32(_ioRegisters, DMA3SAD) & 0x0FFFFFFF;
+		IOREG32(_ioRegisters, DMA3SAD) = 0xFFFFFFFF;
+	}
+	if (address <= DMA0DAD + 3 && DMA0DAD < address + size) {
+		_dma[0].dst = IOREG32(_ioRegisters, DMA0DAD) & 0x07FFFFFF;
+		IOREG32(_ioRegisters, DMA0DAD) = 0xFFFFFFFF;
+	}
+	if (address <= DMA1DAD + 3 && DMA1DAD < address + size) {
+		_dma[1].dst = IOREG32(_ioRegisters, DMA1DAD) & 0x07FFFFFF;
+		IOREG32(_ioRegisters, DMA1DAD) = 0xFFFFFFFF;
+	}
+	if (address <= DMA2DAD + 3 && DMA2DAD < address + size) {
+		_dma[2].dst = IOREG32(_ioRegisters, DMA2DAD) & 0x07FFFFFF;
+		IOREG32(_ioRegisters, DMA2DAD) = 0xFFFFFFFF;
+	}
+	if (address <= DMA3DAD + 3 && DMA3DAD < address + size) {
+		_dma[3].dst = IOREG32(_ioRegisters, DMA3DAD) & 0x0FFFFFFF;
+		IOREG32(_ioRegisters, DMA3DAD) = 0xFFFFFFFF;
+	}
+	if (address <= DMA0CNT_L + 3 && DMA0CNT_L < address + size) {
+		uint32_t newCtrl = IOREG32(_ioRegisters, DMA0CNT_L);
+		_dma[0].active = (((_dma[0].ctrl ^ newCtrl) & newCtrl) & (1 << 31)) != 0;
+		_dma[0].activeDst = _dma[0].dst;
+		_dma[0].activeSrc = _dma[0].src;
+		_dma[0].hasRead = false;
+		if (_dma[0].active) {
+			_dma[0].wc = newCtrl & 0x3FFF;
+		}
+		else {
+			_dma[0].wc = 0;
+		}
+		_dma[0].ctrl = newCtrl;
+	}
+	if (address <= DMA1CNT_L + 3 && DMA1CNT_L < address + size) {
+		uint32_t newCtrl = IOREG32(_ioRegisters, DMA0CNT_L);
+		_dma[1].active = (((_dma[1].ctrl ^ newCtrl) & newCtrl) & (1 << 31)) != 0;
+		_dma[1].activeDst = _dma[1].dst;
+		_dma[1].activeSrc = _dma[1].src;
+		_dma[1].hasRead = false;
+		if (_dma[1].active) {
+			_dma[1].wc = newCtrl & 0x3FFF;
+		}
+		else {
+			_dma[1].wc = 0;
+		}
+		_dma[1].ctrl = newCtrl;
+	}
+	if (address <= DMA2CNT_L + 3 && DMA2CNT_L < address + size) {
+		uint32_t newCtrl = IOREG32(_ioRegisters, DMA0CNT_L);
+		_dma[2].active = (((_dma[2].ctrl ^ newCtrl) & newCtrl) & (1 << 31)) != 0;
+		_dma[2].activeDst = _dma[2].dst;
+		_dma[2].activeSrc = _dma[2].src;
+		_dma[2].hasRead = false;
+		if (_dma[2].active) {
+			_dma[2].wc = newCtrl & 0x3FFF;
+		}
+		else {
+			_dma[2].wc = 0;
+		}
+		_dma[2].ctrl = newCtrl;
+	}
+	if (address <= DMA3CNT_L + 3 && DMA3CNT_L < address + size) {
+		uint32_t newCtrl = IOREG32(_ioRegisters, DMA3CNT_L);
+		_dma[3].active = (((_dma[3].ctrl ^ newCtrl) & newCtrl) & (1 << 31)) != 0;
+		_dma[3].activeDst = _dma[3].dst;
+		_dma[3].activeSrc = _dma[3].src;
+		_dma[3].hasRead = false;
+		if (_dma[3].active) {
+			_dma[3].wc = newCtrl & 0xFFFF;
+		}
+		else {
+			_dma[3].wc = 0;
+		}
+		_dma[3].ctrl = newCtrl;
+	}
+}
+
+void Memory::DMAStartVBlank() {
+	for (int i = 0; i < 4; i++) {
+		if ((_dma[i].ctrl & (1 << 31)) != 0 && 
+			!_dma[i].active && 
+			(_dma[i].ctrl & (3 << 12)) == (1 << 12)) {
+			_dma[i].wc = _dma[i].ctrl & (i == 3 ? 0xFFFF : 0x7FFF);
+			_dma[i].activeDst = _dma[i].dst;
+			_dma[i].activeSrc = _dma[i].src;
+			_dma[i].active = true;
+			_dma[i].hasRead = false;
+		}
+	}
+}
+
+void Memory::DMAStartHBlank() {
+	for (int i = 0; i < 4; i++) {
+		if ((_dma[i].ctrl & (1 << 31)) != 0 &&
+			!_dma[i].active &&
+			(_dma[i].ctrl & (3 << 12)) == (2 << 12)) {
+			_dma[i].wc = _dma[i].ctrl & (i == 3 ? 0xFFFF : 0x7FFF);
+			_dma[i].activeDst = _dma[i].dst;
+			_dma[i].activeSrc = _dma[i].src;
+			_dma[i].active = true;
+			_dma[i].hasRead = false;
+		}
+	}
+}
+
+void Memory::DMAStartSoundFIFO() {
+	for (int i = 1; i < 3; i++) {
+		if ((_dma[i].ctrl & (1 << 31)) != 0 &&
+			!_dma[i].active &&
+			(_dma[i].ctrl & (3 << 12)) == (3 << 12)) {
+			_dma[i].wc = _dma[i].ctrl & 0xFFFF;
+			_dma[i].activeDst = _dma[i].dst;
+			_dma[i].activeSrc = _dma[i].src;
+			_dma[i].active = true;
+			_dma[i].hasRead = false;
+		}
+	}
 }
