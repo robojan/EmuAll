@@ -235,6 +235,7 @@ void Memory::Tick()
 				_dma[i].hasRead = true;
 			}
 			if (_dma[i].wc == 0) {
+
 				_dma[i].active = false;
 				bool repeat = (_dma[i].ctrl & (1 << 25)) != 0;
 				bool irq = (_dma[i].ctrl & (1 << 30)) != 0;

@@ -6,6 +6,7 @@
 #include <vector>
 
 class Texture;
+class Texture3D;
 class BufferObject;
 class BufferTexture;
 
@@ -50,6 +51,7 @@ public:
 	void SetUniform(const char *name, double val0, double val1, double val2);
 	void SetUniform(const char *name, double val0, double val1, double val2, double val3);
 	void SetUniform(const char *name, int pos, Texture &texture);
+	void SetUniform(const char *name, int pos, Texture3D &texture);
 	void SetUniform(const char *name, int pos, BufferTexture &texture);
 	void SetUniform(const char *name, int pos, BufferObject &object);
 

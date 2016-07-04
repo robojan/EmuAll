@@ -1,10 +1,12 @@
 #pragma once
 #include <memory>
 
+#include <GBAemu/defines.h>
 #include <GBAemu/memory/memory.h>
 #include <emuall/graphics/ShaderProgram.h>
 #include <emuall/graphics/BufferObject.h>
 #include <emuall/graphics/texture.h>
+#include <emuall/graphics/texture3D.h>
 #include <emuall/graphics/bufferTexture.h>
 #include <emuall/graphics/VertexArrayObject.h>
 #include <emuall/util/counterPointer.h>
@@ -31,6 +33,14 @@ public:
 	bool _debugTilesGridEnabled[3];
 private:
 	void RegisterEvents();
+
+	void VBlank();
+	void HBlank();
+
+	// Main drawing
+	bool InitMainGL();
+	void DestroyMainGL();
+	void DrawMain();
 
 	// Palette drawing
 	bool InitPalettesGL(bool background);
@@ -60,6 +70,26 @@ private:
 	uint_fast16_t _hcount;
 
 	// Drawing objects
+	typedef struct {
+		int dispcnt;
+		int pad0[3];
+		int bgCnt[4];
+		struct {
+			int hOfs;
+			int vOfs;
+			int pad0[2];
+		} bgOfs[4];
+	} DrawingInfoData_t;
+	// Main drawing
+	bool _mainInitialized;
+	CounterPtr<ShaderProgram> _mainShader;
+	CounterPtr<BufferTexture> _mainVramBT;
+	CounterPtr<BufferTexture> _mainOamBT;
+	CounterPtr<BufferObject> _mainRegistersBO;
+	CounterPtr<BufferObject> _mainVertexData;
+	CounterPtr<Texture3D> _mainPaletteData;
+	VertexArrayObject *_mainVao;
+	DrawingInfoData_t _mainDrawingRegisters[SCREEN_HEIGHT];
 	// Palette drawing
 	bool _paletteInitialized[2];
 	CounterPtr<ShaderProgram> _paletteShader;

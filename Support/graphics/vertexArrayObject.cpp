@@ -31,6 +31,12 @@ static GLenum GetDataType(VertexArrayObject::DataType type) {
 	}
 }
 
+static bool IsIntegerDataType(VertexArrayObject::DataType type) {
+	GLenum t = GetDataType(type);
+	return t == GL_BYTE || t == GL_UNSIGNED_BYTE || t == GL_SHORT ||
+		t == GL_UNSIGNED_SHORT || t == GL_INT || t == GL_UNSIGNED_INT;
+}
+
 VertexArrayObject::VertexArrayObject() : 
 	_vao(0)
 {
@@ -58,8 +64,14 @@ void VertexArrayObject::BindBuffer(int location, BufferObject &buffer, int size,
 {
 	GL_CHECKED(glEnableVertexAttribArray(location));
 	buffer.Begin();
-	GL_CHECKED(glVertexAttribPointer(location, size, GetDataType(type),
-		normalized ? GL_TRUE : GL_FALSE, stride, (GLvoid *)offset));
+	if (IsIntegerDataType(type)) {
+		GL_CHECKED(glVertexAttribIPointer(location, size, GetDataType(type), 
+			stride, (GLvoid *)offset));
+	}
+	else {
+		GL_CHECKED(glVertexAttribPointer(location, size, GetDataType(type),
+			normalized ? GL_TRUE : GL_FALSE, stride, (GLvoid *)offset));
+	}
 	buffer.End();
 }
 

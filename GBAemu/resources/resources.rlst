@@ -7,3 +7,6 @@ oam.vert.glsl
 oam.frag.glsl
 bg.vert.glsl
 bg.frag.glsl
+main.vert.glsl
+main.geo.glsl
+main.frag.glsl

@@ -2,6 +2,8 @@
 
 // General defines
 #define FCPU                16780000
+#define SCREEN_HEIGHT       160
+#define SCREEN_WIDTH        240
 
 // CPU defines
 #define THUMB_NOP           0xB000
@@ -14,6 +16,7 @@
 #define IOREGISTERSSIZE     (1024)
 #define PRAMSIZE            (1024)
 #define VRAMSIZE            (128 * 1024) // 96 kB is the actual vram
+#define VRAMSIZE_USED       (96 * 1024)
 #define ORAMSIZE            (1024)
 
 // Memory masks
@@ -125,6 +128,16 @@
 #define BG3X_H              0x400003A
 #define BG3Y_L              0x400003C
 #define BG3Y_H              0x400003E
+#define WIN0H               0x4000040
+#define WIN1H               0x4000042
+#define WIN0V               0x4000044
+#define WIN1V               0x4000046
+#define WININ               0x4000048
+#define WINOUT              0x400004A
+#define MOSAIC              0x400004C
+#define BLDCNT              0x4000050
+#define BLDALPHA            0x4000052
+#define BLDY                0x4000054
 
 // Interrupt control
 #define IE                  0x4000200

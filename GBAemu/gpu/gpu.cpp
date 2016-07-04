@@ -58,6 +58,7 @@ void Gpu::Tick()
 				if ((dispstat & 0x8) != 0) {
 					_system.RequestIRQ(IRQ_VBLANK);
 				}
+				VBlank();
 			}
 			if (_vcount == dispstat >> 8) {
 				dispstat |= 4;
@@ -82,6 +83,7 @@ void Gpu::Tick()
 			if ((dispstat & 0x10) != 0) {
 				_system.RequestIRQ(IRQ_HBLANK);
 			}
+			HBlank();
 		}
 	}
 }
@@ -104,6 +106,7 @@ void Gpu::HandleEvent(uint32_t address, int size)
 bool Gpu::InitGL(int id)
 {
 	switch (id) {
+	case 0: return InitMainGL();
 	case 3000: return InitBGGL(0);
 	case 3001: return InitBGGL(1);
 	case 3002: return InitBGGL(2);
@@ -121,6 +124,9 @@ bool Gpu::InitGL(int id)
 void Gpu::DestroyGL(int id)
 {
 	switch (id) {
+	case 0:
+		DestroyMainGL();
+		break;
 	case 3000: 
 		DestroyBGGL(0);
 		break;
@@ -162,6 +168,9 @@ void Gpu::Reshape(int id, int width, int height, bool keepAspect)
 void Gpu::Draw(int id)
 {
 	switch (id) {
+	case 0:
+		DrawMain();
+		break;
 	case 3000:
 		DrawBG(0);
 		break;
@@ -206,6 +215,179 @@ void Gpu::RegisterEvents()
 	//_system.GetMemory().RegisterEvent(BG2HOFS, this);
 	//_system.GetMemory().RegisterEvent(BG3HOFS, this);
 
+}
+
+void Gpu::VBlank()
+{
+	// Upload registers to gpu
+	try {
+		//_mainRegistersBT->GetBufferObject().BufferSubData(0, sizeof(_mainDrawingRegisters), _mainDrawingRegisters);
+		_mainRegistersBO->BufferSubData(0, sizeof(_mainDrawingRegisters), _mainDrawingRegisters);
+	}
+	catch (GraphicsException &e) {
+		Log(Error, "Error while updating graphics memory in vblank: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
+	}
+}
+
+void Gpu::HBlank()
+{
+	if (_vcount < SCREEN_HEIGHT)
+	{
+		uint8_t *registers = _system.GetMemory().GetRegisters();
+		// Write registers to buffer
+		_mainDrawingRegisters[_vcount].dispcnt = IOREG16(registers, DISPCNT);
+		_mainDrawingRegisters[_vcount].bgCnt[0] = IOREG16(registers, BG0CNT);
+		_mainDrawingRegisters[_vcount].bgCnt[1] = IOREG16(registers, BG1CNT);
+		_mainDrawingRegisters[_vcount].bgCnt[2] = IOREG16(registers, BG2CNT);
+		_mainDrawingRegisters[_vcount].bgCnt[3] = IOREG16(registers, BG3CNT);
+		_mainDrawingRegisters[_vcount].bgOfs[0].hOfs = IOREG16(registers, BG0HOFS);
+		_mainDrawingRegisters[_vcount].bgOfs[0].vOfs = IOREG16(registers, BG0VOFS) & 0x1F;
+		_mainDrawingRegisters[_vcount].bgOfs[1].hOfs = IOREG16(registers, BG1HOFS);
+		_mainDrawingRegisters[_vcount].bgOfs[1].vOfs = IOREG16(registers, BG1VOFS) & 0x1F;
+		_mainDrawingRegisters[_vcount].bgOfs[2].hOfs = IOREG16(registers, BG2HOFS);
+		_mainDrawingRegisters[_vcount].bgOfs[2].vOfs = IOREG16(registers, BG2VOFS) & 0x1F;
+		_mainDrawingRegisters[_vcount].bgOfs[3].hOfs = IOREG16(registers, BG3HOFS);
+		_mainDrawingRegisters[_vcount].bgOfs[3].vOfs = IOREG16(registers, BG3VOFS) & 0x1F;
+		// Upload VRAM memory to gpu
+		try {
+			uint8_t *vram = _system.GetMemory().GetVRAM();
+			_mainVramBT->GetBufferObject().BufferSubData(_vcount * VRAMSIZE_USED, VRAMSIZE_USED, vram);
+			uint8_t *palettes = _system.GetMemory().GetPalettes();
+			_mainPaletteData->UpdateData(0, 0, _vcount, 16, 32, 1, (char *)palettes, Texture3D::USHORT_1_5_5_5);
+			uint8_t *oam = _system.GetMemory().GetOAM();
+			_mainOamBT->GetBufferObject().BufferSubData(_vcount * ORAMSIZE, ORAMSIZE, oam);
+		}
+		catch (GraphicsException &e) {
+			Log(Error, "Error while updating graphics memory in hblank: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
+		}
+	}
+}
+
+bool Gpu::InitMainGL()
+{
+	// line, type
+	// 0 background, 1 object, 2 backdrop
+	int vertexData[SCREEN_HEIGHT * 3 * 2];
+	for (int i = 0; i < SCREEN_HEIGHT; i++) {
+		vertexData[(i + SCREEN_HEIGHT * 0) * 2] = i;
+		vertexData[(i + SCREEN_HEIGHT * 0) * 2 + 1] = 0;
+		vertexData[(i + SCREEN_HEIGHT * 1) * 2] = i;
+		vertexData[(i + SCREEN_HEIGHT * 1) * 2 + 1] = 1;
+		vertexData[(i + SCREEN_HEIGHT * 2) * 2] = i;
+		vertexData[(i + SCREEN_HEIGHT * 2) * 2 + 1] = 2;
+	}
+	try {
+		if (_mainInitialized) {
+			DestroyMainGL();
+		}
+		// Create Shader program
+		_mainShader.IncRef();
+		if (_mainShader.GetRefCount() == 1) {
+			if (!_mainShader->AddShader(ShaderProgram::Vertex, (char *)resource_main_vert_glsl,
+				resource_main_vert_glsl_len)) {
+				Log(Error, "Could not Compile main vertex shader\n");
+				throw GraphicsException(0, _mainShader->GetLog());
+			}
+			if (!_mainShader->AddShader(ShaderProgram::Geometry, (char *)resource_main_geo_glsl,
+				resource_main_geo_glsl_len)) {
+				Log(Error, "Could not Compile main geometry shader\n");
+				throw GraphicsException(0, _mainShader->GetLog());
+			}
+			if (!_mainShader->AddShader(ShaderProgram::Fragment, (char *)resource_main_frag_glsl,
+				resource_main_frag_glsl_len)) {
+				Log(Error, "Could not Compile main fragment shader\n");
+				throw GraphicsException(0, _mainShader->GetLog());
+			}
+			if (!_mainShader->Link()) {
+				Log(Error, "Could not Link main shader program\n");
+				throw GraphicsException(0, _mainShader->GetLog());
+			}
+		}
+
+		// Create vertex data buffer
+		_mainVertexData.IncRef(BufferObject::Type::Array);
+		if (_mainVertexData.GetRefCount() == 1) {
+			_mainVertexData->BufferData(BufferObject::Usage::StaticDraw, sizeof(vertexData), vertexData);
+		}
+
+		// create VAO
+		_mainVao = new VertexArrayObject();
+		_mainVao->Begin();
+		_mainVao->BindBuffer(0, *_mainVertexData, 1, VertexArrayObject::Int,
+			false, 2 * sizeof(int), 0 * sizeof(int));
+		_mainVao->BindBuffer(1, *_mainVertexData, 1, VertexArrayObject::Int,
+			false, 2 * sizeof(int), 1 * sizeof(int));
+		_mainVao->End();
+
+		// Main vram buffer
+		_mainVramBT.IncRef(SCREEN_HEIGHT * VRAMSIZE_USED, nullptr, BufferTexture::Format::R8UI, BufferObject::Usage::StreamDraw);
+
+		// Oam buffer
+		_mainOamBT.IncRef(SCREEN_HEIGHT * ORAMSIZE, nullptr, BufferTexture::Format::R16UI, BufferObject::Usage::StreamDraw);
+
+		_mainRegistersBO.IncRef(BufferObject::Type::Uniform);
+		if (_mainRegistersBO.GetRefCount() == 1) {
+			_mainRegistersBO->BufferData(BufferObject::Usage::StreamDraw, SCREEN_HEIGHT * sizeof(DrawingInfoData_t), _mainDrawingRegisters);
+		}
+		//_mainRegistersBO.IncRef(SCREEN_HEIGHT * sizeof(DrawingInfoData_t), nullptr, BufferTexture::Format::R32I, BufferObject::Usage::StreamDraw);
+
+		_mainPaletteData.IncRef(16, 32, SCREEN_HEIGHT, nullptr, Texture3D::RGB);
+		if (_mainPaletteData.GetRefCount() == 1) {
+			_mainPaletteData->SetFilter(Texture3D::Linear, Texture3D::Linear);
+			_mainPaletteData->SetWrap(Texture3D::Repeat, Texture3D::Repeat);
+		}
+	}
+	catch (GraphicsException &e) {
+		Log(Error, "Error while creating graphics main objects: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
+		return false;
+	}
+	_mainInitialized = true;
+	return true;
+}
+
+void Gpu::DestroyMainGL()
+{
+	if (_mainInitialized == false) return;
+	_mainInitialized = false;
+	_mainShader.DecRef();
+	_mainVertexData.DecRef();
+	_mainVramBT.DecRef();
+	_mainRegistersBO.DecRef();
+	_mainPaletteData.DecRef();
+	_mainOamBT.DecRef();
+	if (_mainVao != nullptr) {
+		delete _mainVao;
+		_mainVao = nullptr;
+	}
+}
+
+void Gpu::DrawMain()
+{
+	try {
+		if (!_mainInitialized) throw GraphicsException(GL_INVALID_OPERATION, "Tried to draw main without initializing");
+		GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT));
+		GL_CHECKED(glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT));
+		GL_CHECKED(glEnable(GL_DEPTH_TEST));
+		GL_CHECKED(glDepthFunc(GL_GEQUAL));
+
+		_mainShader->Begin();
+		_mainVao->Begin();
+
+		// setup static uniform
+		_mainShader->SetUniform("screenSize", float(SCREEN_WIDTH), float(SCREEN_HEIGHT));
+		_mainShader->SetUniform("DrawingRegisters", 0, *_mainRegistersBO);
+		_mainShader->SetUniform("vramData", 0, *_mainVramBT);
+		_mainShader->SetUniform("paletteData", 1, *_mainPaletteData);
+		_mainShader->SetUniform("oamData", 2, *_mainOamBT);
+
+		GL_CHECKED(glDrawArrays(GL_POINTS, 0, SCREEN_HEIGHT * 3));
+
+		_mainVao->End();
+		_mainShader->End();
+	}
+	catch (GraphicsException  &e) {
+		Log(Error, "Graphics exception in drawing main: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
+	}
 }
 
 bool Gpu::InitPalettesGL(bool background)

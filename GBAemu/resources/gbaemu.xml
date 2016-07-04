@@ -216,6 +216,17 @@
                 </ver>
                 <ver>
                   <infolist prop="1">
+                    <info id="3021">
+                      <name>BG0CNT</name>
+                      <size>4</size>
+                      <mode>hex</mode>
+                    </info>
+                    <info id="3022">
+                      <name>BG0HOFS</name>
+                    </info>
+                    <info id="3023">
+                      <name>BG0VOFS</name>
+                    </info>
                   </infolist>
                 </ver>
               </hor>
@@ -230,6 +241,17 @@
                 </ver>
                 <ver>
                   <infolist prop="1">
+                    <info id="3024">
+                      <name>BG1CNT</name>
+                      <size>4</size>
+                      <mode>hex</mode>
+                    </info>
+                    <info id="3025">
+                      <name>BG1HOFS</name>
+                    </info>
+                    <info id="3026">
+                      <name>BG1VOFS</name>
+                    </info>
                   </infolist>
                 </ver>
               </hor>
@@ -244,6 +266,47 @@
                 </ver>
                 <ver>
                   <infolist prop="1">
+                    <info id="3027">
+                      <name>BG2CNT</name>
+                      <size>4</size>
+                      <mode>hex</mode>
+                    </info>
+                    <info id="3028">
+                      <name>BG2HOFS</name>
+                    </info>
+                    <info id="3029">
+                      <name>BG2VOFS</name>
+                    </info>
+                    <info id="3033">
+                      <name>BG2X</name>
+                      <size>8</size>
+                      <mode>hex</mode>
+                    </info>
+                    <info id="3034">
+                      <name>BG2Y</name>
+                      <size>8</size>
+                      <mode>hex</mode>
+                    </info>
+                    <info id="3035">
+                      <name>BG2PA</name>
+                      <size>4</size>
+                      <mode>hex</mode>
+                    </info>
+                    <info id="3036">
+                      <name>BG2PB</name>
+                      <size>4</size>
+                      <mode>hex</mode>
+                    </info>
+                    <info id="3037">
+                      <name>BG2PC</name>
+                      <size>4</size>
+                      <mode>hex</mode>
+                    </info>
+                    <info id="3038">
+                      <name>BG2PD</name>
+                      <size>4</size>
+                      <mode>hex</mode>
+                    </info>
                   </infolist>
                 </ver>
               </hor>
@@ -258,6 +321,47 @@
                 </ver>
                 <ver>
                   <infolist prop="1">
+                    <info id="3030">
+                      <name>BG3CNT</name>
+                      <size>4</size>
+                      <mode>hex</mode>
+                    </info>
+                    <info id="3031">
+                      <name>BG3HOFS</name>
+                    </info>
+                    <info id="3032">
+                      <name>BG3VOFS</name>
+                    </info>
+                    <info id="3039">
+                      <name>BG3X</name>
+                      <size>8</size>
+                      <mode>hex</mode>
+                    </info>
+                    <info id="3040">
+                      <name>BG3Y</name>
+                      <size>8</size>
+                      <mode>hex</mode>
+                    </info>
+                    <info id="3041">
+                      <name>BG3PA</name>
+                      <size>4</size>
+                      <mode>hex</mode>
+                    </info>
+                    <info id="3042">
+                      <name>BG3PB</name>
+                      <size>4</size>
+                      <mode>hex</mode>
+                    </info>
+                    <info id="3043">
+                      <name>BG3PC</name>
+                      <size>4</size>
+                      <mode>hex</mode>
+                    </info>
+                    <info id="3044">
+                      <name>BG3PD</name>
+                      <size>4</size>
+                      <mode>hex</mode>
+                    </info>
                   </infolist>
                 </ver>
               </hor>

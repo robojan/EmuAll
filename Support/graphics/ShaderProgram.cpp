@@ -1,6 +1,7 @@
 
 #include <emuall/graphics/ShaderProgram.h>
 #include <emuall/graphics/texture.h>
+#include <emuall/graphics/texture3D.h>
 #include <emuall/graphics/BufferObject.h>
 #include <emuall/graphics/bufferTexture.h>
 #include <emuall/graphics/graphicsException.h>
@@ -333,6 +334,16 @@ void ShaderProgram::SetUniform(const char *name, int pos, BufferObject &object)
 }
 
 void ShaderProgram::SetUniform(const char *name, int pos, Texture &texture)
+{
+	int loc = GetUniformLocation(name);
+	if (loc != -1) {
+		GL_CHECKED(glActiveTexture(GL_TEXTURE0 + pos));
+		texture.Bind();
+		GL_CHECKED(glUniform1i(loc, pos));
+	}
+}
+
+void ShaderProgram::SetUniform(const char *name, int pos, Texture3D &texture)
 {
 	int loc = GetUniformLocation(name);
 	if (loc != -1) {

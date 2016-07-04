@@ -195,6 +195,7 @@
     <ClCompile Include="graphics\rectangle.cpp" />
     <ClCompile Include="graphics\ShaderProgram.cpp" />
     <ClCompile Include="graphics\texture.cpp" />
+    <ClCompile Include="graphics\texture3D.cpp" />
     <ClCompile Include="graphics\vertexArrayObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math\math.cpp" />
@@ -210,6 +211,7 @@
     <ClInclude Include="include\emuall\graphics\bufferTexture.h" />
     <ClInclude Include="include\emuall\graphics\guiRenderer.h" />
     <ClInclude Include="include\emuall\graphics\rectangle.h" />
+    <ClInclude Include="include\emuall\graphics\texture3D.h" />
     <ClInclude Include="include\emuall\graphics\VertexArrayObject.h" />
     <ClInclude Include="include\emuall\graphics\BufferObject.h" />
     <ClInclude Include="include\emuall\graphics\font.h" />

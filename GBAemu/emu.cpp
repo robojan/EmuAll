@@ -285,6 +285,54 @@ uint32_t __stdcall GetValU(EMUHANDLE handle, int32_t id) {
 		return (emulator->GetMemory().Read32(DISPSTAT) & 0x20) ? 1 : 0;
 	case 3020: // V-Match
 		return (emulator->GetMemory().Read32(DISPSTAT) >> 8) & 0xFF;
+	case 3021: // BG0CNT
+		return (emulator->GetMemory().Read16(BG0CNT));
+	case 3022: // BG0HOFS
+		return (emulator->GetMemory().Read16(BG0HOFS));
+	case 3023: // BG0VOFS
+		return (emulator->GetMemory().Read16(BG0VOFS));
+	case 3024: // BG1CNT
+		return (emulator->GetMemory().Read16(BG1CNT));
+	case 3025: // BG1HOFS
+		return (emulator->GetMemory().Read16(BG1HOFS));
+	case 3026: // BG1VOFS
+		return (emulator->GetMemory().Read16(BG1VOFS));
+	case 3027: // BG2CNT
+		return (emulator->GetMemory().Read16(BG2CNT));
+	case 3028: // BG2HOFS
+		return (emulator->GetMemory().Read16(BG2HOFS));
+	case 3029: // BG2VOFS
+		return (emulator->GetMemory().Read16(BG2VOFS));
+	case 3030: // BG3CNT
+		return (emulator->GetMemory().Read16(BG3CNT));
+	case 3031: // BG3HOFS
+		return (emulator->GetMemory().Read16(BG3HOFS));
+	case 3032: // BG3VOFS
+		return (emulator->GetMemory().Read16(BG3VOFS));
+	case 3033: // BG2X
+		return (emulator->GetMemory().Read32(BG2X_L));
+	case 3034: // BG2Y
+		return (emulator->GetMemory().Read32(BG2Y_L));
+	case 3035: // BG2PA
+		return (emulator->GetMemory().Read16(BG2PA));
+	case 3036: // BG2PB
+		return (emulator->GetMemory().Read16(BG2PB));
+	case 3037: // BG2PC
+		return (emulator->GetMemory().Read16(BG2PC));
+	case 3038: // BG2PD
+		return (emulator->GetMemory().Read16(BG2PD));
+	case 3039: // BG3X
+		return (emulator->GetMemory().Read32(BG3X_L));
+	case 3040: // BG3Y
+		return (emulator->GetMemory().Read32(BG3Y_L));
+	case 3041: // BG3PA
+		return (emulator->GetMemory().Read16(BG3PA));
+	case 3042: // BG3PB
+		return (emulator->GetMemory().Read16(BG3PB));
+	case 3043: // BG3PC
+		return (emulator->GetMemory().Read16(BG3PC));
+	case 3044: // BG3PD
+		return (emulator->GetMemory().Read16(BG3PD));
 	case 3050: // bit depth tiles 1
 		return (emulator->GetGpu()._debugTiles8BitDepth[0] ? 0 : 1);
 	case 3051: // bit depth tiles 2

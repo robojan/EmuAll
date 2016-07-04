@@ -137,5 +137,14 @@
     <None Include="resources\bg.vert.glsl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="resources\main.vert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\main.frag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\main.geo.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
