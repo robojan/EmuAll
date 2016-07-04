@@ -336,6 +336,8 @@ bool Gpu::InitMainGL()
 			_mainPaletteData->SetFilter(Texture3D::Linear, Texture3D::Linear);
 			_mainPaletteData->SetWrap(Texture3D::Repeat, Texture3D::Repeat);
 		}
+
+		GL_CHECKED(glClearDepth(0));
 	}
 	catch (GraphicsException &e) {
 		Log(Error, "Error while creating graphics main objects: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
@@ -365,7 +367,7 @@ void Gpu::DrawMain()
 {
 	try {
 		if (!_mainInitialized) throw GraphicsException(GL_INVALID_OPERATION, "Tried to draw main without initializing");
-		GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT));
+		GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 		GL_CHECKED(glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT));
 		GL_CHECKED(glEnable(GL_DEPTH_TEST));
 		GL_CHECKED(glDepthFunc(GL_GEQUAL));

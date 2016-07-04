@@ -3,11 +3,13 @@
 // Input
 flat in int fLineNr;
 flat in int fTypeId;
-flat in int fBGTileAddress;
+flat in int fTileAddress;
 flat in int fBGMapAddress;
 flat in int fLargePalette;
 flat in int fPaletteId;
-
+flat in ivec2 fObjSize;
+flat in int fObjId;
+flat in int fTemp;
 in vec2 fTilePos;
 
 // Output
@@ -33,21 +35,42 @@ void main() {
 		// Background
 		int pixelId = int(fTilePos.x + fTilePos.y * 8);
 		if (fLargePalette != 0) {
-			uint paletteIdx = texelFetch(vramData, fBGTileAddress + pixelId).r;
+			uint paletteIdx = texelFetch(vramData, fTileAddress + pixelId).r;
+			if (paletteIdx == 0u) discard;
 			fragColor = vec4(getPaletteColor(paletteIdx), 1.0);
 		}
 		else {
-			uint paletteIdx = texelFetch(vramData, fBGTileAddress + pixelId / 2).r;
+			uint paletteIdx = texelFetch(vramData, fTileAddress + pixelId / 2).r;
 			if ((pixelId & 0x1) != 0) {
 				paletteIdx >>= 4u;
 			}
 			paletteIdx &= 0xFu;
+			if (paletteIdx == 0u) discard;
 			fragColor = vec4(getPaletteColor(paletteIdx + uint(fPaletteId * 16)), 1.0);
 		}
 		break;
 	}
 	case 4: { // Object
-		fragColor = vec4(1.0, 0.0, 1.0, 1.0);
+		int pixelId = int(fTilePos.x + fTilePos.y * 8);
+		if (fLargePalette != 0) {
+			uint paletteIdx = texelFetch(vramData, fTileAddress + pixelId).r;
+			if (paletteIdx == 0u) discard;
+			fragColor = vec4(getPaletteColor(paletteIdx + 256u), 1.0);
+		}
+		else {
+			uint paletteIdx = texelFetch(vramData, fTileAddress + pixelId / 2).r;
+			if ((pixelId & 0x1) != 0) {
+				paletteIdx >>= 4u;
+			}
+			paletteIdx &= 0xFu;
+			if (paletteIdx == 0u) discard;
+			fragColor = vec4(getPaletteColor(paletteIdx + uint(fPaletteId * 16) + 256u), 1.0);
+		}
+		//int address = (fTileAddress + 0) % (96 * 1024);
+		//int address = fTemp;
+		//fragColor = vec4(float((address >> 16) & 0xFF) / 255.0,
+		//	float((address >> 8) & 0xFF) / 255.0, 
+		//	float((address >> 0) & 0xFF) / 255.0, 1.0);
 		break;
 	}
 	case 5: { // Backdrop

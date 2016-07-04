@@ -12,12 +12,12 @@ in int vType[];
 flat out int fLineNr;
 // 0 BG0, 1 BG1, 2 BG2, 3 BG3, 4 OBJ, 5 Backdrop
 flat out int fTypeId;
-out float fObjPos;
 out vec2 fTilePos;
-flat out int fBGTileAddress;
+flat out int fTileAddress;
 flat out int fBGMapAddress;
 flat out int fLargePalette;
 flat out int fPaletteId;
+flat out int fTemp;
 
 // uniforms
 uniform vec2 screenSize;
@@ -34,8 +34,12 @@ layout(std140) uniform DrawingRegisters {
 	Registers dataRegisters[160];
 };
 
+int GetMode(int lineNr) {
+	return dataRegisters[lineNr].dispcnt & 0x7;
+}
+
 bool IsRotScaleMode(int background, int lineNr) {
-	int mode = dataRegisters[lineNr].dispcnt;
+	int mode = GetMode(lineNr);
 	if (mode >= 2) return true;
 	if (mode == 0) return false;
 	if (background == 2) return true;
@@ -72,10 +76,8 @@ void GenerateBackground(int background, int lineNr) {
 	int bgCnt = dataRegisters[lineNr].bgCnt[background];
 	ivec2 bgOfs = dataRegisters[lineNr].bgOfs[background];
 	int priority = (bgCnt & 0x3);
-	float depth = -float(priority) - float(lineNr) / 4.0;
-
-	// scale depth from -100 - 100 to 0.0 - 1.0
-	depth = (depth + 100) / 200;
+	float depth = float(3 - priority) + float(3 - background) / 4.0;
+	depth = (depth + 1.0) / 5.0;
 
 	int bgY = lineNr - bgOfs.y;
 	int baseTileAddress = ((bgCnt >> 2) & 3) * 0x4000;
@@ -126,11 +128,11 @@ void GenerateBackground(int background, int lineNr) {
 		}
 
 		if (largePalette) {
-			fBGTileAddress = lineNr * 96 * 1024 + baseTileAddress + tileId * 64;
+			fTileAddress = lineNr * 96 * 1024 + baseTileAddress + tileId * 64;
 			fLargePalette = 1;
 		}
 		else {
-			fBGTileAddress = lineNr * 96 * 1024 + baseTileAddress + tileId * 32;
+			fTileAddress = lineNr * 96 * 1024 + baseTileAddress + tileId * 32;
 			fLargePalette = 0;
 		}
 
@@ -141,13 +143,11 @@ void GenerateBackground(int background, int lineNr) {
 
 		fTilePos.y = float(vFlip ? (7 - (clippedPos.y & 7)) : (clippedPos.y & 7));
 		fTilePos.x = float(hFlip ? (7 - (clippedPos.x & 7)) : (clippedPos.x & 7));
-		fObjPos = 0.0;
 		gl_Position = vertexPos;
 		EmitVertex();
 
 		fTilePos.y = float(vFlip ? (7 - (clippedPos.y & 7)) : (clippedPos.y & 7));
 		fTilePos.x = float(hFlip ? (7 - ((clippedPos.x + 7) & 7)) : ((clippedPos.x + 7) & 7));
-		fObjPos = 1.0;
 		vertexPos.x += 8.0 * 2.0 / float(screenSize.x);
 		gl_Position = vertexPos;
 		EmitVertex();
@@ -177,71 +177,126 @@ ivec2 GetObjectSize(uint attr0, uint attr1) {
 	}
 }
 
+bool IsObjectRotScaleMode(uint attr0) {
+	return ((attr0 & (1u << 8u)) != 0u);
+}
+
+bool IsObjectEnabled(uint attr0) {
+	 return ((attr0 & (1u << 9u)) == 0u) || IsObjectRotScaleMode(attr0);
+}
+
 void GenerateObjects(int lineNr) {
+	bool obj1Dmapping = (dataRegisters[lineNr].dispcnt & (1 << 6)) != 0;
+	int baseTileAddress = 96 * 1024 * lineNr + 0x10000;
 	for (int i = 0; i < 128; i++) {
-		uint attr0 = texelFetch(oamData, lineNr * 1024 + i * 8 + 0).r;
-		uint attr1 = texelFetch(oamData, lineNr * 1024 + i * 8 + 2).r;
-		uint attr2 = texelFetch(oamData, lineNr * 1024 + i * 8 + 4).r;
+		int baseOamAddr = (lineNr * 1024 + i * 8) / 2;
+		uint attr0 = texelFetch(oamData, baseOamAddr + 0).r;
+		uint attr1 = texelFetch(oamData, baseOamAddr + 1).r;
+		uint attr2 = texelFetch(oamData, baseOamAddr + 2).r;
 		//uint attr3 = texelFetch(oamData, i * 8 + 6).r;
 
 		ivec2 pos = ivec2(int(attr1 & 0x1FFu), int(attr0 & 0xFFu));
 		ivec2 objectSize = GetObjectSize(attr0, attr1);
-		if (pos.y + objectSize.y < lineNr || pos.y > lineNr) {
+		if (!IsObjectEnabled(attr0) || (lineNr < pos.y || lineNr >= pos.y + objectSize.y)) {
 			continue;
 		}
 
-		float depth = 0.0;
+		bool largePalette = (attr0 & (1u << 13u)) != 0u;
+		bool hFlip = (attr1 & (1u << 12u)) != 0u;
+		bool vFlip = (attr1 & (1u << 13u)) != 0u;
+		int baseTileId = int(attr2 & 0x3FFu);
+		int paletteId = int((attr2 >> 12u) & 0xFu);
+		int priority = int((attr2 >> 10u) & 0x3u);
 
-		fTypeId = 4;
-		fLineNr = lineNr;
-		vec4 vertexPos = vec4((float(pos.x) + 0.5) * 2.0 / float(screenSize.x) - 1.0, gl_in[0].gl_Position.y, depth, 1.0);
-		gl_Position = vertexPos;
-		EmitVertex();
+		if (largePalette || !obj1Dmapping) {
+			baseTileId &= ~1;
+		}
 
-		vertexPos.x += float(objectSize.x) * 2.0 / float(screenSize.x);
-		gl_Position = vertexPos;
-		EmitVertex();
+		int widthTiles = objectSize.x / 8;
+		int tileY = (lineNr - pos.y) / 8;
+		float depth = float(3 - priority) + 0.75 + float(127 - i) / (4.0 * 128);
+		depth = (depth + 1.0) / 5.0;
+		for (int tileX = 0; tileX < widthTiles; tileX++) {
 
-		EndPrimitive();
+
+			int tileOffset;
+			if (obj1Dmapping) {
+				tileOffset = tileY * widthTiles;
+			}
+			else {
+				tileOffset = tileY * 32;
+			}
+			
+			int tileId;
+			if (largePalette) {
+				tileId = baseTileId + 2 * tileX + tileOffset;
+			}
+			else {
+				tileId = baseTileId + tileX + tileOffset;
+			}
+
+			if (GetMode(lineNr) >= 3 && tileId < 512) {
+				continue;
+			}
+
+
+			fTileAddress = baseTileAddress + tileId * 32;
+			
+			fLineNr = lineNr;
+			fTypeId = 4;
+			fLargePalette = largePalette ? 1 : 0;
+			fTemp = tileOffset;
+
+			vec4 vertexPos = vec4((float(pos.x + tileX * 8) + 0.5) * 2.0 / screenSize.x - 1.0, 
+				gl_in[0].gl_Position.y, depth, 1.0);
+			fTilePos.y = float(vFlip ? (7 - ((lineNr - pos.y) & 7)) : ((lineNr - pos.y) & 7));
+			fTilePos.x = float(hFlip ? 8 : 0);
+			gl_Position = vertexPos;
+			EmitVertex();
+
+			fTilePos.y = float(vFlip ? (7 - ((lineNr - pos.y) & 7)) : ((lineNr - pos.y) & 7));
+			fTilePos.x = float(hFlip ? 0 : 8);
+			vertexPos.x += 8.0 * 2.0 / screenSize.x;
+			gl_Position = vertexPos;
+			EmitVertex();
+
+			EndPrimitive();
+		}
 	}
+}
+
+void GenerateBackdrop(int lineNr) {
+	gl_Position = vec4(gl_in[0].gl_Position.xy, 0.0, 1.0);
+	fTypeId = 5;
+	fLineNr = lineNr;
+	EmitVertex();
+
+	gl_Position = vec4(gl_in[0].gl_Position.xy + vec2(2.0, 0.0), 0.0, 1.0);
+	EmitVertex();
+	EndPrimitive();
 }
 
 void main() {
 	int lineNr = vLineNr[0];
+	int dispcnt = dataRegisters[lineNr].dispcnt;
 	switch (vType[0]) {
 	case 0:
 		// Generate background tiles
 		for (int i = 0; i < 4; i++)
 		{
-			if ((dataRegisters[lineNr].dispcnt & (1 << (8 + i))) != 0) {
+			if ((dispcnt & (1 << (8 + i))) != 0) {
 				GenerateBackground(i, lineNr);
 			}
 		}
 		break;
 	case 1:
 		// Generate objects
-		if ((dataRegisters[lineNr].dispcnt & (1 << 15)) != 0 || 1 == 1) {
-			//GenerateObjects(lineNr);
-			gl_Position = vec4(-0.1, gl_in[0].gl_Position.y, 0.0, 1.0);
-			fTypeId = 4;
-			fLineNr = lineNr;
-			EmitVertex();
-
-			gl_Position = vec4(0.1, gl_in[0].gl_Position.y, 0.0, 1.0);
-			EmitVertex();
-			EndPrimitive();
+		if ((dispcnt & (1 << 12)) != 0) {
+			GenerateObjects(lineNr);
 		}
 		break;
 	case 2: 
-		// Generate backdrop
-		gl_Position = vec4(gl_in[0].gl_Position.xy, 0.0, 1.0);
-		fTypeId = 5;
-		fLineNr = lineNr;
-		EmitVertex();
-
-		gl_Position = vec4(gl_in[0].gl_Position.xy + vec2(2.0,0.0), 0.0, 1.0);
-		EmitVertex();
-		EndPrimitive();
+		GenerateBackdrop(lineNr);
 		break;
 	}
 }
