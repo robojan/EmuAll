@@ -118,6 +118,7 @@ public:
 	const char *GetString(EMUHANDLE handle, int id) const;
 	void SetValU(EMUHANDLE handle, int id, uint32_t val) const;
 	void SetValI(EMUHANDLE handle, int id, int32_t val) const;
+	float GetFloat(EMUHANDLE handle, int id) const;
 
 	EMUHANDLE CreateEmulator();
 	void ReleaseEmulator(EMUHANDLE handle);
@@ -178,6 +179,7 @@ private:
 	int32_t(__stdcall *_getValI)(EMUHANDLE, int32_t);
 	uint32_t(__stdcall *_getValU)(EMUHANDLE, int32_t);
 	const uint8_t *(__stdcall *_getString)(EMUHANDLE, int32_t);
+	float (__stdcall *_getFloat)(EMUHANDLE handle, int id);
 	void(__stdcall *_setValI)(EMUHANDLE, int32_t, int32_t);
 	void(__stdcall *_setValU)(EMUHANDLE, int32_t, uint32_t);
 	const uint8_t *(__stdcall *_getDescription)(uint32_t *);

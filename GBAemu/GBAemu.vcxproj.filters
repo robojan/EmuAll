@@ -34,13 +34,13 @@
     <Filter Include="Source Files\gpu">
       <UniqueIdentifier>{9e73a568-ca37-42fb-b957-ec4290d7604d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\util">
+      <UniqueIdentifier>{d9f2fbf2-5602-4199-b910-431ecefdf46d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="emu.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="resources\resources.c">
-      <Filter>Resource Files</Filter>
     </ClCompile>
     <ClCompile Include="gba.cpp">
       <Filter>Source Files</Filter>
@@ -66,6 +66,12 @@
     <ClCompile Include="gpu\gpu.cpp">
       <Filter>Source Files\gpu</Filter>
     </ClCompile>
+    <ClCompile Include="util\misc.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="resources\resources.c">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="resources\gbaemu.xml">
@@ -81,9 +87,6 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="resources\resources.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\GBAemu\memory\memory.h">
       <Filter>Header Files\Memory</Filter>
     </ClInclude>
@@ -114,6 +117,12 @@
     <ClInclude Include="include\GBAemu\gpu\gpu.h">
       <Filter>Header Files\gpu</Filter>
     </ClInclude>
+    <ClInclude Include="include\GBAemu\util\FixedPointGBA.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="resources\resources.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\palette.vert.glsl">
@@ -137,13 +146,46 @@
     <None Include="resources\bg.vert.glsl">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="resources\main.vert.glsl">
+    <None Include="resources\mainMix.vert.glsl">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="resources\main.frag.glsl">
+    <None Include="resources\mainMix.frag.glsl">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="resources\main.geo.glsl">
+    <None Include="resources\mainInterface.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\mainBG.vert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\mainBG.frag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\mainBG.geo.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\mainFuncs.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\mainObj.vert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\mainObj.geo.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\mainObj.frag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\bg.geo.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\lines.frag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\grid.geo.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\grid.vert.glsl">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

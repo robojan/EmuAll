@@ -12,6 +12,7 @@ public:
 		Red,
 		USHORT_5_5_5_1,
 		USHORT_1_5_5_5,
+		Depth,
 	};
 
 	enum Filter {

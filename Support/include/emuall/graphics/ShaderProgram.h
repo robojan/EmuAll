@@ -10,26 +10,49 @@ class Texture3D;
 class BufferObject;
 class BufferTexture;
 
+class DLLEXPORT ShaderSource {
+public:
+	explicit ShaderSource(const unsigned char *src, unsigned int len = -1);
+	explicit ShaderSource(const char *src, int len = -1);
+	explicit ShaderSource(const std::string &src);
+	explicit ShaderSource(const ShaderSource &other);
+	virtual ~ShaderSource();
+
+	ShaderSource &operator=(const ShaderSource &other);
+
+	void AddVersionDirective(int version, bool compatibility = false);
+	void AddSource(const std::string &src);
+	void AddSource(const char *src, int len = -1);
+	void AddSource(const unsigned char *src, unsigned int len = -1);
+	void AddSourceFile(const std::string &file);
+
+	const char * GetSrc() const;
+	int GetSrcLen() const;
+
+private:
+	bool _versionAdded;
+	std::string *_source;
+};
+
 class DLLEXPORT ShaderProgram {
 public:
 	enum Type {
 		Vertex,
 		Fragment,
-		TesselationCtrl,
-		TesselationEval,
+		TessellationCtrl,
+		TessellationEval,
 		Geometry,
 		Compute
 	};
 
 	ShaderProgram();
+	ShaderProgram(const char *name);
 	~ShaderProgram();
-	
-	bool AddShader(Type type, const char *src, int len);
-	bool AddShader(Type type, const std::string &path);
-	bool Link();
+
+	void AddShader(Type type, ShaderSource &source);
+	void Link();
 	void Clean();
 
-	const char *GetLog() const;
 	void Begin() const;
 	void End() const;
 	bool IsLinked() const;
@@ -56,13 +79,30 @@ public:
 	void SetUniform(const char *name, int pos, BufferObject &object);
 
 protected:
-	bool Compile(unsigned int shader, const char *source, int len);
+	void Compile(Type type, unsigned int shader, int count, const char * const * src, const int *len);
 	int GetUniformLocation(const char *name);
 	int GetUniformBlockLocation(const char *name);
 private:
-	std::string *_log;
+	std::string *_name;
 	unsigned int _program;
 	std::vector<unsigned int> *_shaders;
+};
+
+class DLLEXPORT ShaderCompileException {
+public:
+	explicit ShaderCompileException(ShaderProgram::Type type, const char *log, const char *name = nullptr);
+	explicit ShaderCompileException(const char *log, const char *name = nullptr);
+
+	ShaderCompileException(ShaderCompileException &other);
+	ShaderCompileException &operator=(ShaderCompileException &other);
+
+	virtual ~ShaderCompileException();
+
+	virtual const char *GetMsg();
+
+protected:
+
+	std::string *_msg;
 };
 
 #endif

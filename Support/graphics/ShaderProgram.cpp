@@ -12,122 +12,61 @@
 #include <sstream>
 #include <assert.h>
 
+static GLenum GetGLShaderType(ShaderProgram::Type type) {
+	switch (type) {
+	case ShaderProgram::Vertex: return GL_VERTEX_SHADER;
+	case ShaderProgram::Fragment: return GL_FRAGMENT_SHADER;
+	case ShaderProgram::Geometry: return GL_GEOMETRY_SHADER;
+	case ShaderProgram::TessellationCtrl: return GL_TESS_CONTROL_SHADER;
+	case ShaderProgram::TessellationEval: return GL_TESS_EVALUATION_SHADER;
+	case ShaderProgram::Compute: return GL_COMPUTE_SHADER;
+	}
+	throw GraphicsException(GL_INVALID_ENUM, "Unknown shader type");
+}
+
 ShaderProgram::ShaderProgram() : 
 	_program(0)
 {
-	_log = new std::string;
+	_name = nullptr;
+	_shaders = new std::vector<unsigned int>;
+}
+
+ShaderProgram::ShaderProgram(const char *name)
+{
+	_name = new std::string(name);
 	_shaders = new std::vector<unsigned int>;
 }
 
 ShaderProgram::~ShaderProgram()
 {
 	Clean();
-	delete _log;
+	if (_name != nullptr) {
+		delete _name;
+		_name = nullptr;
+	}
 	delete _shaders;
 }
 
-bool ShaderProgram::AddShader(Type type, const char *src, int len)
+void ShaderProgram::AddShader(Type type, ShaderSource &source)
 {
-	bool result = false;
-	GLenum shaderType;
-	switch (type) {
-	case ShaderProgram::Vertex:
-		shaderType = GL_VERTEX_SHADER;
-		break;
-	case ShaderProgram::Fragment:
-		shaderType = GL_FRAGMENT_SHADER;
-		break;
-	case ShaderProgram::Geometry:
-		shaderType = GL_GEOMETRY_SHADER;
-		break;
-	case ShaderProgram::TesselationCtrl:
-		shaderType = GL_TESS_CONTROL_SHADER;
-		break;
-	case ShaderProgram::TesselationEval:
-		shaderType = GL_TESS_EVALUATION_SHADER;
-		break;
-	case ShaderProgram::Compute:
-		shaderType = GL_COMPUTE_SHADER;
-		break;
-	}
+	GLenum shaderType = GetGLShaderType(type);
 
 	// Create an shader object
 	GLuint shader;
 	GL_CHECKED(shader = glCreateShader(shaderType));
-	if (shader == 0) {
-		*_log = "Could not create an GL shader object\n";
-		return result;
-	}
 
-	result = Compile(shader, src, len);
-	if (!result) {
-		GL_CHECKED(glDeleteShader(shader));
-		return result;
-	}
+	const char *src = source.GetSrc();
+	int srcLen = source.GetSrcLen();
+
+	Compile(type, shader, 1, &src, &srcLen);
 
 	_shaders->push_back(shader);
-
-	return true;
 }
 
-bool ShaderProgram::AddShader(Type type, const std::string &path)
-{
-	char *src = nullptr;
-	bool result = false;
-
-	// Open the file
-	std::ifstream file(path, std::ios_base::in);
-	if (!file.is_open()) {
-		std::ostringstream stringStream;
-		stringStream << "Error opening file: " << strerror(errno) << std::endl;
-		*_log = stringStream.str();
-		return result;
-	}
-
-	file.exceptions(std::ios_base::failbit | std::ios_base::badbit);
-	try {
-		// Get file size
-		file.seekg(0, std::ios_base::end);
-		std::istream::pos_type size = file.tellg();
-		file.seekg(0, std::ios_base::beg);
-		assert(size <= INT32_MAX);
-
-		// Create Source buffer
-		src = new char[(unsigned int)size];
-
-		// Read content of the file
-		file.read(src, size);
-
-		// Add the shader
-		result = AddShader(type, src, (int)size);
-
-		// Delete the source
-		if (src != nullptr) {
-			delete src;
-		}
-	}
-	catch (std::ifstream::failure) {
-		std::ostringstream stringStream;
-		stringStream << "Error reading file: " << strerror(errno) << std::endl;
-		*_log = stringStream.str();
-
-		// Delete the source
-		if (src != nullptr) {
-			delete src;
-		}
-	}
-
-	return result;
-}
-
-bool ShaderProgram::Link()
+void ShaderProgram::Link()
 {
 	// Create an new program
 	GL_CHECKED(_program = glCreateProgram());
-	if (_program == 0) {
-		*_log = "Could not create an shader program\n";
-		return false;
-	}
 
 	// Attach all the shaders
 	for (auto &shader : *_shaders) {
@@ -141,18 +80,16 @@ bool ShaderProgram::Link()
 	glGetProgramiv(_program, GL_LINK_STATUS, &status);
 	if (status != GL_TRUE) {
 		std::stringstream stringstream;
-		stringstream << "Error linking program" << std::endl;
 		GLint logLength;
 		glGetProgramiv(_program, GL_INFO_LOG_LENGTH, &logLength);
 		std::vector<char> log(logLength + 1);
 		glGetProgramInfoLog(_program, logLength + 1, &logLength, log.data());
 		stringstream << log.data();
-		*_log = stringstream.str();
 		GL_CHECKED(glDeleteProgram(_program));
 		_program = 0;
-		return false;
+		throw ShaderCompileException(stringstream.str().c_str(), 
+			_name != nullptr ? _name->c_str() : nullptr);
 	}
-	return true;
 }
 
 void ShaderProgram::Clean()
@@ -168,11 +105,6 @@ void ShaderProgram::Clean()
 		GL_CHECKED(glDeleteProgram(_program));
 		_program = 0;
 	}
-}
-
-const char *ShaderProgram::GetLog() const
-{
-	return _log->c_str();
 }
 
 void ShaderProgram::Begin() const
@@ -363,13 +295,12 @@ void ShaderProgram::SetUniform(const char *name, int pos, BufferTexture &texture
 	}
 }
 
-bool ShaderProgram::Compile(unsigned int shader, const char *source, int len)
+void ShaderProgram::Compile(Type type, unsigned int shader, int count, const char * const * src, const int *len)
 {
 	assert(glIsShader(shader) == GL_TRUE);
-
-
+	
 	// Assign the source code to the shader
-	GL_CHECKED(glShaderSource(shader, 1, &source, &len));
+	GL_CHECKED(glShaderSource(shader, count, src, len));
 
 	// Compile the shader
 	GL_CHECKED(glCompileShader(shader));
@@ -377,18 +308,12 @@ bool ShaderProgram::Compile(unsigned int shader, const char *source, int len)
 	GLint status;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
 	if (status != GL_TRUE) {
-		std::stringstream stringstream;
-		stringstream << "Error compiling shader\n";
 		GLint logLength;
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength);
 		std::vector<char> log(logLength+1);
 		glGetShaderInfoLog(shader, logLength+1, &logLength, log.data());
-		stringstream << log.data();
-		*_log = stringstream.str();
-		return false;
+		throw ShaderCompileException(type, log.data(), _name != nullptr ? _name->c_str() : nullptr);
 	}
-
-	return true;
 }
 
 int ShaderProgram::GetUniformLocation(const char *name)
@@ -403,4 +328,200 @@ int ShaderProgram::GetUniformBlockLocation(const char *name)
 	int loc;
 	GL_CHECKED(loc = glGetUniformBlockIndex(_program, name));
 	return loc;
+}
+
+ShaderCompileException::ShaderCompileException(ShaderProgram::Type type, const char *log, const char *name /*= nullptr*/)
+{
+	_msg = new std::string("Error while compiling ");
+	switch (type) {
+	case ShaderProgram::Vertex:
+		_msg->append("vertex");
+		break;
+	case ShaderProgram::Fragment:
+		_msg->append("fragment");
+		break;
+	case ShaderProgram::TessellationCtrl:
+		_msg->append("tessellation control");
+		break;
+	case ShaderProgram::TessellationEval:
+		_msg->append("tessellation evaluation");
+		break;
+	case ShaderProgram::Geometry:
+		_msg->append("geometry");
+		break;
+	case ShaderProgram::Compute:
+		_msg->append("compute");
+		break;
+	default:
+		_msg->append("Unknown");
+		break;
+	}
+	_msg->append(" shader");
+	if (name) {
+		_msg->append(" in shader program \"");
+		_msg->append(name);
+		_msg->append("\"");
+	}
+	_msg->append(":\n");
+	_msg->append(log);
+}
+
+ShaderCompileException::ShaderCompileException(const char *log, const char *name /*= nullptr*/)
+{
+	_msg = new std::string("Error while linking shader program");
+	if (name) {
+		_msg->append(" \"");
+		_msg->append(name);
+		_msg->append("\"");
+	}
+	_msg->append(":\n");
+	_msg->append(log);
+}
+
+ShaderCompileException::ShaderCompileException(ShaderCompileException &other)
+{
+	_msg = new std::string(*other._msg);
+}
+
+ShaderCompileException::~ShaderCompileException()
+{
+	delete _msg;
+}
+
+const char * ShaderCompileException::GetMsg()
+{
+	return _msg->c_str();
+}
+
+ShaderCompileException & ShaderCompileException::operator=(ShaderCompileException &other)
+{
+	*_msg = *other._msg;
+	return *this;
+}
+
+ShaderSource::ShaderSource(const char *src, int len /*= -1*/) :
+	_versionAdded(false), _source(new std::string)
+{
+	AddSource(src, len);
+}
+
+ShaderSource::ShaderSource(const std::string &src) :
+	_versionAdded(false), _source(new std::string)
+{
+	AddSource(src);
+}
+
+ShaderSource::ShaderSource(const unsigned char *src, unsigned int len /*= -1*/) :
+	_versionAdded(false), _source(new std::string)
+{
+	AddSource((const char *)src, (int)len);
+}
+
+ShaderSource::ShaderSource(const ShaderSource &other):
+	_source(new std::string(*other._source)), _versionAdded(other._versionAdded)
+{
+
+}
+
+ShaderSource::~ShaderSource()
+{
+	delete _source;
+}
+
+ShaderSource & ShaderSource::operator=(const ShaderSource &other)
+{
+	*_source = *other._source;
+	_versionAdded = other._versionAdded;
+	return *this;
+}
+
+void ShaderSource::AddVersionDirective(int version, bool compatibility /*= false*/)
+{
+	if (_versionAdded) return;
+	
+	std::string versionString("#version ");
+	versionString.append(std::to_string(version));
+	if (compatibility) {
+		versionString.append(" compatibility\n");
+	}
+	else {
+		versionString.append(" core\n");
+	}
+	versionString.append(*_source);
+
+	*_source = versionString;
+	_versionAdded = true;
+}
+
+void ShaderSource::AddSource(const std::string &src)
+{
+	_source->append(src);
+}
+
+void ShaderSource::AddSource(const char *src, int len /*= -1*/)
+{
+	if (len >= 0) {
+		_source->append(src, len);
+	}
+	else {
+		_source->append(src);
+	}
+}
+
+void ShaderSource::AddSource(const unsigned char *src, unsigned int len /*= -1*/)
+{
+	AddSource((const char *)src, (int)len);
+}
+
+void ShaderSource::AddSourceFile(const std::string &path)
+{
+	char *src = nullptr;
+
+	// Open the file
+	std::ifstream file(path, std::ios_base::in);
+	if (!file.is_open()) {
+		std::ostringstream stringStream;
+		stringStream << "Error opening file: " << strerror(errno) << std::endl;
+		throw std::exception(stringStream.str().c_str());
+	}
+
+	file.exceptions(std::ios_base::failbit | std::ios_base::badbit);
+	try {
+		// Get file size
+		file.seekg(0, std::ios_base::end);
+		std::istream::pos_type size = file.tellg();
+		file.seekg(0, std::ios_base::beg);
+		assert(size <= INT32_MAX);
+
+		// Create Source buffer
+		src = new char[(unsigned int)size];
+
+		// Read content of the file
+		file.read(src, size);
+
+		// Add the shader
+		_source->append(src);
+
+		// Delete the source
+		if (src != nullptr) {
+			delete src;
+		}
+	}
+	catch (std::ifstream::failure &e) {
+		// Delete the source
+		if (src != nullptr) {
+			delete src;
+		}
+		throw e;
+	}
+}
+
+const char * ShaderSource::GetSrc() const
+{
+	return _source->c_str();
+}
+
+int ShaderSource::GetSrcLen() const
+{
+	return _source->length();
 }

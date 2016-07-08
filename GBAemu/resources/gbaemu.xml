@@ -4,7 +4,7 @@
   <description>Gameboy Advance Emulator.</description>
   <about>Gameboy Advance Emulator made by Robbert-Jan "robojan" de Jager.</about>
   <fileFilter>*.gba</fileFilter>
-  <screen id="0">
+  <screen id="0" contextShare="0">
     <width>240</width>
     <height>160</height>
   </screen>
@@ -279,33 +279,27 @@
                     </info>
                     <info id="3033">
                       <name>BG2X</name>
-                      <size>8</size>
-                      <mode>hex</mode>
+                      <mode>float</mode>
                     </info>
                     <info id="3034">
                       <name>BG2Y</name>
-                      <size>8</size>
-                      <mode>hex</mode>
+                      <mode>float</mode>
                     </info>
                     <info id="3035">
                       <name>BG2PA</name>
-                      <size>4</size>
-                      <mode>hex</mode>
+                      <mode>float</mode>
                     </info>
                     <info id="3036">
                       <name>BG2PB</name>
-                      <size>4</size>
-                      <mode>hex</mode>
+                      <mode>float</mode>
                     </info>
                     <info id="3037">
                       <name>BG2PC</name>
-                      <size>4</size>
-                      <mode>hex</mode>
+                      <mode>float</mode>
                     </info>
                     <info id="3038">
                       <name>BG2PD</name>
-                      <size>4</size>
-                      <mode>hex</mode>
+                      <mode>float</mode>
                     </info>
                   </infolist>
                 </ver>
@@ -334,33 +328,27 @@
                     </info>
                     <info id="3039">
                       <name>BG3X</name>
-                      <size>8</size>
-                      <mode>hex</mode>
+                      <mode>float</mode>
                     </info>
                     <info id="3040">
                       <name>BG3Y</name>
-                      <size>8</size>
-                      <mode>hex</mode>
+                      <mode>float</mode>
                     </info>
                     <info id="3041">
                       <name>BG3PA</name>
-                      <size>4</size>
-                      <mode>hex</mode>
+                      <mode>float</mode>
                     </info>
                     <info id="3042">
                       <name>BG3PB</name>
-                      <size>4</size>
-                      <mode>hex</mode>
+                      <mode>float</mode>
                     </info>
                     <info id="3043">
                       <name>BG3PC</name>
-                      <size>4</size>
-                      <mode>hex</mode>
+                      <mode>float</mode>
                     </info>
                     <info id="3044">
                       <name>BG3PD</name>
-                      <size>4</size>
-                      <mode>hex</mode>
+                      <mode>float</mode>
                     </info>
                   </infolist>
                 </ver>

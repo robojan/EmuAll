@@ -25,7 +25,8 @@ namespace Debugger {
 				hex,
 				oct,
 				flag,
-				string
+				string, 
+				fp,
 			};
 			wxString name;
 			wxString format;

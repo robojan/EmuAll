@@ -119,25 +119,13 @@ GuiRenderer::GuiRenderer() :
 	_TQVao.BindBuffer(0, _TQVertices, 2, VertexArrayObject::Float);
 	_TQVao.End();
 
-	if (!_TQprogram.AddShader(ShaderProgram::Vertex, (const char *)resource_tq_vert_glsl, resource_tq_vert_glsl_len)) {
-		throw GraphicsException(GL_INVALID_OPERATION, _TQprogram.GetLog());
-	}
-	if (!_TQprogram.AddShader(ShaderProgram::Fragment, (const char *)resource_tq_frag_glsl, resource_tq_frag_glsl_len)) {
-		throw GraphicsException(GL_INVALID_OPERATION, _TQprogram.GetLog());
-	}
-	if (!_TQprogram.Link()) {
-		throw GraphicsException(GL_INVALID_OPERATION, _TQprogram.GetLog());
-	}
+	_TQprogram.AddShader(ShaderProgram::Vertex, ShaderSource(resource_tq_vert_glsl, resource_tq_vert_glsl_len));
+	_TQprogram.AddShader(ShaderProgram::Fragment, ShaderSource(resource_tq_frag_glsl, resource_tq_frag_glsl_len));
+	_TQprogram.Link();
 
-	if (!_solidProgram.AddShader(ShaderProgram::Vertex, (const char *)resource_solid_vert_glsl, resource_solid_vert_glsl_len)) {
-		throw GraphicsException(GL_INVALID_OPERATION, _solidProgram.GetLog());
-	}
-	if (!_solidProgram.AddShader(ShaderProgram::Fragment, (const char *)resource_solid_frag_glsl, resource_solid_frag_glsl_len)) {
-		throw GraphicsException(GL_INVALID_OPERATION, _solidProgram.GetLog());
-	}
-	if (!_solidProgram.Link()) {
-		throw GraphicsException(GL_INVALID_OPERATION, _solidProgram.GetLog());
-	}
+	_solidProgram.AddShader(ShaderProgram::Vertex, ShaderSource(resource_solid_vert_glsl, resource_solid_vert_glsl_len));
+	_solidProgram.AddShader(ShaderProgram::Fragment, ShaderSource(resource_solid_frag_glsl, resource_solid_frag_glsl_len));
+	_solidProgram.Link();
 }
 
 GuiRenderer::~GuiRenderer()

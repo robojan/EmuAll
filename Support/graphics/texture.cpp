@@ -52,32 +52,44 @@ void Texture::LoadTexture(int width, int height, const char *data, Format format
 {
 	GLint glFormat;
 	GLint glInternalFormat;
+	GLint glType;
 	int elementSize = 0;
 	switch (format) {
 	case RGB:
 		elementSize = 3;
 		glFormat = GL_RGB;
 		glInternalFormat = GL_RGB;
+		glType = GL_UNSIGNED_BYTE;
 		break;
 	case RGBA:
 		elementSize = 4;
 		glFormat = GL_RGBA;
 		glInternalFormat = GL_RGBA;
+		glType = GL_UNSIGNED_BYTE;
 		break;
 	case Red:
 		elementSize = 1;
 		glFormat = GL_RED;
 		glInternalFormat = GL_RED;
+		glType = GL_UNSIGNED_BYTE;
 		break;
 	case USHORT_5_5_5_1:
 		elementSize = 2;
 		glFormat = GL_UNSIGNED_SHORT_5_5_5_1;
 		glInternalFormat = GL_RGBA;
+		glType = GL_UNSIGNED_BYTE;
 		break;
 	case USHORT_1_5_5_5:
 		elementSize = 2;
 		glFormat = GL_UNSIGNED_SHORT_1_5_5_5_REV;
 		glInternalFormat = GL_RGBA;
+		glType = GL_UNSIGNED_BYTE;
+		break;
+	case Depth:
+		elementSize = 4;
+		glFormat = GL_DEPTH_COMPONENT;
+		glInternalFormat = GL_DEPTH_COMPONENT;
+		glType = GL_FLOAT;
 		break;
 	default:
 		throw GraphicsException(GL_INVALID_ENUM, "Texture format not recognized");
@@ -92,7 +104,7 @@ void Texture::LoadTexture(int width, int height, const char *data, Format format
 
 	Bind();
 	GL_CHECKED(glPixelStorei(GL_UNPACK_ROW_LENGTH, stride));
-	GL_CHECKED(glTexImage2D(_type, 0, glInternalFormat, width, height, 0, glFormat, GL_UNSIGNED_BYTE, data));
+	GL_CHECKED(glTexImage2D(_type, 0, glInternalFormat, width, height, 0, glFormat, glType, data));
 	GL_CHECKED(glPixelStorei(GL_UNPACK_ROW_LENGTH, 0));
 	UnBind();
 }
@@ -211,6 +223,10 @@ void Texture::UpdateData(int x, int y, int width, int height, const char *data, 
 	case USHORT_1_5_5_5:
 		glFormat = GL_RGBA;
 		glDataFormat = GL_UNSIGNED_SHORT_1_5_5_5_REV;
+		break;
+	case Depth:
+		glFormat = GL_DEPTH_COMPONENT;
+		glDataFormat = GL_FLOAT;
 		break;
 	default:
 		throw GraphicsException(GL_INVALID_ENUM, "Texture format not recognized");

@@ -9,6 +9,7 @@
 #include <emuall/graphics/texture3D.h>
 #include <emuall/graphics/bufferTexture.h>
 #include <emuall/graphics/VertexArrayObject.h>
+#include <emuall/graphics/frameBuffer.h>
 #include <emuall/util/counterPointer.h>
 
 class Gba;
@@ -37,10 +38,24 @@ private:
 	void VBlank();
 	void HBlank();
 
+	int GetModeBuffer(int lineNr);
+	void GetBGSizeBuffer(int lineNr, int background, int &width, int &height);
+	void GetBGOffsetBuffer(int lineNr, int background, float &x, float &y);
+
 	// Main drawing
+	void SetupShaderInterface(ShaderProgram &program);
 	bool InitMainGL();
+	void InitMainBGGL();
+	void InitMainObjGL();
+	void InitMainMixGL();
 	void DestroyMainGL();
+	void DestroyMainBGGL();
+	void DestroyMainObjGL();
+	void DestroyMainMixGL();
 	void DrawMain();
+	void DrawMainBGGL(int background);
+	void DrawMainObjGL();
+	void DrawMainMix();
 
 	// Palette drawing
 	bool InitPalettesGL(bool background);
@@ -61,10 +76,17 @@ private:
 	bool InitBGGL(int idx);
 	void DestroyBGGL(int idx);
 	void DrawBG(int idx);
+
+	void InitGridShader();
+	void DestroyGridShader();
+	void DrawGrid(bool gridEnabled, int gridWidth, int gridHeight, int gridColor, float gridDepth,
+		bool boxEnabled, bool boxWraparound, float boxX, float boxY, float boxWidth, float boxHeight, int boxColor, float boxDepth);
 	
 	void InitPaletteDataGL();
 	void InitVRAMDataGL();
-	void InitOAMAttributeDataGL();
+	void InitOAMDataGL();
+	void InitRegistersDataGL();
+
 	Gba &_system;
 	uint_fast8_t _vcount;
 	uint_fast16_t _hcount;
@@ -79,39 +101,61 @@ private:
 			int vOfs;
 			int pad0[2];
 		} bgOfs[4];
+		struct {
+			float x;
+			float y;
+			int pad0[2];
+		} bgRefPoint[2];
+		struct {
+			float a;
+			float b;
+			int pad0[2];
+			float c;
+			float d; 
+			int pad1[2];
+		} bgAffineMatrix[2];
 	} DrawingInfoData_t;
 	// Main drawing
 	bool _mainInitialized;
-	CounterPtr<ShaderProgram> _mainShader;
+	// Main Mix drawing
+	CounterPtr<ShaderProgram> _mainMixShader;
+	CounterPtr<BufferObject> _mainMixVertexData;
+	VertexArrayObject *_mainMixVao;
+	CounterPtr<ShaderProgram> _mainBGShader;
+	CounterPtr<BufferObject> _mainBGVertexData;
+	VertexArrayObject *_mainBGVao;
+	CounterPtr<ShaderProgram> _mainObjShader;
+	CounterPtr<BufferObject> _mainObjVertexData;
+	VertexArrayObject *_mainObjVao;
+
 	CounterPtr<BufferTexture> _mainVramBT;
 	CounterPtr<BufferTexture> _mainOamBT;
 	CounterPtr<BufferObject> _mainRegistersBO;
-	CounterPtr<BufferObject> _mainVertexData;
 	CounterPtr<Texture3D> _mainPaletteData;
+	CounterPtr<FrameBuffer> _mainFrameBuffer[5];
 	VertexArrayObject *_mainVao;
 	DrawingInfoData_t _mainDrawingRegisters[SCREEN_HEIGHT];
+
 	// Palette drawing
 	bool _paletteInitialized[2];
 	CounterPtr<ShaderProgram> _paletteShader;
-	CounterPtr<Texture> _paletteData;
 	CounterPtr<BufferObject> _paletteVertexData;
 	VertexArrayObject *_paletteVao[2];
 	// Tile drawing
 	bool _tilesInitialized[3];
 	CounterPtr<ShaderProgram> _tilesShader;
-	CounterPtr<BufferTexture> _vramBT;
 	CounterPtr<BufferObject> _tilesVertexData;
 	VertexArrayObject *_tilesVao[3];
 	// OAM drawing
 	bool _oamInitialized;
 	CounterPtr<ShaderProgram> _oamShader;
-	CounterPtr<BufferTexture> _oamBT;
 	CounterPtr<BufferObject> _oamVertexData;
 	VertexArrayObject *_oamVao;
 	// BG drawing
 	bool _bgInitialized[4];
 	CounterPtr<ShaderProgram> _bgShader;
-	CounterPtr<BufferObject> _bgVertexData;
 	VertexArrayObject *_bgVao[4];
+
+	CounterPtr<ShaderProgram> _gridShader;
 
 };

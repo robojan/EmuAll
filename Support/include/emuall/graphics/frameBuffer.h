@@ -21,16 +21,19 @@ public:
 
 	void AttachColorBuffer(int level, bool rectangle = false);
 	void AttachDepthBuffer();
+	void AttachDepthTexture();
 	int GetWidth() const;
 	int GetHeight() const;
 
 	void Clean();
 
 	Texture &GetColorBuffer(int level);
+	Texture &GetDepthTexture();
 
 private:
 	std::vector<unsigned int> *_drawBuffers;
 	std::map<int, Texture> *_textures;
+	Texture _depthTexture;
 	unsigned int _fbo;
 	unsigned int _depthBuffer;
 	int _width;

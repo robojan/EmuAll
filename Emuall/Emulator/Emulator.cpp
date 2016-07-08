@@ -16,7 +16,7 @@ EmulatorInterface::EmulatorInterface(const std::string &dllName) :
 	_run(NULL), _isRunning(NULL), _tick(NULL), _input(NULL), _initPlugin(NULL),
 	_draw(NULL), _reshape(NULL), _save(NULL), _step(NULL), _saveState(NULL), _loadState(NULL),
 	_disassemble(NULL), _addBreakpoint(NULL), _removeBreakpoint(NULL), _isBreakpoint(NULL),
-	_getMemoryData(NULL), _getValI(NULL), _getValU(NULL), _getString(NULL), _initAudio(nullptr), _getAudio(nullptr)
+	_getMemoryData(NULL), _getValI(NULL), _getValU(NULL), _getString(NULL), _getFloat(NULL), _initAudio(nullptr), _getAudio(nullptr)
 {
 	_hDLL = LoadSharedLibrary(dllName.c_str());
 	if (_hDLL == NULL)
@@ -62,6 +62,7 @@ EmulatorInterface::EmulatorInterface(const std::string &dllName) :
 		_getValI				= (int32_t(__stdcall*)(EMUHANDLE, int32_t))					GetStdcallFunc<EMUHANDLE, int32_t>				(_hDLL, "GetValI");
 		_getValU				= (uint32_t(__stdcall*)(EMUHANDLE, int32_t))				GetStdcallFunc<EMUHANDLE, int32_t>				(_hDLL, "GetValU");
 		_getString				= (const uint8_t*(__stdcall*)(EMUHANDLE, int32_t))			GetStdcallFunc<EMUHANDLE, int32_t>				(_hDLL, "GetString");
+		_getFloat				= (float (__stdcall*)(EMUHANDLE, int32_t))					GetStdcallFunc<EMUHANDLE, int32_t>				(_hDLL, "GetFloat");
 		_setValI				= (void(__stdcall *)(EMUHANDLE, int32_t, int32_t))			GetStdcallFunc<EMUHANDLE, int32_t, int32_t>		(_hDLL, "SetValI");
 		_setValU				= (void(__stdcall *)(EMUHANDLE, int32_t, uint32_t))			GetStdcallFunc<EMUHANDLE, int32_t, uint32_t>	(_hDLL, "SetValU");
 		_createEmulator			= (EMUHANDLE(__stdcall*)())									GetStdcallFunc									(_hDLL, "CreateEmulator");
@@ -549,6 +550,14 @@ unsigned int EmulatorInterface::GetXMLVal(EMUHANDLE handle, pugi::xml_node &node
 	}
 }
 
+float EmulatorInterface::GetFloat(EMUHANDLE handle, int id) const
+{
+	if (_getFloat == NULL)
+	{
+		return NAN;
+	}
+	return _getFloat(handle, id);
+}
 
 EmulatorList::EmulatorList(const char *folder)
 {

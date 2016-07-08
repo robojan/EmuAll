@@ -51,6 +51,7 @@ EMUEXPORT int32_t __stdcall LoadState(EMUHANDLE handle, const SaveData_t *data);
 EMUEXPORT int32_t __stdcall GetValI(EMUHANDLE handle, int32_t id);
 EMUEXPORT uint32_t __stdcall GetValU(EMUHANDLE handle, int32_t id);
 EMUEXPORT const uint8_t * __stdcall GetString(EMUHANDLE handle, int32_t id);
+EMUEXPORT float __stdcall GetFloat(EMUHANDLE handle, int32_t id);
 EMUEXPORT void __stdcall SetValI(EMUHANDLE handle, int32_t id, int32_t val);
 EMUEXPORT void __stdcall SetValU(EMUHANDLE handle, int32_t id, uint32_t val);
 EMUEXPORT const uint8_t * __stdcall GetDescription(uint32_t *size);

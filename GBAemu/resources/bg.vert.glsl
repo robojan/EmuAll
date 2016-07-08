@@ -1,15 +1,19 @@
-#version 330 core
-
-// Input
-layout(location = 0) in vec2 vertexPos;
-layout(location = 1) in vec2 vertexUV;
+#line 2 1
 
 // output
-out vec2 uv;
+out ivec2 gBGSize;
+out ivec2 gTilePos;
+out int gId;
+
+// Uniforms
+uniform int lineNr;
+uniform int background;
 
 void main() {
-	gl_Position.xy = vertexPos;
-	gl_Position.zw = vec2(0.0, 1.0);
-
-	uv = vertexUV;
+	gBGSize = GetBackgroundSize(background, lineNr);
+	ivec2 tileSize = gBGSize / 8;
+	gId = gl_VertexID;
+	gTilePos = ivec2(gId % tileSize.x, gId / tileSize.x);
+	gl_Position = vec4(-1.0 + 1.0 / (tileSize.x) + float(gTilePos.x) * (2.0 / (tileSize.x)),
+		1.0 - 1.0 / (tileSize.y) - float(gTilePos.y) * (2.0 / (tileSize.y)), 0.97, 1.0);
 }

@@ -302,6 +302,7 @@ inline void SBC(uint32_t x, uint32_t y, uint32_t &result, uint32_t &flags) {
 	__asm {
 		mov ecx, dword ptr[flags];
 		mov eax, dword ptr[ecx];
+		xor eax, 1
 		push ax;
 		popf;
 		mov eax, x;
@@ -317,6 +318,7 @@ inline void SBC_FLAGS(uint32_t x, uint32_t y, uint32_t &result, uint32_t &flags)
 		// Load carry information
 		mov ecx, dword ptr[flags];
 		mov eax, dword ptr[ecx];
+		xor eax,1
 		push ax;
 		popf;
 		mov eax, x;
@@ -328,6 +330,7 @@ inline void SBC_FLAGS(uint32_t x, uint32_t y, uint32_t &result, uint32_t &flags)
 		mov eax, dword ptr[ecx];
 		and eax, 0xFFFFF73E;
 		pop dx;
+		xor edx, 1;
 		and edx, 0x000008C1;
 		or eax, edx;
 		mov dword ptr[ecx], eax;

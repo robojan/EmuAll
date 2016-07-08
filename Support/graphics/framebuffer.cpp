@@ -34,6 +34,7 @@ FrameBuffer & FrameBuffer::operator=(FrameBuffer &other)
 	_height = other._height;
 	delete _drawBuffers;
 	delete _textures;
+	_depthTexture = other._depthTexture;
 	_textures = other._textures;
 	_drawBuffers = other._drawBuffers;
 	other._textures = new std::map<int, Texture>;
@@ -96,6 +97,26 @@ void FrameBuffer::AttachDepthBuffer()
 	End();
 }
 
+void FrameBuffer::AttachDepthTexture()
+{
+	_depthTexture = Texture(_width, _height, NULL, Texture::Depth, -1, Texture::Texture2D);
+	assert(_depthTexture.IsValid());
+	_depthTexture.Bind();
+	_depthTexture.SetFilter(Texture::Nearest, Texture::Nearest);
+
+	Begin();
+
+	GL_CHECKED(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _depthTexture._id, 0));
+
+	if (_depthTexture.IsValid()) {
+
+		GL_CHECKED(glDrawBuffers((GLsizei)_drawBuffers->size(), _drawBuffers->data()));
+	}
+
+	End();
+	_depthTexture.UnBind();
+}
+
 int FrameBuffer::GetWidth() const
 {
 	return _width;
@@ -127,4 +148,9 @@ Texture & FrameBuffer::GetColorBuffer(int level)
 		throw BaseException("Color buffer not found in frameBuffer object");
 	}
 	return it->second;
+}
+
+Texture & FrameBuffer::GetDepthTexture()
+{
+	return _depthTexture;
 }

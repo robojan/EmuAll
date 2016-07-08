@@ -10,6 +10,7 @@
 #include <GBAemu/gba.h>
 #include <GBAemu/defines.h>
 #include <GBAemu/util/preprocessor.h>
+#include <GBAemu/util/FixedPointGBA.h>
 #include <GBAemu/cpu/armException.h>
 #include "resources/resources.h"
 
@@ -185,6 +186,40 @@ int32_t __stdcall IsBreakpoint(EMUHANDLE handle, uint32_t pos) {
 	return emulator->GetCpu().IsBreakpoint(pos) ? 1 : 0;
 }
 
+float __stdcall GetFloat(EMUHANDLE handle, int32_t id) {
+	Gba *emulator = (Gba *)handle;
+	if (emulator == NULL)
+		return NAN;
+	switch (id) {
+	case 3033: // BG2X
+		return GetFixedPoint28(emulator->GetMemory().Read32(BG2X_L));
+	case 3034: // BG2Y
+		return GetFixedPoint28(emulator->GetMemory().Read32(BG2Y_L));
+	case 3035: // BG2PA
+		return GetFixedPoint16(emulator->GetMemory().Read16(BG2PA));
+	case 3036: // BG2PB
+		return GetFixedPoint16(emulator->GetMemory().Read16(BG2PB));
+	case 3037: // BG2PC
+		return GetFixedPoint16(emulator->GetMemory().Read16(BG2PC));
+	case 3038: // BG2PD
+		return GetFixedPoint16(emulator->GetMemory().Read16(BG2PD));
+	case 3039: // BG3X
+		return GetFixedPoint28(emulator->GetMemory().Read32(BG3X_L));
+	case 3040: // BG3Y
+		return GetFixedPoint28(emulator->GetMemory().Read32(BG3Y_L));
+	case 3041: // BG3PA
+		return GetFixedPoint16(emulator->GetMemory().Read16(BG3PA));
+	case 3042: // BG3PB
+		return GetFixedPoint16(emulator->GetMemory().Read16(BG3PB));
+	case 3043: // BG3PC
+		return GetFixedPoint16(emulator->GetMemory().Read16(BG3PC));
+	case 3044: // BG3PD
+		return GetFixedPoint16(emulator->GetMemory().Read16(BG3PD));
+	default:
+		return NAN;
+	}
+}
+
 int32_t __stdcall GetValI(EMUHANDLE handle, int32_t id) {
 	return GetValU(handle, id);
 }
@@ -309,30 +344,6 @@ uint32_t __stdcall GetValU(EMUHANDLE handle, int32_t id) {
 		return (emulator->GetMemory().Read16(BG3HOFS));
 	case 3032: // BG3VOFS
 		return (emulator->GetMemory().Read16(BG3VOFS));
-	case 3033: // BG2X
-		return (emulator->GetMemory().Read32(BG2X_L));
-	case 3034: // BG2Y
-		return (emulator->GetMemory().Read32(BG2Y_L));
-	case 3035: // BG2PA
-		return (emulator->GetMemory().Read16(BG2PA));
-	case 3036: // BG2PB
-		return (emulator->GetMemory().Read16(BG2PB));
-	case 3037: // BG2PC
-		return (emulator->GetMemory().Read16(BG2PC));
-	case 3038: // BG2PD
-		return (emulator->GetMemory().Read16(BG2PD));
-	case 3039: // BG3X
-		return (emulator->GetMemory().Read32(BG3X_L));
-	case 3040: // BG3Y
-		return (emulator->GetMemory().Read32(BG3Y_L));
-	case 3041: // BG3PA
-		return (emulator->GetMemory().Read16(BG3PA));
-	case 3042: // BG3PB
-		return (emulator->GetMemory().Read16(BG3PB));
-	case 3043: // BG3PC
-		return (emulator->GetMemory().Read16(BG3PC));
-	case 3044: // BG3PD
-		return (emulator->GetMemory().Read16(BG3PD));
 	case 3050: // bit depth tiles 1
 		return (emulator->GetGpu()._debugTiles8BitDepth[0] ? 0 : 1);
 	case 3051: // bit depth tiles 2

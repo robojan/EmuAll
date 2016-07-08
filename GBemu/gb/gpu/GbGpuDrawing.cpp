@@ -70,19 +70,17 @@ bool GbGpu::InitGL(int user)
 			GL_CHECKED(glClearColor(0.0f, 0.0f, 0.0f, 0.0f));
 
 			// Load shaders
-			bool result = _shader.AddShader(ShaderProgram::Vertex, (char *)resource_gb_vert_glsl, resource_gb_vert_glsl_len);
-			if (!result) {
-				Log(Error, "%s", _shader.GetLog());
+			try {
+				_shader.AddShader(ShaderProgram::Vertex, ShaderSource(resource_gb_vert_glsl, resource_gb_vert_glsl_len));
+				_shader.AddShader(ShaderProgram::Fragment, ShaderSource(resource_gb_frag_glsl, resource_gb_frag_glsl_len));
+				_shader.Link();
+			}
+			catch (ShaderCompileException &e) {
+				Log(Error, "Shader Compile Exception:\n%s", e.GetMsg());
 				return false;
 			}
-			result = _shader.AddShader(ShaderProgram::Fragment, (char *)resource_gb_frag_glsl, resource_gb_frag_glsl_len);
-			if (!result) {
-				Log(Error, "%s", _shader.GetLog());
-				return false;
-			}
-			result = _shader.Link();
-			if (!result) {
-				Log(Error, "%s", _shader.GetLog());
+			catch (GraphicsException &e) {
+				Log(Error, "Graphics Exception:\n%s", e.GetMsg());
 				return false;
 			}
 			break;
@@ -105,19 +103,17 @@ bool GbGpu::InitGL(int user)
 			_BGVAO->BindBuffer(1, *_BGBO, 2, VertexArrayObject::Float, false, 5 * sizeof(GLfloat), 3 * sizeof(GLfloat));
 			_BGVAO->End();
 			// Load shaders
-			bool result = _BGShader.AddShader(ShaderProgram::Vertex, (char *)resource_gb_vert_glsl, resource_gb_vert_glsl_len);
-			if (!result) {
-				Log(Error, "%s", _BGShader.GetLog());
+			try {
+				_BGShader.AddShader(ShaderProgram::Vertex, ShaderSource(resource_gb_vert_glsl, resource_gb_vert_glsl_len));
+				_BGShader.AddShader(ShaderProgram::Fragment, ShaderSource(resource_gb_frag_glsl, resource_gb_frag_glsl_len));
+				_BGShader.Link();
+			}
+			catch (ShaderCompileException &e) {
+				Log(Error, "Shader Compile Exception:\n%s", e.GetMsg());
 				return false;
 			}
-			result = _BGShader.AddShader(ShaderProgram::Fragment, (char *)resource_gb_frag_glsl, resource_gb_frag_glsl_len);
-			if (!result) {
-				Log(Error, "%s", _BGShader.GetLog());
-				return false;
-			}
-			result = _BGShader.Link();
-			if (!result) {
-				Log(Error, "%s", _BGShader.GetLog());
+			catch (GraphicsException &e) {
+				Log(Error, "Graphics Exception:\n%s", e.GetMsg());
 				return false;
 			}
 			break;
@@ -141,19 +137,17 @@ bool GbGpu::InitGL(int user)
 			_TiVAO->End();
 			GL_CHECKED(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
 			// Load shaders
-			bool result = _TiShader.AddShader(ShaderProgram::Vertex, (char *)resource_gb_vert_glsl, resource_gb_vert_glsl_len);
-			if (!result) {
-				Log(Error, "%s", _TiShader.GetLog());
+			try {
+				_TiShader.AddShader(ShaderProgram::Vertex, ShaderSource(resource_gb_vert_glsl, resource_gb_vert_glsl_len));
+				_TiShader.AddShader(ShaderProgram::Fragment, ShaderSource(resource_gb_frag_glsl, resource_gb_frag_glsl_len));
+				_TiShader.Link();
+			}
+			catch (ShaderCompileException &e) {
+				Log(Error, "Shader Compile Exception:\n%s", e.GetMsg());
 				return false;
 			}
-			result = _TiShader.AddShader(ShaderProgram::Fragment, (char *)resource_gb_frag_glsl, resource_gb_frag_glsl_len);
-			if (!result) {
-				Log(Error, "%s", _TiShader.GetLog());
-				return false;
-			}
-			result = _TiShader.Link();
-			if (!result) {
-				Log(Error, "%s", _TiShader.GetLog());
+			catch (GraphicsException &e) {
+				Log(Error, "Graphics Exception:\n%s", e.GetMsg());
 				return false;
 			}
 			break;
@@ -177,19 +171,17 @@ bool GbGpu::InitGL(int user)
 			_OAMVAO->End();
 			GL_CHECKED(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
 			// Load shaders
-			bool result = _OAMShader.AddShader(ShaderProgram::Vertex, (char *)resource_gb_vert_glsl, resource_gb_vert_glsl_len);
-			if (!result) {
-				Log(Error, "%s", _OAMShader.GetLog());
+			try {
+				_OAMShader.AddShader(ShaderProgram::Vertex, ShaderSource(resource_gb_vert_glsl, resource_gb_vert_glsl_len));
+				_OAMShader.AddShader(ShaderProgram::Fragment, ShaderSource(resource_gb_frag_glsl, resource_gb_frag_glsl_len));
+				_OAMShader.Link();
+			}
+			catch (ShaderCompileException &e) {
+				Log(Error, "Shader Compile Exception:\n%s", e.GetMsg());
 				return false;
 			}
-			result = _OAMShader.AddShader(ShaderProgram::Fragment, (char *)resource_gb_frag_glsl, resource_gb_frag_glsl_len);
-			if (!result) {
-				Log(Error, "%s", _OAMShader.GetLog());
-				return false;
-			}
-			result = _OAMShader.Link();
-			if (!result) {
-				Log(Error, "%s", _OAMShader.GetLog());
+			catch (GraphicsException &e) {
+				Log(Error, "Graphics Exception:\n%s", e.GetMsg());
 				return false;
 			}
 			break;

@@ -34,6 +34,10 @@ DebuggerInfoList::DebuggerInfoList(Emulator *emu, const pugi::xml_node &node) :
 				item.mode = Item::hex;
 				item.format = wxString::Format("0x%%0%dX", item.size);
 			}
+			else if (mode == "float") {
+				item.mode = Item::fp;
+				item.format = wxString::Format("%%0%dg", item.size);
+			}
 			else if (mode == "string") {
 				item.mode = Item::string;
 				item.format = _("%s");
@@ -92,12 +96,16 @@ wxListCtrl *DebuggerInfoList::GetWidget(wxWindow *parent, wxWindowID id)
 		long pos = _widget->InsertItem(_widget->GetItemCount(), iItem->second.name);
 		newMap[pos] = iItem->second;
 
-		if (iItem->second.mode == Item::string)
-		{
+		switch (iItem->second.mode) {
+		case Item::string:
 			_widget->SetItem(pos, 1, wxString::Format(iItem->second.format, ""));
-		}
-		else {
+			break;
+		case Item::fp:
+			_widget->SetItem(pos, 1, wxString::Format(iItem->second.format, 0.0));
+			break;
+		default:
 			_widget->SetItem(pos, 1, wxString::Format(iItem->second.format, 0));
+			break;
 		}
 	}
 
@@ -120,12 +128,16 @@ void DebuggerInfoList::UpdateInfo()
 			for (std::map<int, Item>::iterator iItem = _items.begin(); iItem != _items.end(); ++iItem)
 			{
 				wxASSERT_MSG(!iItem->second.format.IsEmpty(), "Format is empty for item in a infolist");
-				if (iItem->second.mode == Item::string)
-				{
+				switch (iItem->second.mode) {
+				case Item::string:
 					_widget->SetItem(iItem->first, 1, wxString::Format(iItem->second.format, _emu->emu->GetString(_emu->handle, iItem->second.id)));
-				}
-				else {
+					break;
+				case Item::fp:
+					_widget->SetItem(iItem->first, 1, wxString::Format(iItem->second.format, _emu->emu->GetFloat(_emu->handle, iItem->second.id)));
+					break;
+				default:
 					_widget->SetItem(iItem->first, 1, wxString::Format(iItem->second.format, _emu->emu->GetValI(_emu->handle, iItem->second.id)));
+					break;
 				}
 			}
 		}
@@ -133,13 +145,16 @@ void DebuggerInfoList::UpdateInfo()
 			for (std::map<int, Item>::iterator iItem = _items.begin(); iItem != _items.end(); ++iItem)
 			{
 				wxASSERT_MSG(!iItem->second.format.IsEmpty(), "Format is empty for item in a infolist");
-				if (iItem->second.mode == Item::string)
-				{
-					wxASSERT_MSG(false, "Not implemented");
+				switch (iItem->second.mode) {
+				case Item::string:
 					_widget->SetItem(iItem->first, 1, wxString::Format(iItem->second.format, ""));
-				}
-				else {
+					break;
+				case Item::fp:
+					_widget->SetItem(iItem->first, 1, wxString::Format(iItem->second.format, 0.0));
+					break;
+				default:
 					_widget->SetItem(iItem->first, 1, wxString::Format(iItem->second.format, 0));
+					break;
 				}
 			}
 		}

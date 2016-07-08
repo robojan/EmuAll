@@ -142,24 +142,18 @@ void EmulatorScreen::SetPostProcessingFilter(Filter filter)
 		_shader.Clean();
 	}
 	// load shader
-	if (!_shader.AddShader(ShaderProgram::Vertex, (char *)resource_post_vert_glsl, resource_post_vert_glsl_len))
-	{
-		Log(Error, "%s", _shader.GetLog());
-		return;
+	try {
+		_shader.AddShader(ShaderProgram::Vertex, ShaderSource(resource_post_vert_glsl, resource_post_vert_glsl_len));
+		_shader.AddShader(ShaderProgram::Fragment, ShaderSource(resource_post_frag_glsl, resource_post_frag_glsl_len));
+		_shader.AddShader(ShaderProgram::Fragment, ShaderSource(filterSrc, filterSrcLen));
+		_shader.Link();
 	}
-	if (!_shader.AddShader(ShaderProgram::Fragment, (char *)resource_post_frag_glsl, resource_post_frag_glsl_len)) {
-		Log(Error, "%s", _shader.GetLog());
-		return;
+	catch (ShaderCompileException &e) {
+		Log(Error, "Error while compiling shaders:\n %s", e.GetMsg());
 	}
-	if (!_shader.AddShader(ShaderProgram::Fragment, filterSrc, filterSrcLen)) {
-		Log(Error, "%s", _shader.GetLog());
-		return;
+	catch (GraphicsException &e) {
+		Log(Error, "Error while creating shader program: %s\nStacktrace:\n%s", e.GetMsg(), e.GetStacktrace());
 	}
-	if (!_shader.Link()) {
-		Log(Error, "%s", _shader.GetLog());
-		return;
-	}
-
 }
 
 void EmulatorScreen::ShowMessage(const wxString &message)

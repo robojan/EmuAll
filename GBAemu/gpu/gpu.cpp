@@ -7,6 +7,7 @@
 #include <GBAemu/gba.h>
 #include <GBAemu/util/preprocessor.h>
 #include <GBAemu/util/log.h>
+#include <GBAemu/util/FixedPointGBA.h>
 
 #include <emuall/graphics/graphicsException.h>
 
@@ -17,10 +18,11 @@ Gpu::Gpu(Gba &system) :
 	_debugTiles8BitDepth{ false, false, false },
 	_debugTilesGridEnabled{ true, true, true },
 	_system(system), _vcount(0), _hcount(0),
+	_mainInitialized(false), _mainMixVao{ nullptr }, _mainBGVao{ nullptr }, _mainObjVao{ nullptr },
 	_paletteInitialized{false, false}, _paletteVao{nullptr, nullptr},
 	_tilesInitialized{false, false, false}, _tilesVao{nullptr, nullptr, nullptr},
 	_oamInitialized(false), _oamVao(nullptr),
-	_bgInitialized{ false, false, false, false}, _bgVao{nullptr, nullptr, nullptr, nullptr}
+	_bgInitialized{ false, false, false, false }, _bgVao{ nullptr, nullptr, nullptr, nullptr }
 {
 	RegisterEvents();
 }
@@ -221,8 +223,9 @@ void Gpu::VBlank()
 {
 	// Upload registers to gpu
 	try {
-		//_mainRegistersBT->GetBufferObject().BufferSubData(0, sizeof(_mainDrawingRegisters), _mainDrawingRegisters);
-		_mainRegistersBO->BufferSubData(0, sizeof(_mainDrawingRegisters), _mainDrawingRegisters);
+		if (_mainRegistersBO.GetRefCount() > 0) {
+			_mainRegistersBO->BufferSubData(0, sizeof(_mainDrawingRegisters), _mainDrawingRegisters);
+		}
 	}
 	catch (GraphicsException &e) {
 		Log(Error, "Error while updating graphics memory in vblank: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
@@ -240,22 +243,40 @@ void Gpu::HBlank()
 		_mainDrawingRegisters[_vcount].bgCnt[1] = IOREG16(registers, BG1CNT);
 		_mainDrawingRegisters[_vcount].bgCnt[2] = IOREG16(registers, BG2CNT);
 		_mainDrawingRegisters[_vcount].bgCnt[3] = IOREG16(registers, BG3CNT);
-		_mainDrawingRegisters[_vcount].bgOfs[0].hOfs = IOREG16(registers, BG0HOFS);
-		_mainDrawingRegisters[_vcount].bgOfs[0].vOfs = IOREG16(registers, BG0VOFS) & 0x1F;
-		_mainDrawingRegisters[_vcount].bgOfs[1].hOfs = IOREG16(registers, BG1HOFS);
-		_mainDrawingRegisters[_vcount].bgOfs[1].vOfs = IOREG16(registers, BG1VOFS) & 0x1F;
-		_mainDrawingRegisters[_vcount].bgOfs[2].hOfs = IOREG16(registers, BG2HOFS);
-		_mainDrawingRegisters[_vcount].bgOfs[2].vOfs = IOREG16(registers, BG2VOFS) & 0x1F;
-		_mainDrawingRegisters[_vcount].bgOfs[3].hOfs = IOREG16(registers, BG3HOFS);
-		_mainDrawingRegisters[_vcount].bgOfs[3].vOfs = IOREG16(registers, BG3VOFS) & 0x1F;
+		_mainDrawingRegisters[_vcount].bgOfs[0].hOfs = IOREG16(registers, BG0HOFS) & 0x1FF;
+		_mainDrawingRegisters[_vcount].bgOfs[0].vOfs = IOREG16(registers, BG0VOFS) & 0x1FF;
+		_mainDrawingRegisters[_vcount].bgOfs[1].hOfs = IOREG16(registers, BG1HOFS) & 0x1FF;
+		_mainDrawingRegisters[_vcount].bgOfs[1].vOfs = IOREG16(registers, BG1VOFS) & 0x1FF;
+		_mainDrawingRegisters[_vcount].bgOfs[2].hOfs = IOREG16(registers, BG2HOFS) & 0x1FF;
+		_mainDrawingRegisters[_vcount].bgOfs[2].vOfs = IOREG16(registers, BG2VOFS) & 0x1FF;
+		_mainDrawingRegisters[_vcount].bgOfs[3].hOfs = IOREG16(registers, BG3HOFS) & 0x1FF;
+		_mainDrawingRegisters[_vcount].bgOfs[3].vOfs = IOREG16(registers, BG3VOFS) & 0x1FF;
+		_mainDrawingRegisters[_vcount].bgRefPoint[0].x = GetFixedPoint28(IOREG32(registers, BG2X_L));
+		_mainDrawingRegisters[_vcount].bgRefPoint[0].y = GetFixedPoint28(IOREG32(registers, BG2Y_L));
+		_mainDrawingRegisters[_vcount].bgRefPoint[1].x = GetFixedPoint28(IOREG32(registers, BG3X_L));
+		_mainDrawingRegisters[_vcount].bgRefPoint[1].y = GetFixedPoint28(IOREG32(registers, BG3Y_L));
+		_mainDrawingRegisters[_vcount].bgAffineMatrix[0].a = GetFixedPoint16(IOREG16(registers, BG2PA));
+		_mainDrawingRegisters[_vcount].bgAffineMatrix[0].b = GetFixedPoint16(IOREG16(registers, BG2PB));
+		_mainDrawingRegisters[_vcount].bgAffineMatrix[0].c = GetFixedPoint16(IOREG16(registers, BG2PC));
+		_mainDrawingRegisters[_vcount].bgAffineMatrix[0].d = GetFixedPoint16(IOREG16(registers, BG2PD));
+		_mainDrawingRegisters[_vcount].bgAffineMatrix[1].a = GetFixedPoint16(IOREG16(registers, BG3PA));
+		_mainDrawingRegisters[_vcount].bgAffineMatrix[1].b = GetFixedPoint16(IOREG16(registers, BG3PB));
+		_mainDrawingRegisters[_vcount].bgAffineMatrix[1].c = GetFixedPoint16(IOREG16(registers, BG3PC));
+		_mainDrawingRegisters[_vcount].bgAffineMatrix[1].d = GetFixedPoint16(IOREG16(registers, BG3PD));
 		// Upload VRAM memory to gpu
 		try {
-			uint8_t *vram = _system.GetMemory().GetVRAM();
-			_mainVramBT->GetBufferObject().BufferSubData(_vcount * VRAMSIZE_USED, VRAMSIZE_USED, vram);
-			uint8_t *palettes = _system.GetMemory().GetPalettes();
-			_mainPaletteData->UpdateData(0, 0, _vcount, 16, 32, 1, (char *)palettes, Texture3D::USHORT_1_5_5_5);
-			uint8_t *oam = _system.GetMemory().GetOAM();
-			_mainOamBT->GetBufferObject().BufferSubData(_vcount * ORAMSIZE, ORAMSIZE, oam);
+			if (_mainVramBT.GetRefCount() > 0) {
+				uint8_t *vram = _system.GetMemory().GetVRAM();
+				_mainVramBT->GetBufferObject().BufferSubData(_vcount * VRAMSIZE_USED, VRAMSIZE_USED, vram);
+			}
+			if (_mainPaletteData.GetRefCount() > 0) {
+				uint8_t *palettes = _system.GetMemory().GetPalettes();
+				_mainPaletteData->UpdateData(0, 0, _vcount, 16, 32, 1, (char *)palettes, Texture3D::USHORT_1_5_5_5);
+			}
+			if (_mainOamBT.GetRefCount() > 0) {
+				uint8_t *oam = _system.GetMemory().GetOAM();
+				_mainOamBT->GetBufferObject().BufferSubData(_vcount * ORAMSIZE, ORAMSIZE, oam);
+			}
 		}
 		catch (GraphicsException &e) {
 			Log(Error, "Error while updating graphics memory in hblank: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
@@ -263,81 +284,135 @@ void Gpu::HBlank()
 	}
 }
 
+int Gpu::GetModeBuffer(int lineNr)
+{
+	if (lineNr >= SCREEN_HEIGHT) lineNr = 0;
+	return _mainDrawingRegisters[lineNr].dispcnt & 7;
+}
+
+void Gpu::GetBGSizeBuffer(int lineNr, int background, int &width, int &height)
+{
+	int mode = GetModeBuffer(lineNr);
+	if (mode == 1) {
+		mode = background == 2 ? 2 : 0;
+	}
+	switch (mode) {
+	case 0:
+		switch ((_mainDrawingRegisters[lineNr].bgCnt[background] >> 14) & 0x3) {
+		case 0:
+			width = 256;
+			height = 256;
+			break;
+		case 1: 
+			width = 512;
+			height = 256;
+			break;
+		case 2:
+			width = 256;
+			height = 512;
+			break;
+		case 3: 
+			width = 512;
+			height = 512;
+			break;
+		}
+		break;
+	case 2:
+		switch ((_mainDrawingRegisters[lineNr].bgCnt[background] >> 14) & 0x3) {
+		case 0:
+			width = 128;
+			height = 128;
+			break;
+		case 1:
+			width = 256;
+			height = 256;
+			break;
+		case 2:
+			width = 512;
+			height = 512;
+			break;
+		case 3:
+			width = 1024;
+			height = 1024;
+			break;
+		}
+		break;
+	case 3:
+		width = 240;
+		height = 160;
+		break;
+	case 4:
+		width = 240;
+		height = 160;
+		break;
+	case 5:
+		width = 160;
+		height = 128;
+		break;
+	}
+}
+
+void Gpu::GetBGOffsetBuffer(int lineNr, int background, float &x, float &y)
+{
+	int mode = GetModeBuffer(lineNr);
+	if (mode == 1) {
+		mode = background == 2 ? 2 : 0;
+	}
+	switch (mode) {
+	case 0:
+		x = float(_mainDrawingRegisters[lineNr].bgOfs[background].hOfs);
+		y = float(_mainDrawingRegisters[lineNr].bgOfs[background].vOfs);
+		return;
+	case 2:
+		if (background == 2 || background == 3) {
+			x = _mainDrawingRegisters[lineNr].bgRefPoint[background - 2].x;
+			y = _mainDrawingRegisters[lineNr].bgRefPoint[background - 2].y;
+			return;
+		}
+		break;
+	}
+	x = 0;
+	y = 0;
+}
+
+void Gpu::SetupShaderInterface(ShaderProgram &program)
+{
+	program.SetUniform("screenSize", float(SCREEN_WIDTH), float(SCREEN_HEIGHT));
+	program.SetUniform("DrawingRegisters", 0, *_mainRegistersBO);
+	program.SetUniform("vramData", 0, *_mainVramBT);
+	program.SetUniform("paletteData", 1, *_mainPaletteData);
+	program.SetUniform("oamData", 2, *_mainOamBT);
+}
+
 bool Gpu::InitMainGL()
 {
-	// line, type
-	// 0 background, 1 object, 2 backdrop
-	int vertexData[SCREEN_HEIGHT * 3 * 2];
-	for (int i = 0; i < SCREEN_HEIGHT; i++) {
-		vertexData[(i + SCREEN_HEIGHT * 0) * 2] = i;
-		vertexData[(i + SCREEN_HEIGHT * 0) * 2 + 1] = 0;
-		vertexData[(i + SCREEN_HEIGHT * 1) * 2] = i;
-		vertexData[(i + SCREEN_HEIGHT * 1) * 2 + 1] = 1;
-		vertexData[(i + SCREEN_HEIGHT * 2) * 2] = i;
-		vertexData[(i + SCREEN_HEIGHT * 2) * 2 + 1] = 2;
-	}
 	try {
 		if (_mainInitialized) {
 			DestroyMainGL();
 		}
-		// Create Shader program
-		_mainShader.IncRef();
-		if (_mainShader.GetRefCount() == 1) {
-			if (!_mainShader->AddShader(ShaderProgram::Vertex, (char *)resource_main_vert_glsl,
-				resource_main_vert_glsl_len)) {
-				Log(Error, "Could not Compile main vertex shader\n");
-				throw GraphicsException(0, _mainShader->GetLog());
+		InitMainMixGL();
+		InitMainBGGL();
+		InitMainObjGL();
+		
+		InitVRAMDataGL();
+		InitOAMDataGL();
+		InitRegistersDataGL();
+		InitPaletteDataGL();
+
+		// Init frame buffers, 4 bg + 1 obj
+		for (int i = 0; i < 5; i++) {
+			_mainFrameBuffer[i].IncRef(SCREEN_WIDTH, SCREEN_HEIGHT);
+			if (_mainFrameBuffer[i].GetRefCount() == 1) {
+				_mainFrameBuffer[i]->AttachColorBuffer(0);
+				_mainFrameBuffer[i]->AttachDepthTexture();
 			}
-			if (!_mainShader->AddShader(ShaderProgram::Geometry, (char *)resource_main_geo_glsl,
-				resource_main_geo_glsl_len)) {
-				Log(Error, "Could not Compile main geometry shader\n");
-				throw GraphicsException(0, _mainShader->GetLog());
-			}
-			if (!_mainShader->AddShader(ShaderProgram::Fragment, (char *)resource_main_frag_glsl,
-				resource_main_frag_glsl_len)) {
-				Log(Error, "Could not Compile main fragment shader\n");
-				throw GraphicsException(0, _mainShader->GetLog());
-			}
-			if (!_mainShader->Link()) {
-				Log(Error, "Could not Link main shader program\n");
-				throw GraphicsException(0, _mainShader->GetLog());
-			}
-		}
-
-		// Create vertex data buffer
-		_mainVertexData.IncRef(BufferObject::Type::Array);
-		if (_mainVertexData.GetRefCount() == 1) {
-			_mainVertexData->BufferData(BufferObject::Usage::StaticDraw, sizeof(vertexData), vertexData);
-		}
-
-		// create VAO
-		_mainVao = new VertexArrayObject();
-		_mainVao->Begin();
-		_mainVao->BindBuffer(0, *_mainVertexData, 1, VertexArrayObject::Int,
-			false, 2 * sizeof(int), 0 * sizeof(int));
-		_mainVao->BindBuffer(1, *_mainVertexData, 1, VertexArrayObject::Int,
-			false, 2 * sizeof(int), 1 * sizeof(int));
-		_mainVao->End();
-
-		// Main vram buffer
-		_mainVramBT.IncRef(SCREEN_HEIGHT * VRAMSIZE_USED, nullptr, BufferTexture::Format::R8UI, BufferObject::Usage::StreamDraw);
-
-		// Oam buffer
-		_mainOamBT.IncRef(SCREEN_HEIGHT * ORAMSIZE, nullptr, BufferTexture::Format::R16UI, BufferObject::Usage::StreamDraw);
-
-		_mainRegistersBO.IncRef(BufferObject::Type::Uniform);
-		if (_mainRegistersBO.GetRefCount() == 1) {
-			_mainRegistersBO->BufferData(BufferObject::Usage::StreamDraw, SCREEN_HEIGHT * sizeof(DrawingInfoData_t), _mainDrawingRegisters);
-		}
-		//_mainRegistersBO.IncRef(SCREEN_HEIGHT * sizeof(DrawingInfoData_t), nullptr, BufferTexture::Format::R32I, BufferObject::Usage::StreamDraw);
-
-		_mainPaletteData.IncRef(16, 32, SCREEN_HEIGHT, nullptr, Texture3D::RGB);
-		if (_mainPaletteData.GetRefCount() == 1) {
-			_mainPaletteData->SetFilter(Texture3D::Linear, Texture3D::Linear);
-			_mainPaletteData->SetWrap(Texture3D::Repeat, Texture3D::Repeat);
 		}
 
 		GL_CHECKED(glClearDepth(0));
+	}
+	catch (ShaderCompileException &e) {
+		Log(Error, "Error while compiling shaders:\n %s", e.GetMsg());
+		return false;
 	}
 	catch (GraphicsException &e) {
 		Log(Error, "Error while creating graphics main objects: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
@@ -347,19 +422,158 @@ bool Gpu::InitMainGL()
 	return true;
 }
 
+void Gpu::InitMainBGGL()
+{
+	int vertexData[SCREEN_HEIGHT+1];
+	for (int i = 0; i < SCREEN_HEIGHT+1; i++) {
+		vertexData[i] = i;
+	}
+	ShaderSource vertexSource(resource_mainInterface_glsl, resource_mainInterface_glsl_len);
+	ShaderSource geometrySource(vertexSource);
+	ShaderSource fragmentSource(vertexSource);
+	vertexSource.AddSource(resource_mainBG_vert_glsl, resource_mainBG_vert_glsl_len);
+	geometrySource.AddSource(resource_mainFuncs_glsl, resource_mainFuncs_glsl_len);
+	geometrySource.AddSource(resource_mainBG_geo_glsl, resource_mainBG_geo_glsl_len);
+	fragmentSource.AddSource(resource_mainFuncs_glsl, resource_mainFuncs_glsl_len);
+	fragmentSource.AddSource(resource_mainBG_frag_glsl, resource_mainBG_frag_glsl_len);
+
+	_mainBGShader.IncRef("Main background");
+	if (_mainBGShader.GetRefCount() == 1) {
+		_mainBGShader->AddShader(ShaderProgram::Vertex, vertexSource);
+		_mainBGShader->AddShader(ShaderProgram::Geometry, geometrySource);
+		_mainBGShader->AddShader(ShaderProgram::Fragment, fragmentSource);
+		_mainBGShader->Link();
+	}
+
+	_mainBGVertexData.IncRef(BufferObject::Type::Array);
+	if (_mainBGVertexData.GetRefCount() == 1) {
+		_mainBGVertexData->BufferData(BufferObject::Usage::StaticDraw, sizeof(vertexData), vertexData);
+	}
+
+	_mainBGVao = new VertexArrayObject();
+	_mainBGVao->Begin();
+	_mainBGVao->BindBuffer(0, *_mainBGVertexData, 2, VertexArrayObject::Int, false, 1 * sizeof(int), 0);
+	_mainBGVao->End();
+
+	GL_CHECKED(glClearDepth(0));
+}
+
+void Gpu::InitMainObjGL()
+{
+	int vertexData[SCREEN_HEIGHT + 1];
+	for (int i = 0; i < SCREEN_HEIGHT + 1; i++) {
+		vertexData[i] = i;
+	}
+
+	ShaderSource vertexSource(resource_mainInterface_glsl, resource_mainInterface_glsl_len);
+	ShaderSource geometrySource(vertexSource);
+	ShaderSource fragmentSource(vertexSource);
+	vertexSource.AddSource(resource_mainObj_vert_glsl, resource_mainObj_vert_glsl_len);
+	geometrySource.AddSource(resource_mainFuncs_glsl, resource_mainFuncs_glsl_len);
+	geometrySource.AddSource(resource_mainObj_geo_glsl, resource_mainObj_geo_glsl_len);
+	fragmentSource.AddSource(resource_mainFuncs_glsl, resource_mainFuncs_glsl_len);
+	fragmentSource.AddSource(resource_mainObj_frag_glsl, resource_mainObj_frag_glsl_len);
+
+	_mainObjShader.IncRef("Main Object");
+	if (_mainObjShader.GetRefCount() == 1) {
+		_mainObjShader->AddShader(ShaderProgram::Vertex, vertexSource);
+		_mainObjShader->AddShader(ShaderProgram::Geometry, geometrySource);
+		_mainObjShader->AddShader(ShaderProgram::Fragment, fragmentSource);
+		_mainObjShader->Link();
+	}
+
+	_mainObjVertexData.IncRef(BufferObject::Type::Array);
+	if (_mainObjVertexData.GetRefCount() == 1) {
+		_mainObjVertexData->BufferData(BufferObject::Usage::StaticDraw, sizeof(vertexData), vertexData);
+	}
+
+	_mainObjVao = new VertexArrayObject();
+	_mainObjVao->Begin();
+	_mainObjVao->BindBuffer(0, *_mainBGVertexData, 2, VertexArrayObject::Int, false, 1 * sizeof(int), 0);
+	_mainObjVao->End();
+
+	GL_CHECKED(glClearDepth(0));
+}
+
+void Gpu::InitMainMixGL()
+{
+	const float vertexData[] = {
+		// x,   y
+		0.0, 0.0,
+		1.0, 0.0,
+		0.0, 1.0,
+		1.0, 1.0
+	};
+
+	ShaderSource vertexSource(resource_mainInterface_glsl, resource_mainInterface_glsl_len);
+	ShaderSource fragmentSource(vertexSource);
+	vertexSource.AddSource(resource_mainMix_vert_glsl, resource_mainMix_vert_glsl_len);
+	fragmentSource.AddSource(resource_mainFuncs_glsl, resource_mainFuncs_glsl_len);
+	fragmentSource.AddSource(resource_mainMix_frag_glsl, resource_mainMix_frag_glsl_len);
+	
+	_mainMixShader.IncRef("Main Mix");
+	if (_mainMixShader.GetRefCount() == 1) {
+		_mainMixShader->AddShader(ShaderProgram::Vertex, vertexSource);
+		_mainMixShader->AddShader(ShaderProgram::Fragment, fragmentSource);
+		_mainMixShader->Link();
+	}
+
+	_mainMixVertexData.IncRef(BufferObject::Type::Array);
+	if (_mainMixVertexData.GetRefCount() == 1) {
+		_mainMixVertexData->BufferData(BufferObject::Usage::StaticDraw, sizeof(vertexData), vertexData);
+	}
+
+	_mainMixVao = new VertexArrayObject();
+	_mainMixVao->Begin();
+	_mainMixVao->BindBuffer(0, *_mainMixVertexData, 2, VertexArrayObject::Float, false, 2 * sizeof(float), 0);
+	_mainMixVao->End();
+
+	GL_CHECKED(glClearDepth(0));
+}
+
 void Gpu::DestroyMainGL()
 {
 	if (_mainInitialized == false) return;
 	_mainInitialized = false;
-	_mainShader.DecRef();
-	_mainVertexData.DecRef();
+	DestroyMainMixGL();
+	DestroyMainBGGL();
+	DestroyMainObjGL();
 	_mainVramBT.DecRef();
 	_mainRegistersBO.DecRef();
 	_mainPaletteData.DecRef();
 	_mainOamBT.DecRef();
-	if (_mainVao != nullptr) {
-		delete _mainVao;
-		_mainVao = nullptr;
+	for (int i = 0; i < 5; i++) {
+		_mainFrameBuffer[i].DecRef();
+	}
+}
+
+void Gpu::DestroyMainBGGL()
+{
+	_mainBGShader.DecRef();
+	_mainBGVertexData.DecRef();
+	if (_mainBGVao != nullptr) {
+		delete _mainBGVao;
+		_mainBGVao = nullptr;
+	}
+}
+
+void Gpu::DestroyMainObjGL()
+{
+	_mainObjShader.DecRef();
+	_mainObjVertexData.DecRef();
+	if (_mainObjVao != nullptr) {
+		delete _mainObjVao;
+		_mainObjVao = nullptr;
+	}
+}
+
+void Gpu::DestroyMainMixGL()
+{
+	_mainMixShader.DecRef();
+	_mainMixVertexData.DecRef();
+	if (_mainMixVao != nullptr) {
+		delete _mainMixVao;
+		_mainMixVao = nullptr;
 	}
 }
 
@@ -368,39 +582,97 @@ void Gpu::DrawMain()
 	try {
 		if (!_mainInitialized) throw GraphicsException(GL_INVALID_OPERATION, "Tried to draw main without initializing");
 		GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-		GL_CHECKED(glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT));
 		GL_CHECKED(glEnable(GL_DEPTH_TEST));
+		GL_CHECKED(glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT));
 		GL_CHECKED(glDepthFunc(GL_GEQUAL));
 
-		_mainShader->Begin();
-		_mainVao->Begin();
+		// Get drawing framebuffer
+		int mainFbo;
+		GL_CHECKED(glGetIntegerv(GL_FRAMEBUFFER_BINDING, &mainFbo));
 
-		// setup static uniform
-		_mainShader->SetUniform("screenSize", float(SCREEN_WIDTH), float(SCREEN_HEIGHT));
-		_mainShader->SetUniform("DrawingRegisters", 0, *_mainRegistersBO);
-		_mainShader->SetUniform("vramData", 0, *_mainVramBT);
-		_mainShader->SetUniform("paletteData", 1, *_mainPaletteData);
-		_mainShader->SetUniform("oamData", 2, *_mainOamBT);
+		for (int i = 0; i < 4; i++) {
+			// Draw backgrounds
+			_mainFrameBuffer[i]->Begin();
+			DrawMainBGGL(i);
+		}
 
-		GL_CHECKED(glDrawArrays(GL_POINTS, 0, SCREEN_HEIGHT * 3));
+		// Draw objects layer
+		_mainFrameBuffer[4]->Begin();
+		DrawMainObjGL();
 
-		_mainVao->End();
-		_mainShader->End();
+		// restore framebuffer
+		GL_CHECKED(glBindFramebuffer(GL_FRAMEBUFFER, mainFbo));
+		DrawMainMix();
 	}
-	catch (GraphicsException  &e) {
+	catch (GraphicsException &e) {
 		Log(Error, "Graphics exception in drawing main: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
 	}
 }
 
+void Gpu::DrawMainBGGL(int background)
+{
+	GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+	GL_CHECKED(glEnable(GL_DEPTH_TEST));
+	GL_CHECKED(glDepthFunc(GL_GEQUAL));
+	GL_CHECKED(glClearColor(0.0, 0.0, 0.0, 0.0));
+	_mainBGShader->Begin();
+	_mainBGVao->Begin();
+
+	SetupShaderInterface(*_mainBGShader);
+	_mainBGShader->SetUniform("background", background);
+
+	GL_CHECKED(glDrawArrays(GL_POINTS, 0, SCREEN_HEIGHT+1));
+
+	_mainBGVao->End();
+	_mainBGShader->End();
+}
+
+void Gpu::DrawMainObjGL()
+{
+	GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+	GL_CHECKED(glEnable(GL_DEPTH_TEST));
+	GL_CHECKED(glDepthFunc(GL_GEQUAL));
+	GL_CHECKED(glClearColor(0.0, 0.0, 0.0, 0.0));
+
+	_mainObjShader->Begin();
+	_mainObjVao->Begin();
+
+	SetupShaderInterface(*_mainObjShader);
+
+	GL_CHECKED(glDrawArrays(GL_POINTS, 0, SCREEN_HEIGHT + 1));
+	
+	_mainObjVao->End();
+	_mainObjShader->End();
+}
+
+void Gpu::DrawMainMix()
+{
+	GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+	GL_CHECKED(glEnable(GL_DEPTH_TEST));
+	GL_CHECKED(glDepthFunc(GL_GEQUAL));
+	_mainMixShader->Begin();
+	_mainMixVao->Begin();
+
+	SetupShaderInterface(*_mainMixShader);
+	_mainMixShader->SetUniform("background[0]", 3, _mainFrameBuffer[0]->GetColorBuffer(0));
+	_mainMixShader->SetUniform("background[1]", 4, _mainFrameBuffer[1]->GetColorBuffer(0));
+	_mainMixShader->SetUniform("background[2]", 5, _mainFrameBuffer[2]->GetColorBuffer(0));
+	_mainMixShader->SetUniform("background[3]", 6, _mainFrameBuffer[3]->GetColorBuffer(0));
+	_mainMixShader->SetUniform("backgroundDepth[0]", 7, _mainFrameBuffer[0]->GetDepthTexture());
+	_mainMixShader->SetUniform("backgroundDepth[1]", 8, _mainFrameBuffer[1]->GetDepthTexture());
+	_mainMixShader->SetUniform("backgroundDepth[2]", 9, _mainFrameBuffer[2]->GetDepthTexture());
+	_mainMixShader->SetUniform("backgroundDepth[3]", 10, _mainFrameBuffer[3]->GetDepthTexture());
+	_mainMixShader->SetUniform("objectLayer", 11, _mainFrameBuffer[4]->GetColorBuffer(0));
+	_mainMixShader->SetUniform("objectLayerDepth", 12, _mainFrameBuffer[4]->GetDepthTexture());
+
+	GL_CHECKED(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
+
+	_mainMixVao->End();
+	_mainMixShader->End();
+}
+
 bool Gpu::InitPalettesGL(bool background)
 {
-	const float vertexData[] = {
-		// x     y    u    v
-		-1.0,  1.0, 0.0, 0.0,
-		 1.0,  1.0, 1.0, 0.0,
-		-1.0, -1.0, 0.0, 1.0,
-		 1.0, -1.0, 1.0, 1.0
-	};
 	int index = background ? 0 : 1;
 	try {
 		// Clear
@@ -410,46 +682,13 @@ bool Gpu::InitPalettesGL(bool background)
 			DestroyPalettesGL(background);
 		}
 
-		// Create Shader program
-		_paletteShader.IncRef();
-		if (_paletteShader.GetRefCount() == 1) {
-			if (!_paletteShader->AddShader(ShaderProgram::Vertex, (char *)resource_palette_vert_glsl,
-				resource_palette_vert_glsl_len)) {
-				Log(Error, "Could not Compile palette vertex shader\n");
-				throw GraphicsException(0, _paletteShader->GetLog());
-			}
-			if (!_paletteShader->AddShader(ShaderProgram::Fragment, (char *)resource_palette_frag_glsl,
-				resource_palette_frag_glsl_len)) {
-				Log(Error, "Could not Compile palette fragment shader\n");
-				throw GraphicsException(0, _paletteShader->GetLog());
-			}
-			if (!_paletteShader->Link()) {
-				Log(Error, "Could not Link palette shader program\n");
-				throw GraphicsException(0, _paletteShader->GetLog());
-			}
-		}
-
-		// Create Vertex buffer object
-		_paletteVertexData.IncRef(BufferObject::Type::Array);
-		if (_paletteVertexData.GetRefCount() == 1) {
-			_paletteVertexData->BufferData(BufferObject::Usage::StaticDraw, sizeof(vertexData), vertexData);
-		}
-
-		// Create buffer for palette data
-		InitPaletteDataGL();
-
-		// Create Vertex array object
-		_paletteVao[index] = new VertexArrayObject;
-		_paletteVao[index]->Begin();
-		_paletteVao[index]->BindBuffer(0, *_paletteVertexData, 2,
-			VertexArrayObject::Float, false, 4 * sizeof(float), 0 * sizeof(float));
-		_paletteVao[index]->BindBuffer(1, *_paletteVertexData, 2,
-			VertexArrayObject::Float, false, 4 * sizeof(float), 2 * sizeof(float));
-		_paletteVao[index]->End();
+	}
+	catch (ShaderCompileException &e) {
+		Log(Error, "Error while compiling shaders:\n %s", e.GetMsg());
+		return false;
 	}
 	catch (GraphicsException &e) {
 		Log(Error, "Error while creating palette graphics objects: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
-		DestroyPalettesGL(background);
 		return false;
 	}
 	_paletteInitialized[index] = true;
@@ -461,13 +700,6 @@ void Gpu::DestroyPalettesGL(bool background)
 	int index = background ? 0 : 1;
 	if (_paletteInitialized[index] == false) return;
 	_paletteInitialized[index] = false;
-	_paletteShader.DecRef();
-	if (_paletteVao[index] != nullptr) {
-		delete _paletteVao[index];
-		_paletteVao[index] = nullptr;
-	}
-	_paletteData.DecRef();
-	_paletteVertexData.DecRef();
 }
 
 void Gpu::DrawPalettes(bool background)
@@ -478,19 +710,6 @@ void Gpu::DrawPalettes(bool background)
 		GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT));
 		GL_CHECKED(glViewport(0, 0, 512, 256));
 
-		uint8_t *palettes = _system.GetMemory().GetPalettes();
-		_paletteData->UpdateData(0, 0, 16, 32, (char *)palettes, Texture::USHORT_1_5_5_5);
-
-		_paletteShader->Begin();
-		_paletteVao[index]->Begin();
-		_paletteShader->SetUniform("paletteData", 0, *_paletteData);
-		_paletteShader->SetUniform("windowSize", 512.0f, 256.0f);
-		_paletteShader->SetUniform("objPalette", !background);
-
-		GL_CHECKED(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
-
-		_paletteVao[index]->End();
-		_paletteShader->End();
 	}
 	catch (GraphicsException  &e) {
 		Log(Error, "Graphics exception in drawing palettes: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
@@ -499,54 +718,15 @@ void Gpu::DrawPalettes(bool background)
 
 bool Gpu::InitTilesGL(int idx)
 {
-	const float vertexData[] = {
-		// x     y    u    v
-		-1.0,  1.0, 0.0, 0.0,
-		1.0,  1.0, 1.0, 0.0,
-		-1.0, -1.0, 0.0, 1.0,
-		1.0, -1.0, 1.0, 1.0
-	};
 	try {
 		if (_tilesInitialized[idx]) {
 			DestroyTilesGL(idx);
 		}
-		// Create Shader program
-		_tilesShader.IncRef();
-		if (_tilesShader.GetRefCount() == 1) {
-			if (!_tilesShader->AddShader(ShaderProgram::Vertex, (char *)resource_tiles_vert_glsl,
-				resource_tiles_vert_glsl_len)) {
-				Log(Error, "Could not Compile tiles vertex shader\n");
-				throw GraphicsException(0, _tilesShader->GetLog());
-			}
-			if (!_tilesShader->AddShader(ShaderProgram::Fragment, (char *)resource_tiles_frag_glsl,
-				resource_tiles_frag_glsl_len)) {
-				Log(Error, "Could not Compile tiles fragment shader\n");
-				throw GraphicsException(0, _tilesShader->GetLog());
-			}
-			if (!_tilesShader->Link()) {
-				Log(Error, "Could not Link tiles shader program\n");
-				throw GraphicsException(0, _tilesShader->GetLog());
-			}
-		}
-
-		// Create vertex data buffer
-		_tilesVertexData.IncRef(BufferObject::Type::Array);
-		if (_tilesVertexData.GetRefCount() == 1) {
-			_tilesVertexData->BufferData(BufferObject::Usage::StaticDraw, sizeof(vertexData), vertexData);
-		}
-
-		// create VAO
-		_tilesVao[idx] = new VertexArrayObject();
-		_tilesVao[idx]->Begin();
-		_tilesVao[idx]->BindBuffer(0, *_tilesVertexData, 2, VertexArrayObject::Float,
-			false, 4 * sizeof(float), 0 * sizeof(float));
-		_tilesVao[idx]->BindBuffer(1, *_tilesVertexData, 2, VertexArrayObject::Float,
-			false, 4 * sizeof(float), 2 * sizeof(float));
-		_tilesVao[idx]->End();
-
-		// Create tile buffer data
-		InitVRAMDataGL();		
-		InitPaletteDataGL();
+		
+	}
+	catch (ShaderCompileException &e) {
+		Log(Error, "Error while compiling shaders:\n %s", e.GetMsg());
+		return false;
 	}
 	catch (GraphicsException &e) {
 		Log(Error, "Error while creating graphics tiles objects: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
@@ -560,14 +740,6 @@ void Gpu::DestroyTilesGL(int idx)
 {
 	if (_tilesInitialized[idx] == false) return;
 	_tilesInitialized[idx] = false;
-	_tilesShader.DecRef();
-	_paletteData.DecRef();
-	_vramBT.DecRef();
-	_tilesVertexData.DecRef();
-	if (_tilesVao[idx] != nullptr) {
-		delete _tilesVao[idx];
-		_tilesVao[idx] = nullptr;
-	}
 }
 
 void Gpu::DrawTiles(int idx)
@@ -578,30 +750,7 @@ void Gpu::DrawTiles(int idx)
 		if (!_tilesInitialized[idx]) throw GraphicsException(GL_INVALID_OPERATION, "Tried to draw tiles without initializing");
 		GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT));
 		GL_CHECKED(glViewport(0, 0, 512, 512));
-
-		uint8_t *palettes = _system.GetMemory().GetPalettes();
-		_paletteData->UpdateData(0, 0, 16, 32, (char *)palettes, Texture::USHORT_1_5_5_5);
-
-		uint8_t *vram = _system.GetMemory().GetVRAM() + address;
-		_vramBT->GetBufferObject().BufferSubData(address, 0x8000, vram);
-
-		int paletteId = 0;
-		if (idx == 2) paletteId |= 0x10;
-
-		_tilesShader->Begin();
-		_tilesVao[idx]->Begin();
-		_tilesShader->SetUniform("paletteId", paletteId); // TODO: Detect palette
-		_tilesShader->SetUniform("depth8bit", _debugTiles8BitDepth[idx]);
-		_tilesShader->SetUniform("paletteData", 1, *_paletteData);
-		_tilesShader->SetUniform("vramData", 0, *_vramBT);
-		_tilesShader->SetUniform("baseAddress", (int)address);
-		_tilesShader->SetUniform("windowSize", 512.0f, 512.0f);
-		_tilesShader->SetUniform("grid", _debugTilesGridEnabled[idx]);
-
-		GL_CHECKED(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
-
-		_tilesVao[idx]->End();
-		_tilesShader->End();
+				
 	}
 	catch (GraphicsException  &e) {
 		Log(Error, "Graphics exception in drawing tiles: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
@@ -610,55 +759,14 @@ void Gpu::DrawTiles(int idx)
 
 bool Gpu::InitOAMGL()
 {
-	const float vertexData[] = {
-		// x     y    u    v
-		-1.0,  1.0, 0.0, 0.0,
-		1.0,  1.0, 1.0, 0.0,
-		-1.0, -1.0, 0.0, 1.0,
-		1.0, -1.0, 1.0, 1.0
-	};
 	try {
 		if (_oamInitialized) {
 			DestroyOAMGL();
 		}
-		// Create Shader program
-		_oamShader.IncRef();
-		if (_oamShader.GetRefCount() == 1) {
-			if (!_oamShader->AddShader(ShaderProgram::Vertex, (char *)resource_oam_vert_glsl,
-					resource_oam_vert_glsl_len)) {
-				Log(Error, "Could not Compile oam vertex shader\n");
-				throw GraphicsException(0, _oamShader->GetLog());
-			}
-			if (!_oamShader->AddShader(ShaderProgram::Fragment, (char *)resource_oam_frag_glsl,
-					resource_oam_frag_glsl_len)) {
-				Log(Error, "Could not Compile oam fragment shader\n");
-				throw GraphicsException(0, _oamShader->GetLog());
-			}
-			if (!_oamShader->Link()) {
-				Log(Error, "Could not Link oam shader program\n");
-				throw GraphicsException(0, _oamShader->GetLog());
-			}
-		}
-
-		// Create vertex data buffer
-		_oamVertexData.IncRef(BufferObject::Type::Array);
-		if (_oamVertexData.GetRefCount() == 1) {
-			_oamVertexData->BufferData(BufferObject::Usage::StaticDraw, sizeof(vertexData), vertexData);
-		}
-
-		// create VAO
-		_oamVao = new VertexArrayObject();
-		_oamVao->Begin();
-		_oamVao->BindBuffer(0, *_oamVertexData, 2, VertexArrayObject::Float,
-			false, 4 * sizeof(float), 0 * sizeof(float));
-		_oamVao->BindBuffer(1, *_oamVertexData, 2, VertexArrayObject::Float,
-			false, 4 * sizeof(float), 2 * sizeof(float));
-		_oamVao->End();
-
-		// Create tile buffer data
-		InitVRAMDataGL();
-		InitPaletteDataGL();
-		InitOAMAttributeDataGL();
+	}
+	catch (ShaderCompileException &e) {
+		Log(Error, "Error while compiling shaders:\n %s", e.GetMsg());
+		return false;
 	}
 	catch (GraphicsException &e) {
 		Log(Error, "Error while creating graphics oam objects: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
@@ -672,15 +780,6 @@ void Gpu::DestroyOAMGL()
 {
 	if (_oamInitialized == false) return;
 	_oamInitialized = false;
-	_oamShader.DecRef();
-	_paletteData.DecRef();
-	_vramBT.DecRef();
-	_oamVertexData.DecRef();
-	_oamBT.DecRef();
-	if (_oamVao != nullptr) {
-		delete _oamVao;
-		_oamVao = nullptr;
-	}
 }
 
 void Gpu::DrawOAM()
@@ -689,27 +788,6 @@ void Gpu::DrawOAM()
 		if (!_oamInitialized) throw GraphicsException(GL_INVALID_OPERATION, "Tried to draw oam without initializing");
 		GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT));
 		GL_CHECKED(glViewport(0, 0, 768, 384));
-
-		uint8_t *palettes = _system.GetMemory().GetPalettes();
-		_paletteData->UpdateData(0, 0, 16, 32, (char *)palettes, Texture::USHORT_1_5_5_5);
-
-		uint8_t *vram = _system.GetMemory().GetVRAM() + 0x10000;
-		_vramBT->GetBufferObject().BufferSubData(0x10000, 0x8000, vram);
-		
-		uint8_t *oam = _system.GetMemory().GetOAM();
-		_oamBT->GetBufferObject().BufferSubData(0, 0x400, oam);
-
-		uint8_t *registers = _system.GetMemory().GetRegisters();
-
-		_oamShader->Begin();
-		_oamVao->Begin();
-		_oamShader->SetUniform("oamData", 2, *_oamBT);
-		_oamShader->SetUniform("paletteData", 1, *_paletteData);
-		_oamShader->SetUniform("vramData", 0, *_vramBT);
-		_oamShader->SetUniform("DISPCNT", IOREG32(registers, DISPCNT));
-		_oamShader->SetUniform("windowSize", 768.0f, 384.0f);
-
-		GL_CHECKED(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
 
 		_oamVao->End();
 		_oamShader->End();
@@ -721,54 +799,43 @@ void Gpu::DrawOAM()
 
 bool Gpu::InitBGGL(int idx)
 {
-	const float vertexData[] = {
-		// x     y    u    v
-		-1.0,  1.0, 0.0, 0.0,
-		1.0,  1.0, 1.0, 0.0,
-		-1.0, -1.0, 0.0, 1.0,
-		1.0, -1.0, 1.0, 1.0
-	};
 	try {
 		if (_bgInitialized[idx]) {
-			DestroyOAMGL();
+			DestroyBGGL(idx);
 		}
+		ShaderSource vertexSource(resource_mainInterface_glsl, resource_mainInterface_glsl_len);
+		ShaderSource geometrySource(vertexSource);
+		ShaderSource fragmentSource(vertexSource);
+		vertexSource.AddSource(resource_mainFuncs_glsl, resource_mainFuncs_glsl_len);
+		vertexSource.AddSource(resource_bg_vert_glsl, resource_bg_vert_glsl_len);
+		geometrySource.AddSource(resource_mainFuncs_glsl, resource_mainFuncs_glsl_len);
+		geometrySource.AddSource(resource_bg_geo_glsl, resource_bg_geo_glsl_len);
+		fragmentSource.AddSource(resource_mainFuncs_glsl, resource_mainFuncs_glsl_len);
+		fragmentSource.AddSource(resource_bg_frag_glsl, resource_bg_frag_glsl_len);
+
 		// Create Shader program
-		_bgShader.IncRef();
+		_bgShader.IncRef("Debug BG");
 		if (_bgShader.GetRefCount() == 1) {
-			if (!_bgShader->AddShader(ShaderProgram::Vertex, (char *)resource_bg_vert_glsl,
-					resource_bg_vert_glsl_len)) {
-				Log(Error, "Could not Compile bg vertex shader\n");
-				throw GraphicsException(0, _bgShader->GetLog());
-			}
-			if (!_bgShader->AddShader(ShaderProgram::Fragment, (char *)resource_bg_frag_glsl,
-					resource_bg_frag_glsl_len)) {
-				Log(Error, "Could not Compile bg fragment shader\n");
-				throw GraphicsException(0, _bgShader->GetLog());
-			}
-			if (!_bgShader->Link()) {
-				Log(Error, "Could not Link bg shader program\n");
-				throw GraphicsException(0, _bgShader->GetLog());
-			}
+			_bgShader->AddShader(ShaderProgram::Vertex, vertexSource);
+			_bgShader->AddShader(ShaderProgram::Geometry, geometrySource);
+			_bgShader->AddShader(ShaderProgram::Fragment, fragmentSource);
+			_bgShader->Link();
 		}
 
-		// Create vertex data buffer
-		_bgVertexData.IncRef(BufferObject::Type::Array);
-		if (_bgVertexData.GetRefCount() == 1) {
-			_bgVertexData->BufferData(BufferObject::Usage::StaticDraw, sizeof(vertexData), vertexData);
+		if (_bgVao[idx] == nullptr) {
+			_bgVao[idx] = new VertexArrayObject();
 		}
 
-		// create VAO
-		_bgVao[idx] = new VertexArrayObject();
-		_bgVao[idx]->Begin();
-		_bgVao[idx]->BindBuffer(0, *_bgVertexData, 2, VertexArrayObject::Float,
-			false, 4 * sizeof(float), 0 * sizeof(float));
-		_bgVao[idx]->BindBuffer(1, *_bgVertexData, 2, VertexArrayObject::Float,
-			false, 4 * sizeof(float), 2 * sizeof(float));
-		_bgVao[idx]->End();
+		InitGridShader();
 
 		// Create tile buffer data
 		InitVRAMDataGL();
 		InitPaletteDataGL();
+		InitRegistersDataGL();
+	}
+	catch (ShaderCompileException &e) {
+		Log(Error, "Error while compiling shaders:\n %s", e.GetMsg());
+		return false;
 	}
 	catch (GraphicsException &e) {
 		Log(Error, "Error while creating graphics bg objects: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
@@ -783,9 +850,9 @@ void Gpu::DestroyBGGL(int idx)
 	if (_bgInitialized[idx] == false) return;
 	_bgInitialized[idx] = false;
 	_bgShader.DecRef();
-	_paletteData.DecRef();
-	_vramBT.DecRef();
-	_bgVertexData.DecRef();
+	_mainVramBT.DecRef();
+	_mainRegistersBO.DecRef();
+	_mainPaletteData.DecRef();
 	if (_bgVao[idx] != nullptr) {
 		delete _bgVao[idx];
 		_bgVao[idx] = nullptr;
@@ -796,59 +863,118 @@ void Gpu::DrawBG(int idx)
 {
 	try {
 		if (!_bgInitialized[idx]) throw GraphicsException(GL_INVALID_OPERATION, "Tried to draw bg without initializing");
-		GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT));
+		GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+		GL_CHECKED(glEnable(GL_DEPTH_TEST));
 		GL_CHECKED(glViewport(0, 0, 512, 512));
-
-		uint8_t *palettes = _system.GetMemory().GetPalettes();
-		_paletteData->UpdateData(0, 0, 16, 32, (char *)palettes, Texture::USHORT_1_5_5_5);
-
-		uint8_t *vram = _system.GetMemory().GetVRAM();
-		_vramBT->GetBufferObject().BufferSubData(0, 0x14000, vram);
-
-		uint8_t *registers = _system.GetMemory().GetRegisters();
-
+		
 		_bgShader->Begin();
 		_bgVao[idx]->Begin();
-		_bgShader->SetUniform("paletteData", 1, *_paletteData);
-		_bgShader->SetUniform("vramData", 0, *_vramBT);
-		_bgShader->SetUniform("DISPCNT", IOREG32(registers, DISPCNT));
-		_bgShader->SetUniform("BGCNT", (uint32_t)IOREG16(registers, BG0CNT + 2 * idx));
-		_bgShader->SetUniform("BGHOFS", (uint32_t)IOREG16(registers, BG0HOFS + 4 * idx));
-		_bgShader->SetUniform("BGVOFS", (uint32_t)IOREG16(registers, BG0VOFS + 4 * idx));
-		_bgShader->SetUniform("BGX", ((uint32_t)IOREG16(registers, BG2X_H + 8 * (idx - 2)) << 16) | IOREG16(registers, BG2X_L + 8 * (idx - 2)));
-		_bgShader->SetUniform("BGY", ((uint32_t)IOREG16(registers, BG2Y_H + 8 * (idx - 2)) << 16) | IOREG16(registers, BG2Y_L + 8 * (idx - 2)));
-		_bgShader->SetUniform("backgroundId", idx);
-		_bgShader->SetUniform("windowSize", 512.0f, 512.0f);
-		_bgShader->SetUniform("grid", true);
+		
+		SetupShaderInterface(*_bgShader);
+		int lineNr = _vcount < SCREEN_HEIGHT ? (int)_vcount : 0;
+		_bgShader->SetUniform("lineNr", lineNr);
+		_bgShader->SetUniform("background", idx);
+		_bgShader->SetUniform("screenSize", 512.0f, 512.0f);
+		
+		GL_CHECKED(glDrawArrays(GL_POINTS, 0, 128*128));
 
-		GL_CHECKED(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
+		_bgShader->End();
+		
+		int bgWidth, bgHeight;
+		GetBGSizeBuffer(lineNr, idx, bgWidth, bgHeight);
+		float bgX, bgY;
+		GetBGOffsetBuffer(lineNr, idx, bgX, bgY);
+		bgX /= bgWidth;
+		bgY /= bgHeight;
+		int mode = GetModeBuffer(lineNr);
+		bool boxEnabled = !((mode == 1 && idx == 3) || (mode >= 2 && idx < 2) || (mode >= 3 && idx == 3));
+		bool gridEnabled = boxEnabled;
+		if (mode == 1) mode = idx == 2 ? 2 : 0;
+		bool wrapAroundFlag = (_mainDrawingRegisters[lineNr].bgCnt[idx] & (1 << 13)) != 0;
+		int bgMode = (_mainDrawingRegisters[lineNr].bgCnt[idx] >> 14) & 3;
+		bool wraparound = mode == 0 || (mode == 2 && wrapAroundFlag && bgMode != 0);
+
+		DrawGrid(gridEnabled, bgWidth / 8, bgHeight / 8, 0xFFAAAAAA, 0.01f,
+			boxEnabled, wraparound, bgX, bgY, 240.0f / bgWidth, 160.0f / bgHeight, 0xFF0000FF, 0.0f);
 
 		_bgVao[idx]->End();
-		_bgShader->End();
+		
 	}
 	catch (GraphicsException  &e) {
 		Log(Error, "Graphics exception in drawing bg: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());
 	}
 }
 
+void Gpu::InitGridShader()
+{
+	_gridShader.IncRef("Grid");
+	if (_gridShader.GetRefCount() == 1) {
+		ShaderSource vertexSource(resource_grid_vert_glsl, resource_grid_vert_glsl_len);
+		ShaderSource geometrySource(resource_grid_geo_glsl, resource_grid_geo_glsl_len);
+		ShaderSource fragmentSource(resource_lines_frag_glsl, resource_lines_frag_glsl_len);
+
+		_gridShader->AddShader(ShaderProgram::Vertex, vertexSource);
+		_gridShader->AddShader(ShaderProgram::Geometry, geometrySource);
+		_gridShader->AddShader(ShaderProgram::Fragment, fragmentSource);
+		_gridShader->Link();
+	}
+
+}
+
+void Gpu::DestroyGridShader()
+{
+	_gridShader.DecRef();
+}
+
+void Gpu::DrawGrid(bool gridEnabled, int gridWidth, int gridHeight, int gridColor, float gridDepth,
+	bool boxEnabled, bool boxWraparound, float boxX, float boxY, float boxWidth, float boxHeight, int boxColor, float boxDepth)
+{
+	_gridShader->Begin();
+
+	_gridShader->SetUniform("gridSize", gridWidth, gridHeight);
+	_gridShader->SetUniform("gridColor", float((gridColor >> 0) & 0xFF) / 255.0f,
+		float((gridColor >> 8) & 0xFF) / 255.0f, float((gridColor >> 16) & 0xFF) / 255.0f,
+		float((gridColor >> 24) & 0xFF) / 255.0f);
+	_gridShader->SetUniform("gridEnabled", gridEnabled ? 1 : 0);
+	_gridShader->SetUniform("boxSize", boxWidth * 2.0f, boxHeight * 2.0f);
+	_gridShader->SetUniform("boxPos", boxX * 2.0f - 1.0f, 1.0f - boxY * 2.0f);
+	_gridShader->SetUniform("boxEnabled", boxEnabled ? 1 : 0);
+	_gridShader->SetUniform("boxWraparound", boxWraparound ? 1 : 0);
+	_gridShader->SetUniform("boxColor", float((boxColor >> 0) & 0xFF) / 255.0f,
+		float((boxColor >> 8) & 0xFF) / 255.0f, float((boxColor >> 16) & 0xFF) / 255.0f,
+		float((boxColor >> 24) & 0xFF) / 255.0f);
+	_gridShader->SetUniform("gridDepth", gridDepth);
+	_gridShader->SetUniform("boxDepth", boxDepth);
+
+	GL_CHECKED(glDrawArrays(GL_POINTS, 0, 1 + (gridWidth+63)/64 + (gridHeight+63) / 64));
+
+	_gridShader->End();
+}
+
 void Gpu::InitPaletteDataGL()
 {
-	_paletteData.IncRef(16, 32, nullptr, Texture::RGBA);
-	if (_paletteData.GetRefCount() == 1) {
-		_paletteData->Bind();
-		_paletteData->SetFilter(Texture::Nearest, Texture::Nearest);
-		_paletteData->SetWrap(Texture::Repeat, Texture::Repeat);
-		_paletteData->UnBind();
+	_mainPaletteData.IncRef(16, 32, SCREEN_HEIGHT, nullptr, Texture3D::RGB);
+	if (_mainPaletteData.GetRefCount() == 1) {
+		_mainPaletteData->SetFilter(Texture3D::Linear, Texture3D::Linear);
+		_mainPaletteData->SetWrap(Texture3D::Repeat, Texture3D::Repeat);
 	}
 }
 
 void Gpu::InitVRAMDataGL()
 {
-	_vramBT.IncRef(0x18000, nullptr, BufferTexture::Format::R8UI, BufferObject::Usage::StreamDraw);
+	_mainVramBT.IncRef(SCREEN_HEIGHT * VRAMSIZE_USED, nullptr, BufferTexture::Format::R8UI, BufferObject::Usage::StreamDraw);
 }
 
-void Gpu::InitOAMAttributeDataGL()
+void Gpu::InitOAMDataGL()
 {
-	_oamBT.IncRef(0x400, nullptr, BufferTexture::Format::R16UI, BufferObject::Usage::StreamDraw);
+	_mainOamBT.IncRef(SCREEN_HEIGHT * ORAMSIZE, nullptr, BufferTexture::Format::R16UI, BufferObject::Usage::StreamDraw);
+}
+
+void Gpu::InitRegistersDataGL()
+{
+	_mainRegistersBO.IncRef(BufferObject::Type::Uniform);
+	if (_mainRegistersBO.GetRefCount() == 1) {
+		_mainRegistersBO->BufferData(BufferObject::Usage::StreamDraw, SCREEN_HEIGHT * sizeof(DrawingInfoData_t), _mainDrawingRegisters);
+	}
 }
 
