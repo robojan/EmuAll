@@ -208,7 +208,12 @@ bool IsObjectLargePalette(uint attr0) {
 	return (attr0 & 0x2000u) != 0u;
 }
 
-mat2 GetObjectAffineMatrix(int lineNr, int idx) {
+bool IsObjectDoubleSize(uint attr0) {
+	return (attr0 & (1u << 9u)) != 0u;
+}
+
+mat2 GetObjectAffineMatrix(int lineNr, uint attr1) {
+	int idx = int(attr1 >> 9) & 0x1F;
 	int baseAddr = lineNr * 1024 / 2 + 3;
 	uint PA = texelFetch(oamData, baseAddr + (idx * 4 + 0) * 4).r;
 	uint PB = texelFetch(oamData, baseAddr + (idx * 4 + 1) * 4).r;

@@ -56,7 +56,7 @@ void main() {
 		tileId &= ~1;
 		int tileOffset = 2 * tilePos.x;
 		if (oneDimCharMapping) {
-			tileOffset += tilePos.y * tileDim.x;
+			tileOffset += tilePos.y * tileDim.x * 2;
 		}
 		else {
 			tileOffset += tilePos.y * 32;

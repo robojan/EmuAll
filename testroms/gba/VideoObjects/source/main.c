@@ -131,6 +131,19 @@ void videoInitObjects() {
 	OAM[0].attr0 = ATTR0_SQUARE | ATTR0_NORMAL | ATTR0_COLOR_256 | OBJ_Y(0);
 	OAM[0].attr1 = ATTR1_SIZE_16 | OBJ_X(0);
 	OAM[0].attr2 = OBJ_CHAR(0) | OBJ_PRIORITY(0);
+	OAM[1].attr0 = ATTR0_SQUARE | ATTR0_NORMAL | ATTR0_COLOR_256 | OBJ_Y(32);
+	OAM[1].attr1 = ATTR1_SIZE_16 | OBJ_X(16);
+	OAM[1].attr2 = OBJ_CHAR(0) | OBJ_PRIORITY(0);
+	OAM[2].attr0 = ATTR0_SQUARE | OBJ_ROT_SCALE_ON | OBJ_DOUBLE | OBJ_256_COLOR | OBJ_Y(32);
+	OAM[2].attr1 = ATTR1_SIZE_16 | OBJ_ROT_SCALE(0) | OBJ_X(64);
+	OAM[2].attr2 = OBJ_CHAR(0) | OBJ_PRIORITY(0);
+	OAM[3].attr0 = ATTR0_SQUARE | OBJ_ROT_SCALE_ON | OBJ_DOUBLE | OBJ_256_COLOR | OBJ_Y(240);
+	OAM[3].attr1 = ATTR1_SIZE_16 | OBJ_ROT_SCALE(0) | OBJ_X(64);
+	OAM[3].attr2 = OBJ_CHAR(0) | OBJ_PRIORITY(0);
+	((OBJAFFINE *)OAM)[0].pa = 192;
+	((OBJAFFINE *)OAM)[0].pb = 64;
+	((OBJAFFINE *)OAM)[0].pc = 0;
+	((OBJAFFINE *)OAM)[0].pd = 192;
 }
 
 //---------------------------------------------------------------------------------

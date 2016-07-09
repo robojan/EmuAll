@@ -1,4 +1,4 @@
-//#version 330 core
+#line 2 3
 
 // I/O primitives
 layout(points) in;
@@ -9,12 +9,23 @@ in int gLineNr[];
 
 // Outputs
 flat out int fLineNr;
-flat out int fPaletteId;
-flat out int fLargePalette;
-flat out int fTileAddress;
-out vec2 fTilePos;
+flat out int fRSMode;
+flat out uvec3 fAttr;
+out vec2 fPixelPos;
 
 // uniforms
+
+int GetObjectY(int lineNr, int posY, int sizeY) {
+	if (sizeY >= 128 && posY > 128) {
+		posY -= 256;
+	}
+	if (posY + sizeY > 256) {
+		return lineNr + 256 - posY;
+	}
+	else {
+		return lineNr - posY;;
+	}
+}
 
 void GenerateObjects(int lineNr) {
 	bool obj1Dmapping = (dataRegisters[lineNr].dispcnt & (1 << 6)) != 0;
@@ -26,69 +37,57 @@ void GenerateObjects(int lineNr) {
 		uint attr2 = texelFetch(oamData, baseOamAddr + 2).r;
 		//uint attr3 = texelFetch(oamData, i * 8 + 6).r;
 
-		ivec2 pos = ivec2(int(attr1 & 0x1FFu), int(attr0 & 0xFFu));
+		bool RSMode = IsObjectRotScaleMode(attr0);
+		bool doubleSize = IsObjectDoubleSize(attr0);
+		int objSizeModifier = doubleSize && RSMode ? 2 : 1;
+		ivec2 pos = GetObjectPos(attr0, attr1);
 		ivec2 objectSize = GetObjectSize(attr0, attr1);
-		if (!IsObjectEnabled(attr0) || (lineNr < pos.y || lineNr >= pos.y + objectSize.y)) {
+
+		int objY = GetObjectY(lineNr, pos.y, objectSize.y * objSizeModifier);
+
+		if (!IsObjectEnabled(attr0) || (objY < 0 || objY >= objectSize.y * objSizeModifier)) {
 			continue;
 		}
-
-		bool largePalette = (attr0 & (1u << 13u)) != 0u;
-		bool hFlip = (attr1 & (1u << 12u)) != 0u;
-		bool vFlip = (attr1 & (1u << 13u)) != 0u;
-		int baseTileId = int(attr2 & 0x3FFu);
-		int paletteId = int((attr2 >> 12u) & 0xFu);
+		
 		int priority = int((attr2 >> 10u) & 0x3u);
 
-		if (largePalette || !obj1Dmapping) {
-			baseTileId &= ~1;
-		}
-
-		int widthTiles = objectSize.x / 8;
-		int tileY = (lineNr - pos.y) / 8;
 		float depth = float(3 - priority) + 0.75 + float(127 - i) / (4.0 * 128);
 		depth = (depth + 1.0) / 5.0;
-		for (int tileX = 0; tileX < widthTiles; tileX++) {
-			int tileOffset;
-			if (obj1Dmapping) {
-				tileOffset = tileY * widthTiles;
-			}
-			else {
-				tileOffset = tileY * 32;
-			}
 
-			int tileId;
-			if (largePalette) {
-				tileId = baseTileId + 2 * tileX + tileOffset;
-			}
-			else {
-				tileId = baseTileId + tileX + tileOffset;
-			}
-
-			if (GetMode(lineNr) >= 3 && tileId < 512) {
-				continue;
-			}
-
-
-			fTileAddress = baseTileAddress + tileId * 32;
-
-			fLineNr = lineNr;
-			fLargePalette = largePalette ? 1 : 0;
-
-			vec4 vertexPos = vec4((float(pos.x + tileX * 8) + 0.5) * 2.0 / screenSize.x - 1.0,
-				gl_in[0].gl_Position.y, depth, 1.0);
-			fTilePos.y = float(vFlip ? (7 - ((lineNr - pos.y) & 7)) : ((lineNr - pos.y) & 7));
-			fTilePos.x = float(hFlip ? 8 : 0);
-			gl_Position = vertexPos;
-			EmitVertex();
-
-			fTilePos.y = float(vFlip ? (7 - ((lineNr - pos.y) & 7)) : ((lineNr - pos.y) & 7));
-			fTilePos.x = float(hFlip ? 0 : 8);
-			vertexPos.x += 8.0 * 2.0 / screenSize.x;
-			gl_Position = vertexPos;
-			EmitVertex();
-
-			EndPrimitive();
+		bool hFlip, vFlip;
+		int startX = pos.x;
+		int endX;
+		if (RSMode) {
+			hFlip = false;
+			vFlip = false;
+			endX = startX + objectSize.x * objSizeModifier;
 		}
+		else {
+			hFlip = IsObjectHFlip(attr1);
+			vFlip = IsObjectVFlip(attr1);
+			endX = startX + objectSize.x;
+		}
+
+		vec4 vertexPos = vec4(startX * 2.0 / screenSize.x - 1.0,
+			gl_in[0].gl_Position.y, depth, 1.0);
+
+		// Emit line from start of object to the end of the object
+		fLineNr = lineNr;
+		fRSMode = RSMode ? 1 : 0;
+		fAttr = uvec3(attr0, attr1, attr2);
+
+		fPixelPos.y = float(vFlip ? objectSize.y - objY : objY);
+		fPixelPos.x = float(hFlip ? objectSize.x * objSizeModifier : 0);
+		gl_Position = vertexPos;
+		EmitVertex();
+
+		fPixelPos.y = float(vFlip ? objectSize.y - objY : objY);
+		fPixelPos.x = float(hFlip ? 0 : objectSize.x * objSizeModifier);
+		vertexPos.x = endX * 2.0 / screenSize.x - 1.0;
+		gl_Position = vertexPos;
+		EmitVertex();
+
+		EndPrimitive();
 	}
 }
 
