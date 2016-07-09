@@ -32,6 +32,12 @@ ivec2 WrapAround(ivec2 pos, ivec2 size) {
 	return pos;
 }
 
+vec3 GetGBAColor(uint color) {
+	return vec3( float((color >> 0u) & 0x1Fu) / 31.0,
+		float((color >> 5u) & 0x1Fu) / 31.0, 
+		float((color >> 10u) & 0x1Fu) / 31.0);
+}
+
 void main() {
 	vec4 color = vec4(0.0, 0.0, 0.0, 0.0);
 	ivec2 pixelPos = GetPixelPos();
@@ -105,12 +111,29 @@ void main() {
 		break;
 	}
 	case 2: { // bitmap mode color
+		pixelPos = ivec2(vec2(pixelPos) * GetBackgroundAffineMatrix(background, fLineNr) + fRefPoint);
+		if (pixelPos.x < 0 || pixelPos.y < 0 ||
+			pixelPos.x >= fBGSize.x || pixelPos.y >= fBGSize.y) {
+			discard;
+		}
+		int pixelId = pixelPos.x + pixelPos.y * fBGSize.x;
+		int address = fMapBaseAddr + pixelId * 2;
+		uint data = texelFetch(vramData, address).r;
+		data |= texelFetch(vramData, address + 1).r << 8;
+		color = vec4(GetGBAColor(data), 1.0);
 		break;
 	}
 	case 3: { // bitmap mode palette
-		break;
-	}
-	case 4: { // bitmap mode color swap
+		pixelPos = ivec2(vec2(pixelPos) * GetBackgroundAffineMatrix(background, fLineNr) + fRefPoint);
+		if (pixelPos.x < 0 || pixelPos.y < 0 ||
+			pixelPos.x >= fBGSize.x || pixelPos.y >= fBGSize.y) {
+			discard;
+		}
+		int pixelId = pixelPos.x + pixelPos.y * fBGSize.x;
+		int address = fMapBaseAddr + pixelId;
+		uint data = texelFetch(vramData, address).r;
+		if (data == 0u) discard;
+		color = vec4(getPaletteColor(data, fLineNr), 1.0);
 		break;
 	}
 	}

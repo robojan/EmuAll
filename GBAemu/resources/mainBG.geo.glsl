@@ -58,7 +58,7 @@ void SetupOutputs(int background, int lineNr) {
 		fBGMode = 2;
 		fMapBaseAddr = GetVRAMaddress(0, lineNr);
 		fTileBaseAddr = 0;
-		fRefPoint = vec2(0.0, 0.0);
+		fRefPoint = GetBackgroundRefPoint(background, lineNr);
 		//fAffineMatrix = mat2(1.0);
 		fLargePalette = 0;
 		fBGSize = ivec2(240, 160);
@@ -69,7 +69,7 @@ void SetupOutputs(int background, int lineNr) {
 		fBGMode = 3;
 		fMapBaseAddr = GetVRAMaddress(IsFrameSelect(lineNr) ? 0xA000 : 0x0000, lineNr);
 		fTileBaseAddr = 0;
-		fRefPoint = vec2(0.0, 0.0);
+		fRefPoint = GetBackgroundRefPoint(background, lineNr);
 		//fAffineMatrix = mat2(1.0);
 		fLargePalette = 1;
 		fBGSize = ivec2(240, 160);
@@ -77,10 +77,10 @@ void SetupOutputs(int background, int lineNr) {
 		break;
 	}
 	case 5: { // bitmap mode color swap
-		fBGMode = 4;
+		fBGMode = 2;
 		fMapBaseAddr = GetVRAMaddress(IsFrameSelect(lineNr) ? 0xA000 : 0x0000, lineNr);
 		fTileBaseAddr = 0;
-		fRefPoint = vec2(0.0, 0.0);
+		fRefPoint = GetBackgroundRefPoint(background, lineNr);
 		//fAffineMatrix = mat2(1.0);
 		fLargePalette = 0;
 		fBGSize = ivec2(160, 128);
