@@ -226,7 +226,6 @@ ModelManifest.xml
 rom/
 Test/
 TestResults/*
-TestROMs/*
 
 #generated files
 GBemu/resources/resources.h
