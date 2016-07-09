@@ -39,7 +39,12 @@ ShaderProgram::ShaderProgram(const char *name)
 
 ShaderProgram::~ShaderProgram()
 {
-	Clean();
+	try {
+		Clean();
+	}
+	catch (GraphicsException &) {
+
+	}
 	if (_name != nullptr) {
 		delete _name;
 		_name = nullptr;

@@ -305,7 +305,6 @@ void MainFrame::LoadEmulator(std::string &fileName)
 		throw;
 	}
 	
-
 	// Loading the rom in memory
 	Log(Message, "Loading the ROM in memory");
 
@@ -313,6 +312,8 @@ void MainFrame::LoadEmulator(std::string &fileName)
 	wxFFile romFile(fileName, "rb");
 	if (!romFile.IsOpened()) {
 		Log(Error, "Could not open the ROM file '%s'", fileName.c_str());
+		wxMessageBox(wxString::Format(_("Could not open the ROM file '%s'"), fileName.c_str()),
+			_("File not found"), wxOK | wxICON_ERROR, this);
 		emu->ReleaseEmulator(handle);
 		return;
 	}

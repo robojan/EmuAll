@@ -133,7 +133,6 @@ private:
 	CounterPtr<BufferObject> _mainRegistersBO;
 	CounterPtr<Texture3D> _mainPaletteData;
 	CounterPtr<FrameBuffer> _mainFrameBuffer[5];
-	VertexArrayObject *_mainVao;
 	DrawingInfoData_t _mainDrawingRegisters[SCREEN_HEIGHT];
 
 	// Palette drawing

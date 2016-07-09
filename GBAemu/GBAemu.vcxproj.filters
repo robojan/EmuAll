@@ -125,19 +125,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\palette.vert.glsl">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="resources\palette.frag.glsl">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="resources\tiles.vert.glsl">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="resources\oam.frag.glsl">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="resources\oam.vert.glsl">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="resources\bg.frag.glsl">
@@ -186,6 +177,9 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="resources\grid.vert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="resources\screenrect.vert.glsl">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

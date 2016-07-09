@@ -241,9 +241,8 @@
     <None Include="resources\mainObj.geo.glsl" />
     <None Include="resources\mainObj.vert.glsl" />
     <None Include="resources\oam.frag.glsl" />
-    <None Include="resources\oam.vert.glsl" />
     <None Include="resources\palette.frag.glsl" />
-    <None Include="resources\palette.vert.glsl" />
+    <None Include="resources\screenrect.vert.glsl" />
     <CustomBuild Include="resources\tiles.frag.glsl">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -271,9 +270,6 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </Outputs>
     </CustomBuild>
-    <None Include="resources\tiles.vert.glsl">
-      <FileType>Document</FileType>
-    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

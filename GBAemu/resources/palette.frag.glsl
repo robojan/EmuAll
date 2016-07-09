@@ -1,33 +1,32 @@
-#version 330 core
+#line 2 3
 
 // Input 
-in vec2 uv;
-
-// Uniform data
-uniform sampler2D paletteData;
-uniform vec2 windowSize;
-uniform bool objPalette;
+in vec2 fPos;
 
 // Output
-out vec4 resultColor;
+out vec4 fragColor;
+
+// Uniform data
+uniform bool objectPalette;
+uniform int lineNr;
 
 // constants
-const float lineWidth = 0.5;
+const float lineWidth = 1.0;
 const vec3 lineColor = vec3(0.9, 0.9, 0.9);
 
 void main() {
-	// 16*16 pixel display
-	vec2 pos = uv / vec2(1.0, 2.0);
-	vec2 offset = vec2(0.0, 0.0);
-	if (objPalette) offset.y = 0.5;
-	vec3 color = texture(paletteData, pos + offset).rgb;
+	// 16 x 16 
+	fragColor = vec4(lineColor, 1.0);
+	vec2 lineSize = (lineWidth / screenSize);
 
-	vec2 pixelSize = vec2(1.0, 1.0) / windowSize;
-	vec2 paletteSize = textureSize(paletteData, 0);
-	vec2 invPaletteSize = vec2(1.0, 1.0) / paletteSize;
-	vec2 pixelPos = mod(pos, invPaletteSize);
-	vec2 distance2D = min(pixelPos - vec2(0.0, 0.0), invPaletteSize - pixelPos);
+	vec2 globalPos = mod(fPos * 16.0, 1.0);
+	vec2 distEdge = min(globalPos, vec2(1.0, 1.0) - globalPos);
+	if (all(greaterThan(distEdge, lineSize * 8.0))) {
+		ivec2 palettePos = ivec2(fPos * 16.0);
+		int paletteId = palettePos.x + palettePos.y * 16;
+		if (objectPalette) paletteId += 256;
 
-	resultColor.rgb = (distance2D.x <= lineWidth * pixelSize.x || distance2D.y <= lineWidth * pixelSize.y) ? lineColor : color;
-	resultColor.a = 1.0;
+		vec3 color = getPaletteColor(uint(paletteId), lineNr);
+		fragColor = vec4(color, 1.0);
+	}
 }

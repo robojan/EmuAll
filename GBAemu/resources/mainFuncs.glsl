@@ -176,3 +176,44 @@ ivec2 GetObjectSize(uint attr0, uint attr1) {
 	}
 }
 
+int GetObjectTileAddress(int lineNr, int tileId) {
+	return lineNr * 96 * 1024 + 0x10000 + tileId * 32;
+}
+
+int GetObjectAttributeAddress(int lineNr, int object) {
+	return lineNr * 1024/2 + object * 4;
+}
+
+int GetObjectTileId(uint attr2) {
+	return int(attr2 & 0x3FFu);
+}
+
+int GetObjectPalette(uint attr2) {
+	return int(attr2 >> 12) & 0xF;
+}
+
+ivec2 GetObjectPos(uint attr0, uint attr1) {
+	return ivec2(int(attr1) & 0x1FF, int(attr0) & 0xFF);
+}
+
+bool IsObjectHFlip(uint attr1) {
+	return (attr1 & 0x1000u) != 0u;
+}
+
+bool IsObjectVFlip(uint attr1) {
+	return (attr1 & 0x2000u) != 0u;
+}
+
+bool IsObjectLargePalette(uint attr0) {
+	return (attr0 & 0x2000u) != 0u;
+}
+
+mat2 GetObjectAffineMatrix(int lineNr, int idx) {
+	int baseAddr = lineNr * 1024 / 2 + 3;
+	uint PA = texelFetch(oamData, baseAddr + (idx * 4 + 0) * 4).r;
+	uint PB = texelFetch(oamData, baseAddr + (idx * 4 + 1) * 4).r;
+	uint PC = texelFetch(oamData, baseAddr + (idx * 4 + 2) * 4).r;
+	uint PD = texelFetch(oamData, baseAddr + (idx * 4 + 3) * 4).r;
+	return mat2(float(PA) / 256.0, float(PB) / 256.0,
+		float(PC) / 256.0, float(PD) / 256.0);
+}
