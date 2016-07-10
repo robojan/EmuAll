@@ -73,6 +73,13 @@ void main() {
 	int lineNr = int((1.0 - fUV.y) * screenSize.y);
 	ivec2 pos = ivec2(int(fUV.x * screenSize.x), lineNr);
 
+	// Forced blanking
+	if ((dataRegisters[lineNr].dispcnt & 0x80) != 0) {
+		gl_FragDepth = 0.0;
+		fragColor = vec4(1.0, 1.0, 1.0, 1.0);
+		return;
+	}
+
 	// Determine which window we are in 
 	bool windowsEnabled = AreWindowsEnabled(lineNr);
 	bvec4 bgEnabledMask = bvec4(true);
