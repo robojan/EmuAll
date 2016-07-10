@@ -34,6 +34,7 @@ public:
 	MainFrame(const wxString &title, const wxPoint &pos, const wxSize &size);
 	~MainFrame();
 	void Update();
+	void DrawNow(int id);
 
 private:
 
@@ -63,6 +64,7 @@ private:
 	std::string _saveStateFilePath;
 	AudioManager _audio;
 	InputMaster _inputHandler;
+	bool _screenAutoRefresh;
 
 	std::vector<AudioCallbackData> _audioCBData;
 

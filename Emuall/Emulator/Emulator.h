@@ -95,6 +95,7 @@ typedef struct {
 	std::string aboutInfo;
 	std::vector <EmulatorScreen_t> screens;
 	int numAudioStreams;
+	bool screenAutoRefresh;
 } EmulatorInfo_t;
 
 class EmulatorInterface

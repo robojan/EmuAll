@@ -10,10 +10,14 @@
 
 IMPLEMENT_APP(EmuAll);
 
-
+MainFrame *EmuAll::_mainFrame = nullptr;
 
 bool EmuAll::OnInit()
 {
+	if (_mainFrame != nullptr) {
+		delete _mainFrame;
+		_mainFrame = nullptr;
+	}
 	// Start the program
 	_mainFrame = new MainFrame(_("EmuAll"), wxDefaultPosition, wxSize(400,300));
 	_mainFrame->Show(true);
@@ -34,6 +38,12 @@ int EmuAll::OnExit()
 #ifdef _WIN32
 	timeEndPeriod(1000);
 #endif
+
 	return 0;
+}
+
+MainFrame * EmuAll::GetMainFrame()
+{
+	return _mainFrame;
 }
 

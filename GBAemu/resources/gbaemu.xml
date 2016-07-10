@@ -4,6 +4,7 @@
   <description>Gameboy Advance Emulator.</description>
   <about>Gameboy Advance Emulator made by Robbert-Jan "robojan" de Jager.</about>
   <fileFilter>*.gba</fileFilter>
+  <automaticScreenRefresh>false</automaticScreenRefresh>
   <screen id="0" contextShare="0">
     <width>240</width>
     <height>160</height>

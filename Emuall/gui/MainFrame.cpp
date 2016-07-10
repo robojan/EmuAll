@@ -14,6 +14,7 @@
 #include "IdList.h"
 #include "GLPane.h"
 #include "../Emulator/SaveFile.h"
+#include "../emuAll.h"
 
 BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_MENU(ID_Main_File_quit, MainFrame::OnQuit)
@@ -42,8 +43,13 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_CLOSE(MainFrame::OnClose)
 END_EVENT_TABLE()
 
+void DrawFrameEmulatorCallback(int id) {
+	MainFrame *mf = EmuAll::GetMainFrame();
+	mf->DrawNow(id);
+}
+
 MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &size) :
-	wxFrame(NULL, ID_MainFrame, title, pos, size)
+	wxFrame(NULL, ID_MainFrame, title, pos, size), _screenAutoRefresh(true)
 {	
 	_bar = NULL;
 	_menFile = NULL;
@@ -59,6 +65,7 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
 	_emulator.handle = NULL;
 	_emulators = NULL;
 	_inputOptionsFrame = NULL;
+	
 
 	// Constructor
 	_logger = new wxLogWindow(this, _("Debug Log"), false, false);
@@ -257,6 +264,7 @@ void MainFrame::LoadEmulator(std::string &fileName)
 	// Loading the callback functions
 	callBackfunctions_t callback;
 	callback.Log = Log;
+	callback.DrawFrame = DrawFrameEmulatorCallback;
 	
 	// set current context
 	_display->SetCurrentContext();
@@ -270,6 +278,7 @@ void MainFrame::LoadEmulator(std::string &fileName)
 	}
 
 	EmulatorInfo_t info = emu->GetInfo();
+	_screenAutoRefresh = info.screenAutoRefresh;
 
 	try {
 		// Init the display
@@ -472,7 +481,12 @@ void MainFrame::RunEmulator(uint32_t deltaTime)
 	}
 	try {
 		_audio.Tick();
-		_display->Refresh();
+		if (_screenAutoRefresh) {
+			_display->Refresh();
+		}
+		else if(_emulator.emu == nullptr || !_emulator.emu->IsRunning(_emulator.handle)){
+			_display->DrawGUI();
+		}
 	}
 	catch (BaseException &e) {
 		Log(Error, "BaseException caught: %s\nStacktrace:\n%s", e.GetMsg(), e.GetStacktrace());
@@ -510,6 +524,11 @@ void MainFrame::Update()
 	else {
 		_menFile->SetLabel(ID_Main_File_run, _("&Run\tCtrl+R"));
 	}
+}
+
+void MainFrame::DrawNow(int id)
+{
+	_display->Refresh();
 }
 
 void MainFrame::OnClose(wxCloseEvent &evt)

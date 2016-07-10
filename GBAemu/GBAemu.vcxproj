@@ -215,6 +215,7 @@
     <ClInclude Include="include\GBAemu\cpu\disassembler.h" />
     <ClInclude Include="include\GBAemu\cpu\hostInstructions.h" />
     <ClInclude Include="include\GBAemu\defines.h" />
+    <ClInclude Include="include\GBAemu\emuallApi.h" />
     <ClInclude Include="include\GBAemu\gba.h" />
     <ClInclude Include="include\GBAemu\gpu\gpu.h" />
     <ClInclude Include="include\GBAemu\memory\memory.h" />

@@ -15,6 +15,7 @@
 #include "resources/resources.h"
 
 void(*Log)(enum loglevel, char *, ...);
+void(*DrawFrame)(int id);
 
 void __stdcall InitPlugin()
 {
@@ -57,6 +58,7 @@ void __stdcall ReleaseEmulator(EMUHANDLE handle) {
 int32_t __stdcall Init(EMUHANDLE handle, callBackfunctions_t funcs) {
 	Gba *emulator = reinterpret_cast<Gba *>(handle);
 	Log = funcs.Log;
+	DrawFrame = funcs.DrawFrame;
 	if (emulator == nullptr)
 		return 0;
 	return emulator->Init();

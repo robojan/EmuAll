@@ -111,6 +111,7 @@ EmulatorInfo_t EmulatorInterface::GetInfo() const
 	info.description = _root.child_value("description");
 	info.fileFilterString = _root.child_value("fileFilter");
 	info.aboutInfo = _root.child_value("about");
+	info.screenAutoRefresh = _root.child("automaticScreenRefresh").text().as_bool(true);
 	for (pugi::xml_node screen = _root.child("screen"); screen; screen = screen.next_sibling("screen")) {
 		EmulatorScreen_t screenInfo;
 		screenInfo.id = screen.attribute("id").as_int(-1);		

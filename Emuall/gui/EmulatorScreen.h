@@ -29,13 +29,13 @@ public:
 	void SetPostProcessingFilter(Filter filter);
 
 	void ShowMessage(const wxString &message);
+	void DrawGUI();
 
 protected:
 	virtual void Render(wxPaintEvent &evt);
 
 private:
 	void Create();
-
 	bool _initialized;
 	int _width;
 	int _height;

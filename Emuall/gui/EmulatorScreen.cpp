@@ -253,3 +253,8 @@ void EmulatorScreen::Render(wxPaintEvent &evt)
 
 	SwapBuffers();
 }
+
+void EmulatorScreen::DrawGUI()
+{
+	Refresh();
+}

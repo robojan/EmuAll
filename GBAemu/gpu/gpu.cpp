@@ -8,6 +8,7 @@
 #include <GBAemu/util/preprocessor.h>
 #include <GBAemu/util/log.h>
 #include <GBAemu/util/FixedPointGBA.h>
+#include <GBAemu/emuallApi.h>
 
 #include <emuall/graphics/graphicsException.h>
 
@@ -227,6 +228,7 @@ void Gpu::VBlank()
 		if (_mainRegistersBO.GetRefCount() > 0) {
 			_mainRegistersBO->BufferSubData(0, sizeof(_mainDrawingRegisters), _mainDrawingRegisters);
 		}
+		DrawFrame(0);
 	}
 	catch (GraphicsException &e) {
 		Log(Error, "Error while updating graphics memory in vblank: %s\nStacktrace: %s", e.GetMsg(), e.GetStacktrace());

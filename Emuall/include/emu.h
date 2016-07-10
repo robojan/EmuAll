@@ -22,6 +22,7 @@ typedef void *EMUHANDLE;
 typedef struct
 {
 	void (*Log)(enum loglevel, char *, ...);
+	void(*DrawFrame)(int id);
 } callBackfunctions_t;
 
 typedef struct
