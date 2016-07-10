@@ -55,7 +55,7 @@ void GenerateObjects(int lineNr) {
 
 		int priority = int((attr2 >> 10u) & 0x3u);		
 
-		float depth = float(3 - priority) + 0.75 + 128.0 / (4.0 * 129.0);
+		float depth = float(3 - priority) + 0.75 + float(127 - i) / (4.0 * 128.0);
 		depth = (depth + 1.0) / 5.0;
 
 		bool hFlip, vFlip;

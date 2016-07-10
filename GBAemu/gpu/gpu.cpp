@@ -274,6 +274,9 @@ void Gpu::HBlank()
 		_mainDrawingRegisters[_vcount].windim[1].y2 = (IOREG16(registers, WIN1V) >> 0) & 0xFF;
 		_mainDrawingRegisters[_vcount].winCnt.winin = IOREG16(registers, WININ);
 		_mainDrawingRegisters[_vcount].winCnt.winout = IOREG16(registers, WINOUT);
+		_mainDrawingRegisters[_vcount].effects.bldcnt = IOREG16(registers, BLDCNT);
+		_mainDrawingRegisters[_vcount].effects.bldalpha = IOREG16(registers, BLDALPHA);
+		_mainDrawingRegisters[_vcount].effects.bldy = IOREG16(registers, BLDY);
 		// Upload VRAM memory to gpu
 		try {
 			if (_mainVramBT.GetRefCount() > 0) {

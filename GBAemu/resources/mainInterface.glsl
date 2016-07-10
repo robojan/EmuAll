@@ -14,6 +14,7 @@ struct Registers {
 	vec4 bgAffineMatrix[2];
 	ivec4 windim[2];
 	ivec2 wincnt;
+	ivec3 effects;
 };
 
 layout(std140) uniform DrawingRegisters{

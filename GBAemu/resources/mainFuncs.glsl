@@ -247,3 +247,6 @@ bool IsInsideWindow(int lineNr, ivec2 pos, int window) {
 	return all(greaterThan(pos, TL)) && all(lessThan(pos, BR));
 }
 
+int GetEffectMode(int lineNr) {
+	return ((dataRegisters[lineNr].effects.x >> 6) & 3);
+}

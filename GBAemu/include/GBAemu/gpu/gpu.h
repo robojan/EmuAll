@@ -123,6 +123,12 @@ private:
 			int winout;
 			int pad0[2];
 		} winCnt;
+		struct {
+			int bldcnt;
+			int bldalpha;
+			int bldy;
+			int pad0;
+		} effects;
 	} DrawingInfoData_t;
 	// Main drawing
 	bool _mainInitialized;
