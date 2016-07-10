@@ -68,9 +68,16 @@ void main() {
 
 	switch (GetObjectMode(fAttr.x)) {
 	case 0:
-	case 1:
 	case 3:
 		fragColor = color;
+		break;
+	case 1:
+		if (maskDrawing) {
+			fragColor = vec4(0.0, 1.0, 0.0, 1.0);
+		}
+		else {
+			fragColor = color;
+		}
 		break;
 	case 2:
 		fragColor = vec4(1.0, 0.0, 0.0, 1.0);

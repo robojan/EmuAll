@@ -29,7 +29,12 @@ struct LayerData {
 
 bool IsInsideObjectWindow() {
 	vec4 t = texture(objectLayerMask, fUV);
-	return t.x == 1.0;
+	return t.r == 1.0;
+}
+
+bool IsObjectSemiTrans() {
+	vec4 t = texture(objectLayerMask, fUV);
+	return t.g == 1.0;
 }
 
 void SortLayers(inout LayerData data[5]) {
@@ -154,33 +159,43 @@ void main() {
 
 	for (int i = 0; i < 5; i++) {
 		if (layers[i].type != BACKDROP && layers[i].color.a > 0.0) {
-			if (specialEffectMask && IsEffectActive(lineNr, type, layers[i].type)) {
-				switch (GetEffectMode(lineNr)) {
-				case 1: {
-					int bldalpha = dataRegisters[lineNr].effects.y;
-					float eva = min(1.0, float(bldalpha & 0x1f) / 16.0);
-					float evb = min(1.0, float((bldalpha >> 8) & 0x1f) / 16.0);
-					color = min(vec4(1.0, 1.0, 1.0, 1.0), layers[i].color * eva + color * evb);
-					break;
-				}
-				case 2: {
-					int bldy = dataRegisters[lineNr].effects.z;
-					float evy = min(1.0, float(bldy & 0x1f) / 16.0);
-					vec3 effColor = layers[i].color.rgb + (vec3(1.0) - layers[i].color.rgb) * evy;
-					color = vec4(min(vec3(1.0),effColor), layers[i].color.a);
-					break;
-				}
-				case 3: {
-					int bldy = dataRegisters[lineNr].effects.z;
-					float evy = min(1.0, float(bldy & 0x1f) / 16.0);
-					vec3 effColor = layers[i].color.rgb - layers[i].color.rgb * evy;
-					color = vec4(max(vec3(0.0), effColor), layers[i].color.a);
-					break;
-				}
-				}
+			int bldcnt = dataRegisters[lineNr].effects.x;
+			if (layers[i].type == OBJ && IsObjectSemiTrans() && ((bldcnt & (1 << (type + 8))) != 0))
+			{
+				int bldalpha = dataRegisters[lineNr].effects.y;
+				float eva = min(1.0, float(bldalpha & 0x1f) / 16.0);
+				float evb = min(1.0, float((bldalpha >> 8) & 0x1f) / 16.0);
+				color = min(vec4(1.0, 1.0, 1.0, 1.0), layers[i].color * eva + color * evb);
 			}
 			else {
-				color = layers[i].color;
+				if (specialEffectMask && IsEffectActive(lineNr, type, layers[i].type)) {
+					switch (GetEffectMode(lineNr)) {
+					case 1: {
+						int bldalpha = dataRegisters[lineNr].effects.y;
+						float eva = min(1.0, float(bldalpha & 0x1f) / 16.0);
+						float evb = min(1.0, float((bldalpha >> 8) & 0x1f) / 16.0);
+						color = min(vec4(1.0, 1.0, 1.0, 1.0), layers[i].color * eva + color * evb);
+						break;
+					}
+					case 2: {
+						int bldy = dataRegisters[lineNr].effects.z;
+						float evy = min(1.0, float(bldy & 0x1f) / 16.0);
+						vec3 effColor = layers[i].color.rgb + (vec3(1.0) - layers[i].color.rgb) * evy;
+						color = vec4(min(vec3(1.0), effColor), layers[i].color.a);
+						break;
+					}
+					case 3: {
+						int bldy = dataRegisters[lineNr].effects.z;
+						float evy = min(1.0, float(bldy & 0x1f) / 16.0);
+						vec3 effColor = layers[i].color.rgb - layers[i].color.rgb * evy;
+						color = vec4(max(vec3(0.0), effColor), layers[i].color.a);
+						break;
+					}
+					}
+				}
+				else {
+					color = layers[i].color;
+				}
 			}
 			depth = layers[i].depth;
 			type = layers[i].type;

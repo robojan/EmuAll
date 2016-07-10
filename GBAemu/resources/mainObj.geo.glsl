@@ -48,7 +48,7 @@ void GenerateObjects(int lineNr) {
 		int objMode = GetObjectMode(attr0);
 
 		if (!IsObjectEnabled(attr0) || (objY < 0 || objY >= objectSize.y * objSizeModifier) ||
-			(objMode == 2 && !maskDrawing) || (objMode != 2 && maskDrawing)) {
+			(objMode == 2 && !maskDrawing) || (objMode == 0 && maskDrawing)) {
 			continue;
 		}
 		
