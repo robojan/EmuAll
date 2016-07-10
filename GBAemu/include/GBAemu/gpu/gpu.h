@@ -109,10 +109,8 @@ private:
 		struct {
 			float a;
 			float b;
-			int pad0[2];
 			float c;
 			float d; 
-			int pad1[2];
 		} bgAffineMatrix[2];
 		struct {
 			int x1;
@@ -143,7 +141,7 @@ private:
 	CounterPtr<BufferTexture> _mainOamBT;
 	CounterPtr<BufferObject> _mainRegistersBO;
 	CounterPtr<Texture3D> _mainPaletteData;
-	CounterPtr<FrameBuffer> _mainFrameBuffer[5];
+	CounterPtr<FrameBuffer> _mainFrameBuffer[6];
 	DrawingInfoData_t _mainDrawingRegisters[SCREEN_HEIGHT];
 
 	// Palette drawing

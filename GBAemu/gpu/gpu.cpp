@@ -418,6 +418,10 @@ bool Gpu::InitMainGL()
 				_mainFrameBuffer[i]->AttachDepthTexture();
 			}
 		}
+		_mainFrameBuffer[5].IncRef(SCREEN_WIDTH, SCREEN_HEIGHT);
+		if (_mainFrameBuffer[5].GetRefCount() == 1) {
+			_mainFrameBuffer[5]->AttachColorBuffer(0);
+		}
 
 		GL_CHECKED(glClearDepth(0));
 	}
@@ -608,7 +612,6 @@ void Gpu::DrawMain()
 		}
 
 		// Draw objects layer
-		_mainFrameBuffer[4]->Begin();
 		DrawMainObjGL();
 
 		// restore framebuffer
@@ -640,7 +643,6 @@ void Gpu::DrawMainBGGL(int background)
 
 void Gpu::DrawMainObjGL()
 {
-	GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 	GL_CHECKED(glEnable(GL_DEPTH_TEST));
 	GL_CHECKED(glDepthFunc(GL_GEQUAL));
 	GL_CHECKED(glClearColor(0.0, 0.0, 0.0, 0.0));
@@ -650,6 +652,16 @@ void Gpu::DrawMainObjGL()
 
 	SetupShaderInterface(*_mainObjShader);
 
+	// Draw objects
+	_mainFrameBuffer[4]->Begin();
+	GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+	_mainObjShader->SetUniform("maskDrawing", 0);
+	GL_CHECKED(glDrawArrays(GL_POINTS, 0, SCREEN_HEIGHT + 1));
+
+	// Draw object window mask
+	_mainFrameBuffer[5]->Begin();
+	GL_CHECKED(glClear(GL_COLOR_BUFFER_BIT));
+	_mainObjShader->SetUniform("maskDrawing", 1);
 	GL_CHECKED(glDrawArrays(GL_POINTS, 0, SCREEN_HEIGHT + 1));
 	
 	_mainObjVao->End();
@@ -675,6 +687,7 @@ void Gpu::DrawMainMix()
 	_mainMixShader->SetUniform("backgroundDepth[3]", 10, _mainFrameBuffer[3]->GetDepthTexture());
 	_mainMixShader->SetUniform("objectLayer", 11, _mainFrameBuffer[4]->GetColorBuffer(0));
 	_mainMixShader->SetUniform("objectLayerDepth", 12, _mainFrameBuffer[4]->GetDepthTexture());
+	_mainMixShader->SetUniform("objectLayerMask", 13, _mainFrameBuffer[5]->GetColorBuffer(0));
 
 	GL_CHECKED(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
 

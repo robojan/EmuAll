@@ -98,8 +98,10 @@ mat2 GetBackgroundAffineMatrix(int background, int lineNr) {
 	if (background < 2) {
 		return mat2(1.0);
 	}
-	return dataRegisters[lineNr].bgAffineMatrix[background - 2];
+	//return dataRegisters[lineNr].bgAffineMatrix[background - 2];
 	//return mat2(1.0);
+	vec4 mat = dataRegisters[lineNr].bgAffineMatrix[background - 2];
+	return mat2(mat.xy, mat.zw);
 }
 
 float GetBackgroundDepth(int background, int lineNr) {
@@ -222,6 +224,10 @@ mat2 GetObjectAffineMatrix(int lineNr, uint attr1) {
 	uint PD = texelFetch(oamData, baseAddr + (idx * 4 + 3) * 4).r;
 	return mat2(float(PA) / 256.0, float(PB) / 256.0,
 		float(PC) / 256.0, float(PD) / 256.0);
+}
+
+int GetObjectMode(uint attr0) {
+	return int((attr0 >> 10u) & 0x3u);
 }
 
 bool AreWindowsEnabled(int lineNr) {

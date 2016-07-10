@@ -14,6 +14,7 @@ flat out uvec3 fAttr;
 out vec2 fPixelPos;
 
 // uniforms
+uniform bool maskDrawing;
 
 int GetObjectY(int lineNr, int posY, int sizeY) {
 	if (sizeY >= 128 && posY > 128) {
@@ -44,14 +45,17 @@ void GenerateObjects(int lineNr) {
 		ivec2 objectSize = GetObjectSize(attr0, attr1);
 
 		int objY = GetObjectY(lineNr, pos.y, objectSize.y * objSizeModifier);
+		int objMode = GetObjectMode(attr0);
 
-		if (!IsObjectEnabled(attr0) || (objY < 0 || objY >= objectSize.y * objSizeModifier)) {
+		if (!IsObjectEnabled(attr0) || (objY < 0 || objY >= objectSize.y * objSizeModifier) ||
+			(objMode == 2 && !maskDrawing) || (objMode != 2 && maskDrawing)) {
 			continue;
 		}
 		
-		int priority = int((attr2 >> 10u) & 0x3u);
 
-		float depth = float(3 - priority) + 0.75 + float(127 - i) / (4.0 * 128);
+		int priority = int((attr2 >> 10u) & 0x3u);		
+
+		float depth = float(3 - priority) + 0.75 + 128.0 / (4.0 * 129.0);
 		depth = (depth + 1.0) / 5.0;
 
 		bool hFlip, vFlip;

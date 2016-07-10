@@ -10,8 +10,10 @@ in vec2 fPixelPos;
 out vec4 fragColor;
 
 // Uniforms
+uniform bool maskDrawing;
 
 void main() {
+	vec4 color;
 	ivec2 objSize = GetObjectSize(fAttr.x, fAttr.y);
 	ivec2 pixelPos = ivec2(fPixelPos);
 	if (fRSMode != 0) { // Rotate scale mode
@@ -44,7 +46,7 @@ void main() {
 		int address = GetObjectTileAddress(fLineNr, baseTileId + tileOffset) + innerId;
 		uint data = texelFetch(vramData, address).r;
 		if (data == 0u) discard;
-		fragColor = vec4(getPaletteColor(data + 256u, fLineNr), 1.0);
+		color = vec4(getPaletteColor(data + 256u, fLineNr), 1.0);
 	}
 	else {
 		int tileOffset;
@@ -61,6 +63,17 @@ void main() {
 		data &= 0xFu;
 		if (data == 0u) discard;
 		int paletteId = GetObjectPalette(fAttr.z);
-		fragColor = vec4(getPaletteColor(data + 256u + uint(paletteId * 16), fLineNr), 1.0);
+		color = vec4(getPaletteColor(data + 256u + uint(paletteId * 16), fLineNr), 1.0);
+	}
+
+	switch (GetObjectMode(fAttr.x)) {
+	case 0:
+	case 1:
+	case 3:
+		fragColor = color;
+		break;
+	case 2:
+		fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+		break;
 	}
 }

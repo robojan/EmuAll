@@ -10,7 +10,8 @@ struct Registers {
 	ivec4 bgCnt;
 	ivec2 bgOfs[4];
 	vec2 bgRefPoint[2];
-	mat2 bgAffineMatrix[2];
+	// bug in glsl compiler when using mat2 and nsight debugger
+	vec4 bgAffineMatrix[2];
 	ivec4 windim[2];
 	ivec2 wincnt;
 };

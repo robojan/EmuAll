@@ -11,6 +11,7 @@ uniform sampler2D background[4];
 uniform sampler2D backgroundDepth[4];
 uniform sampler2D objectLayer;
 uniform sampler2D objectLayerDepth;
+uniform sampler2D objectLayerMask;
 
 // defines
 #define BACKDROP 0
@@ -20,8 +21,9 @@ uniform sampler2D objectLayerDepth;
 #define BG3 4
 #define OBJ 5
 
-bool IsInsideObjectWindow(ivec2 pos) {
-	return false;
+bool IsInsideObjectWindow() {
+	vec4 t = texture(objectLayerMask, fUV);
+	return t.x == 1.0;
 }
 
 void main() {
@@ -60,7 +62,7 @@ void main() {
 			objEnabledMask = (winin & 0x1000) != 0;
 			specialEffectMask = (winin & 0x2000) != 0;
 		} 
-		else if (IsInsideObjectWindow(pos) && IsWindowEnabled(lineNr, 2)) {
+		else if (IsInsideObjectWindow() && IsWindowEnabled(lineNr, 2)) {
 			// Object window
 			bgEnabledMask = bvec4(
 				(winout & 0x0100) != 0,
