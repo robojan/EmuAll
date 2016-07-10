@@ -1,3 +1,4 @@
+#line 2 1
 
 int GetMode(int lineNr) {
 	return dataRegisters[lineNr].dispcnt & 0x7;
@@ -222,3 +223,21 @@ mat2 GetObjectAffineMatrix(int lineNr, uint attr1) {
 	return mat2(float(PA) / 256.0, float(PB) / 256.0,
 		float(PC) / 256.0, float(PD) / 256.0);
 }
+
+bool AreWindowsEnabled(int lineNr) {
+	return (dataRegisters[lineNr].dispcnt & (0xE000)) != 0;
+}
+
+bool IsWindowEnabled(int lineNr, int window) {
+	return (dataRegisters[lineNr].dispcnt & (1 << (13 + window))) != 0;
+}
+
+bool IsInsideWindow(int lineNr, ivec2 pos, int window) {
+	ivec4 winDim = dataRegisters[lineNr].windim[window];
+	ivec2 TL = winDim.xy;
+	ivec2 BR = winDim.zw;
+	if (BR.x > 240 || TL.x > BR.x) BR.x = 240;
+	if (BR.y > 160 || TL.y > BR.y) BR.y = 160;
+	return all(greaterThan(pos, TL)) && all(lessThan(pos, BR));
+}
+

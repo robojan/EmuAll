@@ -114,6 +114,17 @@ private:
 			float d; 
 			int pad1[2];
 		} bgAffineMatrix[2];
+		struct {
+			int x1;
+			int y1;
+			int x2;
+			int y2;
+		} windim[2];
+		struct {
+			int winin;
+			int winout;
+			int pad0[2];
+		} winCnt;
 	} DrawingInfoData_t;
 	// Main drawing
 	bool _mainInitialized;

@@ -264,6 +264,16 @@ void Gpu::HBlank()
 		_mainDrawingRegisters[_vcount].bgAffineMatrix[1].b = GetFixedPoint16(IOREG16(registers, BG3PB));
 		_mainDrawingRegisters[_vcount].bgAffineMatrix[1].c = GetFixedPoint16(IOREG16(registers, BG3PC));
 		_mainDrawingRegisters[_vcount].bgAffineMatrix[1].d = GetFixedPoint16(IOREG16(registers, BG3PD));
+		_mainDrawingRegisters[_vcount].windim[0].x1 = (IOREG16(registers, WIN0H) >> 8) & 0xFF;
+		_mainDrawingRegisters[_vcount].windim[0].x2 = (IOREG16(registers, WIN0H) >> 0) & 0xFF;
+		_mainDrawingRegisters[_vcount].windim[0].y1 = (IOREG16(registers, WIN0V) >> 8) & 0xFF;
+		_mainDrawingRegisters[_vcount].windim[0].y2 = (IOREG16(registers, WIN0V) >> 0) & 0xFF;
+		_mainDrawingRegisters[_vcount].windim[1].x1 = (IOREG16(registers, WIN1H) >> 8) & 0xFF;
+		_mainDrawingRegisters[_vcount].windim[1].x2 = (IOREG16(registers, WIN1H) >> 0) & 0xFF;
+		_mainDrawingRegisters[_vcount].windim[1].y1 = (IOREG16(registers, WIN1V) >> 8) & 0xFF;
+		_mainDrawingRegisters[_vcount].windim[1].y2 = (IOREG16(registers, WIN1V) >> 0) & 0xFF;
+		_mainDrawingRegisters[_vcount].winCnt.winin = IOREG16(registers, WININ);
+		_mainDrawingRegisters[_vcount].winCnt.winout = IOREG16(registers, WINOUT);
 		// Upload VRAM memory to gpu
 		try {
 			if (_mainVramBT.GetRefCount() > 0) {

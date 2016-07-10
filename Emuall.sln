@@ -20,6 +20,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "resourceCompiler", "resourceCompiler\resourceCompiler.vcxproj", "{A122A494-9AC9-4D75-8CA4-5A6835329F52}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Support", "Support\Support.vcxproj", "{999C80BE-1F93-4F09-AC30-3144524018B2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A122A494-9AC9-4D75-8CA4-5A6835329F52} = {A122A494-9AC9-4D75-8CA4-5A6835329F52}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GBAemu", "GBAemu\GBAemu.vcxproj", "{95A09D6F-156D-465F-A0CF-7B5AAC8057B6}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -27,9 +30,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GBAemu", "GBAemu\GBAemu.vcx
 	EndProjectSection
 EndProject
 Global
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug inline|ARM = Debug inline|ARM
 		Debug inline|Win32 = Debug inline|Win32
