@@ -10,14 +10,15 @@
 #include <GBAemu/util/log.h>
 #include <GBAemu/defines.h>
 #include <GBAemu/gba.h>
+#include <GBAemu/memory/cartridgeStorage.h>
 
 
 Memory::Memory(Gba &gba) :
 	_system(gba), _events(),
 	_dma{{false, false, 0, 0},{ false, false, 0, 0 },{ false, false, 0, 0 } ,{ false, false, 0, 0 } },
 	_bios(nullptr), _wram(nullptr), _chipWram(nullptr), _ioRegisters(nullptr),
-	_pram(nullptr), _vram(nullptr), _oram(nullptr), _sram(nullptr), 
-	_sramLength(0), _rom(nullptr), _romLength(0)
+	_pram(nullptr), _vram(nullptr), _oram(nullptr),
+	_rom(nullptr), _romLength(0), _cartridge(nullptr)
 {
 	// Allocate all the memory buffers
 	_bios = new uint8_t[BIOSSIZE];
@@ -82,6 +83,8 @@ Memory::Memory(Gba &gba) :
 	fread(_bios, 16 * 1024, 1, biosFile);
 	fclose(biosFile);
 
+	SetBiosProtected(0xE129F000);
+
 	// Init registers
 	InitRegisters();
 
@@ -115,11 +118,16 @@ Memory::~Memory()
 		_romLength = 0;
 		_rom = nullptr;
 	}
-	if (_sram != nullptr) {
-		delete[] _sram;
-		_sramLength = 0;
-		_sram = nullptr;
+	if (_cartridge != nullptr) {
+		delete _cartridge;
+		_cartridge = nullptr;
 	}
+}
+
+
+void Memory::SetBiosProtected(uint32_t word)
+{
+	_biosProtected = word;
 }
 
 int Memory::Load(const SaveData_t *data)
@@ -130,10 +138,9 @@ int Memory::Load(const SaveData_t *data)
 		_rom = nullptr;
 		_romLength = 0;
 	}
-	if (_sram != nullptr) {
-		delete[] _sram;
-		_sram = nullptr;
-		_sramLength = 0;
+	if (_cartridge != nullptr) {
+		delete _cartridge;
+		_cartridge = nullptr;
 	}
 
 	// Copy the rom 
@@ -168,21 +175,8 @@ int Memory::Load(const SaveData_t *data)
 		}
 	}
 
-	// Setup SRAM
-	// Assume 64kB TODO: detect in some way
-	_sramLength = 64 * 1024;
-	if (_sramLength > 0) {
-		_sram = new uint8_t[_sramLength];
-		unsigned int ramdataLen = data->ramDataLen;
-		if (ramdataLen > _sramLength) {
-			Log(Error, "SRAM length is larger than 64kB.");
-			ramdataLen = _sramLength;
-		}
-		if (ramdataLen > 0) {
-			memcpy(_sram, data->ramData, ramdataLen);
-		}
-	}
-
+	_cartridge = DetectStorageChip();
+	
 	return 1;
 }
 
@@ -270,7 +264,12 @@ bool Memory::IsDMAActive() const
 uint8_t Memory::Read8(uint32_t address)
 {
 	uint8_t index = (address >> 24) & 0xF;
-	address &= _memMask[index];
+	if (index >= 0xD) {
+		return _cartridge->Read8(address);
+	}
+	if (index == 0 && !_system.GetCpu().IsInBios()) {
+		return (_biosProtected >> (8 * (address & 3))) & 0xFF;
+	}
 	if (_memmap[index] == nullptr) {
 		// Comment from gbxemu source
 		// reads beyond the ROM data seem to be filled with:
@@ -278,9 +277,8 @@ uint8_t Memory::Read8(uint32_t address)
 		// 0xx20000: 0000 0001 0002 .. FFFF: 0xx3FFFE
 		// (Incrementing 16 bit values, mirrored each 128 KiB)
 		// [Verified on EZ-Flash IV]
-		if (index >= 8 && index <= 0xd) {
-			// cartridge 
-			
+		if (index >= 8) {
+			// cartridge 			
 			int value = (address & 0x1FFFE) >> 1;
 			if ((address & 1) != 0) {
 				return (value >> 8) & 0xFF;
@@ -289,54 +287,65 @@ uint8_t Memory::Read8(uint32_t address)
 				return value & 0xFF;
 			}
 		}
-		throw DataAbortARMException();
+		throw DataAbortARMException(address);
 	}
-	return _memmap[index][address];
+	return _memmap[index][address & _memMask[index]];
 }
 
 uint16_t Memory::Read16(uint32_t address)
 {
 	uint8_t index = (address >> 24) & 0xF;
-	address &= _memMask[index];
+	if (index >= 0xD) {
+		return _cartridge->Read16(address);
+	}
+	if (index == 0 && !_system.GetCpu().IsInBios()) {
+		return (_biosProtected >> (16 * (address & 1))) & 0xFFFF;
+	}
 	if (_memmap[index] == nullptr) {
-		if (index >= 8 && index <= 0xd) {
+		if (index >= 8) {
 			// cartridge 
 			return (address & 0x1FFFE) >> 1;
 		}
-		throw DataAbortARMException();
+		throw DataAbortARMException(address);
 	}
-	return *((uint16_t *)&_memmap[index][address]);
+	return *((uint16_t *)&_memmap[index][address & _memMask[index]]);
 }
 
 uint32_t Memory::Read32(uint32_t address)
 {
 	uint8_t index = (address >> 24) & 0xF;
-	address &= _memMask[index];
-	if (_memmap[index] == nullptr) {
-		if (index >= 8 && index <= 0xd) {
-			// cartridge 
-			if (index >= 8 && index <= 0xd) {
-				// cartridge 
-				uint32_t value = (address & 0x1FFFE) >> 1;
-				value |= value << 16;
-				return value;
-			}
-		}
-		throw DataAbortARMException();
+	if (index >= 0xD) {
+		return _cartridge->Read32(address);
 	}
-	return *((uint32_t *)&_memmap[index][address]);
+	if (index == 0 && !_system.GetCpu().IsInBios()) {
+		return _biosProtected;
+	}
+	if (_memmap[index] == nullptr) {
+		// cartridge 
+		if (index >= 8) {
+			// cartridge 
+			uint32_t value = (address & 0x1FFFE) >> 1;
+			value |= value << 16;
+			return value;
+		}
+		throw DataAbortARMException(address);
+	}
+	return *((uint32_t *)&_memmap[index][address & _memMask[index]]);
 }
 
 void Memory::Write8(uint32_t address, uint8_t value, bool event)
 {
 	uint8_t index = (address >> 24) & 0xF;
-	if (_memmap[index] == nullptr) {
-		throw DataAbortARMException();
+	if (index >= 0xD) {
+		_cartridge->Write8(address, value);
 	}
-	if (index == 0 || (index >= 8 && index <= 0xD)) {
-		throw DataAbortARMException();
+	else {
+		if (_memmap[index] == nullptr || index == 0) {
+			Log(Debug, "Illegal write to address 0x%08x, val 0x%08x", address, value);
+			return;
+		}
+		_memmap[index][address & _memMask[index]] = value;
 	}
-	_memmap[index][address & _memMask[index]] = value;
 	if (event) {
 		auto &it = _events.Find(address & ~3);
 		while (it != _events.End()) {
@@ -349,13 +358,16 @@ void Memory::Write8(uint32_t address, uint8_t value, bool event)
 void Memory::Write16(uint32_t address, uint16_t value, bool event)
 {
 	uint8_t index = (address >> 24) & 0xF;
-	if (_memmap[index] == nullptr) {
-		throw DataAbortARMException();
+	if (index >= 0xD) {
+		_cartridge->Write16(address, value);
 	}
-	if (index == 0 || (index >= 8 && index <= 0xD)) {
-		throw DataAbortARMException();
+	else {
+		if (_memmap[index] == nullptr || index == 0) {
+			Log(Debug, "Illegal write to address 0x%08x, val 0x%08x", address, value);
+			return;
+		}
+		*((uint16_t *)&_memmap[index][address & _memMask[index]]) = value;
 	}
-	*((uint16_t *)&_memmap[index][address & _memMask[index]]) = value;
 	if (event) {
 		auto &it = _events.Find(address & ~3);
 		while (it != _events.End()) {
@@ -368,13 +380,16 @@ void Memory::Write16(uint32_t address, uint16_t value, bool event)
 void Memory::Write32(uint32_t address, uint32_t value, bool event)
 {
 	uint8_t index = (address >> 24) & 0xF;
-	if (_memmap[index] == nullptr) {
-		throw DataAbortARMException();
+	if (index >= 0xD) {
+		_cartridge->Write32(address, value);
 	}
-	if (index == 0 || (index >= 8 && index <= 0xD)) {
-		throw DataAbortARMException();
+	else {
+		if (_memmap[index] == nullptr || index == 0) {
+			Log(Debug, "Illegal write to address 0x%08x, val 0x%08x", address, value);
+			return;
+		}
+		*((uint32_t *)&_memmap[index][address & _memMask[index]]) = value;
 	}
-	*((uint32_t *)&_memmap[index][address & _memMask[index]]) = value;
 	if (event) {
 		auto &it = _events.Find(address & ~3);
 		while (it != _events.End()) {
@@ -389,7 +404,7 @@ void Memory::ManagedWrite32(uint32_t address, uint32_t value)
 	uint8_t index = (address >> 24) & 0xF;
 	address &= _memMask[index];
 	if (_memmap[index] == nullptr) {
-		throw DataAbortARMException();
+		throw DataAbortARMException(address);
 	}
 	*((uint32_t *)&_memmap[index][address]) = value;
 }
@@ -397,11 +412,6 @@ void Memory::ManagedWrite32(uint32_t address, uint32_t value)
 uint32_t Memory::GetRomSize()
 {
 	return _romLength;
-}
-
-uint32_t Memory::GetSRAMSize()
-{
-	return _sramLength;
 }
 
 uint8_t Memory::ReadBios8(uint32_t address)
@@ -444,12 +454,6 @@ uint8_t Memory::ReadORAM8(uint32_t address)
 {
 	assert(address < ORAMSIZE);
 	return _oram[address];
-}
-
-uint8_t Memory::ReadSRAM8(uint32_t address)
-{
-	assert(address < _sramLength);
-	return _sram[address];
 }
 
 uint8_t Memory::ReadROM8(uint32_t address)
@@ -511,6 +515,51 @@ void Memory::InitRegisters()
 	RegisterEvent(DMA3CNT_L, this);
 }
 
+
+CartridgeStorage *Memory::DetectStorageChip()
+{
+	Log(Message, "Detecting storage chip");
+	// Detect storage type from nintendo api id's 
+	// EEPROM_Vnnn
+	// SRAM_Vnnn
+	// FLASH_Vnnn
+	// FLASH512_Vnnn
+	// FLASH1M_Vnnn
+	int memorySize = 0;
+	for (unsigned int i = 0; i < _romLength; i++) {
+		char c = (char)_rom[i];
+		if (c == 'E' || c == 'S' || c == 'F') {
+			// check remaining
+			if (memcmp(&_rom[i + 1], "EPROM_V", 7) == 0) {
+				memorySize = 8 * 1024;
+				Log(Message, "EEPROM storage of 8KB assumed found");
+				break;
+			}
+			else if (memcmp(&_rom[i + 1], "RAM_V", 5) == 0) {
+				memorySize = 32 * 1024;
+				Log(Message, "SRAM storage of 32KB found");
+				break;
+			}
+			else if (memcmp(&_rom[i + 1], "LASH_V", 6) == 0) {
+				memorySize = 64 * 1024;
+				Log(Message, "FLASH storage of 64KB found");
+				break;
+			}
+			else if (memcmp(&_rom[i + 1], "LASH512_V", 9) == 0) {
+				memorySize = 64 * 1024;
+				Log(Message, "FLASH storage of 64KB found");
+				break;
+			}
+			else if (memcmp(&_rom[i + 1], "LASH1M_V", 8) == 0) {
+				memorySize = 128 * 1024;
+				Log(Message, "FLASH storage of 128KB found");
+				break;
+			}
+		}
+	}
+	return new CartridgeStorage();
+}
+
 void Memory::HandleEvent(uint32_t address, int size)
 {
 	if (address <= DMA0SAD + 3 && DMA0SAD < address + size) {
@@ -553,6 +602,7 @@ void Memory::HandleEvent(uint32_t address, int size)
 		_dma[0].hasRead = false;
 		if (_dma[0].active) {
 			_dma[0].wc = newCtrl & 0x3FFF;
+			Log(Debug, "DMA %d src: 0x%08x dst: 0x%08x, length: %d", 0, _dma[0].activeSrc, _dma[0].activeDst, _dma[0].wc);
 		}
 		else {
 			_dma[0].wc = 0;
@@ -567,6 +617,7 @@ void Memory::HandleEvent(uint32_t address, int size)
 		_dma[1].hasRead = false;
 		if (_dma[1].active) {
 			_dma[1].wc = newCtrl & 0x3FFF;
+			Log(Debug, "DMA %d src: 0x%08x dst: 0x%08x, length: %d", 1, _dma[1].activeSrc, _dma[1].activeDst, _dma[1].wc);
 		}
 		else {
 			_dma[1].wc = 0;
@@ -581,6 +632,7 @@ void Memory::HandleEvent(uint32_t address, int size)
 		_dma[2].hasRead = false;
 		if (_dma[2].active) {
 			_dma[2].wc = newCtrl & 0x3FFF;
+			Log(Debug, "DMA %d src: 0x%08x dst: 0x%08x, length: %d", 2, _dma[2].activeSrc, _dma[2].activeDst, _dma[2].wc);
 		}
 		else {
 			_dma[2].wc = 0;
@@ -595,6 +647,7 @@ void Memory::HandleEvent(uint32_t address, int size)
 		_dma[3].hasRead = false;
 		if (_dma[3].active) {
 			_dma[3].wc = newCtrl & 0xFFFF;
+			Log(Debug, "DMA %d src: 0x%08x dst: 0x%08x, length: %d", 3, _dma[3].activeSrc, _dma[3].activeDst, _dma[3].wc);
 		}
 		else {
 			_dma[3].wc = 0;
@@ -613,6 +666,7 @@ void Memory::DMAStartVBlank() {
 			_dma[i].activeSrc = _dma[i].src;
 			_dma[i].active = true;
 			_dma[i].hasRead = false;
+			Log(Debug, "DMA %d src: 0x%08x dst: 0x%08x, length: %d", i, _dma[i].activeSrc, _dma[i].activeDst, _dma[i].wc);
 		}
 	}
 }
@@ -627,6 +681,7 @@ void Memory::DMAStartHBlank() {
 			_dma[i].activeSrc = _dma[i].src;
 			_dma[i].active = true;
 			_dma[i].hasRead = false;
+			Log(Debug, "DMA %d src: 0x%08x dst: 0x%08x, length: %d", i, _dma[i].activeSrc, _dma[i].activeDst, _dma[i].wc);
 		}
 	}
 }
@@ -641,6 +696,7 @@ void Memory::DMAStartSoundFIFO() {
 			_dma[i].activeSrc = _dma[i].src;
 			_dma[i].active = true;
 			_dma[i].hasRead = false;
+			Log(Debug, "DMA %d src: 0x%08x dst: 0x%08x, length: %d", i, _dma[i].activeSrc, _dma[i].activeDst, _dma[i].wc);
 		}
 	}
 }

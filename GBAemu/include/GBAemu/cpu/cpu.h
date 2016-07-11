@@ -25,6 +25,7 @@ public:
 
 	void Tick(bool step = false);
 
+	bool IsInBios() const;
 	bool InAPrivilegedMode() const;
 	bool InABankedUserRegistersMode() const;
 	Mode GetMode() const;

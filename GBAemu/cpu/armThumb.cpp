@@ -9,6 +9,7 @@
 void Cpu::TickThumb(bool step)
 {
 	uint16_t instruction = _pipelineInstruction;
+	assert((_registers[REGPC] & 1) == 0);
 	_pipelineInstruction = _system._memory.Read16(_registers[REGPC] & 0xFFFFFFFE);
 	if (step && IsBreakpoint(_registers[REGPC] - 2)) {
 		_pipelineInstruction = _breakpoints.at(_registers[REGPC] - 2);
@@ -30,6 +31,10 @@ void Cpu::TickThumb(bool step)
 		uint8_t rm = (instruction >> 3) & 0x7;
 		uint8_t imm = (instruction >> 6) & 0x1F;
 		LSL_FLAGS(_registers[rm], imm, _registers[rd], _hostFlags);
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0x08:
@@ -44,6 +49,10 @@ void Cpu::TickThumb(bool step)
 		uint8_t rm = (instruction >> 3) & 0x7;
 		uint8_t imm = (instruction >> 6) & 0x1F;
 		LSR_FLAGS(_registers[rm], imm, _registers[rd], _hostFlags);
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0x10:
@@ -58,6 +67,10 @@ void Cpu::TickThumb(bool step)
 		uint8_t rm = (instruction >> 3) & 0x7;
 		uint8_t imm = (instruction >> 6) & 0x1F;
 		ASR_FLAGS(_registers[rm], imm, _registers[rd], _hostFlags);
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0x18:
@@ -66,6 +79,10 @@ void Cpu::TickThumb(bool step)
 		uint8_t rn = (instruction >> 3) & 0x7;
 		uint8_t rm = (instruction >> 6) & 0x7;
 		ADD_FLAGS(_registers[rn], _registers[rm], _registers[rd], _hostFlags);
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0x1A:
@@ -74,6 +91,10 @@ void Cpu::TickThumb(bool step)
 		uint8_t rn = (instruction >> 3) & 0x7;
 		uint8_t rm = (instruction >> 6) & 0x7;
 		SUB_FLAGS(_registers[rn], _registers[rm], _registers[rd], _hostFlags);
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0x1C:
@@ -82,6 +103,10 @@ void Cpu::TickThumb(bool step)
 		uint8_t rn = (instruction >> 3) & 0x7;
 		uint8_t imm = (instruction >> 6) & 0x7;
 		ADD_FLAGS(_registers[rn], imm, _registers[rd], _hostFlags);
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0x1E:
@@ -90,6 +115,10 @@ void Cpu::TickThumb(bool step)
 		uint8_t rn = (instruction >> 3) & 0x7;
 		uint8_t imm = (instruction >> 6) & 0x7;
 		SUB_FLAGS(_registers[rn], imm, _registers[rd], _hostFlags);
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0x20:
@@ -104,6 +133,10 @@ void Cpu::TickThumb(bool step)
 		uint8_t imm = instruction & 0xFF;
 		MOV_FLAGS(imm, _hostFlags);
 		_registers[rd] = imm;
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0x28:
@@ -130,6 +163,10 @@ void Cpu::TickThumb(bool step)
 		uint8_t rd = (instruction >> 8) & 0x7;
 		uint8_t imm = instruction & 0xFF;
 		ADD_FLAGS(_registers[rd], imm, _registers[rd], _hostFlags);
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0x38:
@@ -143,6 +180,10 @@ void Cpu::TickThumb(bool step)
 		uint8_t rd = (instruction >> 8) & 0x7;
 		uint8_t imm = instruction & 0xFF;
 		SUB_FLAGS(_registers[rd], imm, _registers[rd], _hostFlags);
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0x40:
@@ -202,12 +243,20 @@ void Cpu::TickThumb(bool step)
 			MVN_FLAGS(_registers[rm], _hostFlags);
 			break;
 		}
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0x44: { // Add rd, rm
 		uint8_t rd = (instruction & 0x7) | ((instruction >> 4) & 0x8);
 		uint8_t rm = (instruction >> 3) & 0xF;
 		ADD(_registers[rd], _registers[rm], _registers[rd]);
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0x45: { // CMP rn, rm
@@ -220,6 +269,10 @@ void Cpu::TickThumb(bool step)
 		uint8_t rd = (instruction & 0x7) | ((instruction >> 4) & 0x8);
 		uint8_t rm = (instruction >> 3) & 0xF;
 		_registers[rd] = _registers[rm];
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0x47: { // Branch/exchange instruction set
@@ -241,6 +294,10 @@ void Cpu::TickThumb(bool step)
 		uint8_t rd = (instruction >> 8) & 0x7;
 		uint8_t imm = (instruction & 0xFF);
 		_registers[rd] = _system._memory.Read32((_registers[REGPC] & 0xFFFFFFFC) + imm * 4);
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0x50:
@@ -274,6 +331,10 @@ void Cpu::TickThumb(bool step)
 		uint8_t rm = (instruction >> 6) & 0x7;
 		_registers[rd] = _system._memory.Read8(_registers[rn] + _registers[rm]);
 		if ((_registers[rd] & 0x80) != 0) _registers[rd] |= 0xFFFFFF00;
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0x58:
@@ -282,6 +343,10 @@ void Cpu::TickThumb(bool step)
 		uint8_t rn = (instruction >> 3) & 0x7;
 		uint8_t rm = (instruction >> 6) & 0x7;
 		_registers[rd] = _system._memory.Read32(_registers[rn] + _registers[rm]);
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0x5A:
@@ -290,6 +355,10 @@ void Cpu::TickThumb(bool step)
 		uint8_t rn = (instruction >> 3) & 0x7;
 		uint8_t rm = (instruction >> 6) & 0x7;
 		_registers[rd] = _system._memory.Read16(_registers[rn] + _registers[rm]);
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0x5C:
@@ -298,6 +367,10 @@ void Cpu::TickThumb(bool step)
 		uint8_t rn = (instruction >> 3) & 0x7;
 		uint8_t rm = (instruction >> 6) & 0x7;
 		_registers[rd] = _system._memory.Read8(_registers[rn] + _registers[rm]);
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0x5E:
@@ -307,6 +380,10 @@ void Cpu::TickThumb(bool step)
 		uint8_t rm = (instruction >> 6) & 0x7;
 		_registers[rd] = _system._memory.Read16(_registers[rn] + _registers[rm]);
 		if ((_registers[rd] & 0x8000) != 0) _registers[rd] |= 0xFFFF0000;
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0x60:
@@ -337,6 +414,10 @@ void Cpu::TickThumb(bool step)
 		uint8_t imm = (instruction >> 6) & 0x1F;
 		uint32_t address = _registers[rn] + imm * 4;
 		_registers[rd] = _system._memory.Read32(address);
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0x70:
@@ -367,6 +448,10 @@ void Cpu::TickThumb(bool step)
 		uint8_t imm = (instruction >> 6) & 0x1F;
 		uint32_t address = _registers[rn] + imm;
 		_registers[rd] = _system._memory.Read8(address);
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0x80:
@@ -397,6 +482,10 @@ void Cpu::TickThumb(bool step)
 		uint8_t imm = (instruction >> 6) & 0x1F;
 		uint32_t address = _registers[rn] + imm * 2;
 		_registers[rd] = _system._memory.Read16(address);
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0x90:
@@ -425,6 +514,10 @@ void Cpu::TickThumb(bool step)
 		uint8_t imm = instruction & 0xFF;
 		uint32_t address = _registers[REGSP] + imm * 4;
 		_registers[rd] = _system._memory.Read32(address);
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0xA0:
@@ -438,6 +531,10 @@ void Cpu::TickThumb(bool step)
 		uint8_t rd = (instruction >> 8) & 0x7;
 		uint8_t imm = instruction & 0xFF;
 		ADD(_registers[REGPC] & 0xFFFFFFFC, imm * 4, _registers[rd]);
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0xA8:
@@ -451,6 +548,10 @@ void Cpu::TickThumb(bool step)
 		uint8_t rd = (instruction >> 8) & 0x7;
 		uint8_t imm = instruction & 0xFF;
 		ADD(_registers[REGSP], imm * 4, _registers[rd]);
+		if (rd == REGPC) {
+			_pipelineInstruction = ARM_NOP;
+			_registers[rd] &= ~1;
+		}
 		break;
 	}
 	case 0xB0: { // Adjust stack pointer

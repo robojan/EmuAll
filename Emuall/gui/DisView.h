@@ -19,6 +19,9 @@ protected:
 	void OnPaint(wxPaintEvent &evt);
 	void OnScroll(wxScrollWinEvent &evt);
 	void OnDClick(wxMouseEvent &evt);
+	void OnRightClick(wxMouseEvent &evt);
+	void OnGotoAddress(wxCommandEvent &evt);
+
 	wxSize DoGetBestClientSize() const;
 private:
 	int _emuCurLineId;

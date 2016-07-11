@@ -27,6 +27,8 @@ void Cpu::Reset()
 	EnableIRQs(false);
 	EnableFIQs(false);
 	_pipelineInstruction = ARM_NOP;
+
+	_system.GetMemory().SetBiosProtected(0xE129f000);
 }
 
 void Cpu::Tick(bool step)
@@ -58,9 +60,13 @@ void Cpu::Tick(bool step)
 		throw e;
 	}
 	catch (DataAbortARMException &e) {
-		Log(Error, "Data Abort ARM Exception at 0x%08x", _registers[REGPC]);
+		Log(Error, "Data Abort ARM Exception at 0x%08x, while accessing address 0x%08x", _registers[REGPC], e._address);
 		throw e;
 	}
+}
+
+bool Cpu::IsInBios() const {
+	return _registers[REGPC] >> 24 == 0;
 }
 
 bool Cpu::InAPrivilegedMode() const
@@ -272,6 +278,7 @@ void Cpu::SoftwareInterrupt(uint32_t value)
 	_registers[REGLR] = returnAddress;
 	_registers[REGPC] = 0x00000008;
 	_pipelineInstruction = ARM_NOP;
+	_system.GetMemory().SetBiosProtected(0xE3A02004);
 	Log(Debug, "Software interrupt %d", value);
 }
 
@@ -286,6 +293,7 @@ void Cpu::IRQ()
 	_registers[REGLR] = returnAddress;
 	_registers[REGPC] = 0x00000018;
 	_pipelineInstruction = ARM_NOP;
+	_system.GetMemory().SetBiosProtected(0xE55EC002);
 }
 
 uint32_t Cpu::GetBreakpointInstruction(uint32_t address)

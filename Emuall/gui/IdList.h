@@ -27,6 +27,7 @@ enum
 	ID_Debug_Cpu_stepOut,
 	ID_Debug_Cpu_step,
 	ID_Debug_Cpu_run,
+	ID_Debug_Cpu_goto,
 	ID_Debug_Mem_picker,
 	ID_Debug_Mem_goto,
 	ID_Debug_Gpu_timer,

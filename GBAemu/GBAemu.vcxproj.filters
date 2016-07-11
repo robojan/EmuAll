@@ -72,6 +72,9 @@
     <ClCompile Include="resources\resources.c">
       <Filter>Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="memory\cartridgeStorage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="resources\gbaemu.xml">
@@ -125,6 +128,9 @@
     </ClInclude>
     <ClInclude Include="include\GBAemu\emuallApi.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gbaemu\memory\cartridgeStorage.h">
+      <Filter>Header Files\Memory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

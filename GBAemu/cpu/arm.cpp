@@ -3569,8 +3569,8 @@ void Cpu::TickARM(bool step) {
 		uint8_t rn = (instruction >> 12) & 0xF;
 		uint8_t rs = (instruction >> 8) & 0xF;
 		uint8_t rm = (instruction >> 0) & 0xF;
-		MLA(_registers[rn], _registers[rs], _registers[rm], _registers[rd], _hostFlags);
-		if (rd == REGPC || rm == REGPC) _pipelineInstruction = ARM_NOP;
+		MLA(_registers[rm], _registers[rs], _registers[rn], _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	case 0x039: { // MLAS <Rd>, <Rm>, <Rs>, <Rn>
@@ -3578,8 +3578,8 @@ void Cpu::TickARM(bool step) {
 		uint8_t rn = (instruction >> 12) & 0xF;
 		uint8_t rs = (instruction >> 8) & 0xF;
 		uint8_t rm = (instruction >> 0) & 0xF;
-		MLA_FLAGS(_registers[rn], _registers[rs], _registers[rm], _registers[rd], _hostFlags);
-		if (rd == REGPC || rm == REGPC) _pipelineInstruction = ARM_NOP;
+		MLA_FLAGS(_registers[rm], _registers[rs], _registers[rn], _registers[rd], _hostFlags);
+		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
 		break;
 	}
 	// MOV
@@ -7079,6 +7079,7 @@ void Cpu::TickARM(bool step) {
 	}
 	default: {
 		Log(Error, "Unknown ARM instruction found: 0x%08x at PC=0x%08x", instruction, _registers[REGPC] - 8);
+		throw BreakPointARMException(0);
 		__debugbreak();
 		break;
 	}

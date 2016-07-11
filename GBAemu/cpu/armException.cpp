@@ -1,4 +1,5 @@
 
+#include <stdint.h>
 #include <GBAemu/cpu/armException.h>
 
 ArmException::ArmException()
@@ -21,7 +22,8 @@ UndefinedInstructionARMException::~UndefinedInstructionARMException()
 
 }
 
-DataAbortARMException::DataAbortARMException()
+DataAbortARMException::DataAbortARMException(uint32_t address) :
+	_address(address)
 {
 
 }

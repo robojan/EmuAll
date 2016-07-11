@@ -9,6 +9,7 @@
 #define IOREG8(registers, addr) (registers[addr & IOREGISTERSMASK])
 
 class Gba;
+class CartridgeStorage;
 
 struct DMAInternalInfo {
 	bool active;
@@ -32,11 +33,11 @@ public:
 	Memory(Gba &gba);
 	~Memory();
 
+	void SetBiosProtected(uint32_t word);
 	int Load(const SaveData_t *data);
 
 	void Tick();
-
-
+	
 	uint8_t Read8(uint32_t address);
 	uint16_t Read16(uint32_t address);
 	uint32_t Read32(uint32_t address);
@@ -46,7 +47,6 @@ public:
 	void ManagedWrite32(uint32_t address, uint32_t value);
 
 	uint32_t GetRomSize();
-	uint32_t GetSRAMSize();
 	uint8_t ReadBios8(uint32_t address);
 	uint8_t ReadWRAM8(uint32_t address);
 	uint8_t ReadChipWRAM8(uint32_t address);
@@ -54,7 +54,6 @@ public:
 	uint8_t ReadPRAM8(uint32_t address);
 	uint8_t ReadVRAM8(uint32_t address);
 	uint8_t ReadORAM8(uint32_t address);
-	uint8_t ReadSRAM8(uint32_t address);
 	uint8_t ReadROM8(uint32_t address);
 
 	void RegisterEvent(uint32_t address, MemoryEventHandler *evt);
@@ -72,6 +71,7 @@ public:
 	void DMAStartSoundFIFO();
 private:
 	void InitRegisters();
+	CartridgeStorage *DetectStorageChip();
 
 	// Memory map Should be first in the class memory
 	uint8_t *_memmap[16]; 
@@ -83,6 +83,8 @@ private:
 	struct DMAInternalInfo _dma[4];
 	// system
 	Gba &_system;
+	// Protected bios word
+	uint32_t _biosProtected;
 	// 16 kB bios
 	uint8_t *_bios;
 	// 256kB on board wram
@@ -97,10 +99,8 @@ private:
 	uint8_t *_vram;
 	// 1kB OAM, OBJ attributes
 	uint8_t *_oram;
-	// external sram
-	uint8_t *_sram;
-	uint32_t _sramLength;
 	// Gamepack rom
 	uint8_t *_rom;
 	uint32_t _romLength;
+	CartridgeStorage *_cartridge;
 };

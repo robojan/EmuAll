@@ -459,7 +459,6 @@ void EmulatorInterface::Draw(EMUHANDLE handle, int id)
 {
 	if (_draw == NULL)
 		return;
-	Log(Debug, "Draw %d", id);
 	_draw(handle, id);
 }
 

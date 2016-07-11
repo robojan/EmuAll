@@ -194,10 +194,6 @@
         <name>OAM Data</name>
         <size>0x400</size>
       </memory>
-      <memory id="2008">
-        <name>SRAM</name>
-        <size var="true">2009</size>
-      </memory>
       <memory id="2010">
         <name>ROM</name>
         <size var="true">2011</size>

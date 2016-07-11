@@ -2,12 +2,14 @@
 #include "DisView.h"
 #include "../util/memDbg.h"
 #include "../util/log.h"
+#include "IdList.h"
 
 IMPLEMENT_CLASS(DisView,wxWindow)
 BEGIN_EVENT_TABLE(DisView,wxWindow)
 	EVT_PAINT(DisView::OnPaint)
 	EVT_SCROLLWIN(DisView::OnScroll)
 	EVT_LEFT_DCLICK(DisView::OnDClick)
+	EVT_RIGHT_DOWN(DisView::OnRightClick)
 END_EVENT_TABLE()
 
 DisView::DisView(Emulator *emu, wxWindow *parent, int windowId, const wxPoint &pos, const wxSize &size, long style, const wxString &name) :
@@ -239,6 +241,35 @@ void DisView::OnDClick(wxMouseEvent &evt)
 	else {
 		// Add breakpoint
 		_emu->emu->AddBreakpoint(_emu->handle, line);
+	}
+	Refresh();
+}
+
+
+void DisView::OnRightClick(wxMouseEvent &evt)
+{
+	wxMenu menu;
+	menu.Append(ID_Debug_Cpu_goto, "Goto address");
+	menu.Bind(wxEVT_COMMAND_MENU_SELECTED, &DisView::OnGotoAddress, this, ID_Debug_Cpu_goto);
+	PopupMenu(&menu);
+}
+
+
+void DisView::OnGotoAddress(wxCommandEvent &evt)
+{
+	wxString address = wxGetTextFromUser(_("Address: "), _("Get address"), wxString::Format(_("0x%08x"), _startingLine));
+	address.Trim(false).Trim(true);
+	wxString number;
+	unsigned long line;
+	if (address.StartsWith("0x", &number)) {
+		if (number.ToULong(&line, 16)) {
+			_startingLine = line;
+		}
+	}
+	else {
+		if (number.ToULong(&line, 10)) {
+			_startingLine = line;
+		}
 	}
 	Refresh();
 }
