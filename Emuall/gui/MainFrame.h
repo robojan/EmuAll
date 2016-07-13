@@ -12,7 +12,7 @@
 #include "../Emulator/Sound/AudioBuffer.h"
 #include "../util/Options.h"
 #include "../util/logWx.h"
-#include "../keyhandler.h"
+#include "../input/inputMaster.h"
 #include "InputOptionsFrame.h"
 #include "cpuDebugger.h"
 #include "memDebugger.h"
@@ -63,7 +63,7 @@ private:
 	std::string _saveFilePath;
 	std::string _saveStateFilePath;
 	AudioManager _audio;
-	InputMaster _inputHandler;
+	InputMaster *_inputHandler;
 	bool _screenAutoRefresh;
 
 	std::vector<AudioCallbackData> _audioCBData;

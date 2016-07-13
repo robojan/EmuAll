@@ -13,6 +13,18 @@
       <Configuration>Debug inline</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug steam|ARM">
+      <Configuration>Debug steam</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug steam|Win32">
+      <Configuration>Debug steam</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug steam|x64">
+      <Configuration>Debug steam</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|ARM">
       <Configuration>Debug</Configuration>
       <Platform>ARM</Platform>
@@ -63,7 +75,21 @@
     <PlatformToolset>v140</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug steam|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug steam|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
@@ -119,6 +145,9 @@
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug steam|ARM'" Label="Configuration">
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
@@ -134,7 +163,13 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug steam|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug steam|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'" Label="PropertySheets">
@@ -162,7 +197,15 @@
     <LibraryPath>$(LIBDIR)\glew-1.13.0\lib\Release\$(PlatformName);$(LIBDIR)\openal-soft-1.17.2-bin\libs\$(PlatformName);$(LIBDIR)\wxWidgets-3.1.0\lib\vc_lib;$(LIBDIR)\SFML-2.3.2\lib;$(LibraryPath)</LibraryPath>
     <IncludePath>$(LIBDIR)\freetype-2.6\include;$(SolutionDir)Support\include;$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(LIBDIR)\SFML-2.3.2\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug steam|Win32'">
+    <LibraryPath>$(LIBDIR)\glew-1.13.0\lib\Release\$(PlatformName);$(LIBDIR)\openal-soft-1.17.2-bin\libs\$(PlatformName);$(LIBDIR)\wxWidgets-3.1.0\lib\vc_lib;$(LIBDIR)\SFML-2.3.2\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(LIBDIR)\freetype-2.6\include;$(SolutionDir)Support\include;$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(LIBDIR)\SFML-2.3.2\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LibraryPath>$(LIBDIR)\glew-1.13.0\lib\Release\$(PlatformName);$(LIBDIR)\openal-soft-1.17.2-bin\libs\Win64;$(LIBDIR)\wxWidgets-3.1.0\lib\vc_x64_lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(LIBDIR)\freetype-2.6\include;$(SolutionDir)Support\include;$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug steam|x64'">
     <LibraryPath>$(LIBDIR)\glew-1.13.0\lib\Release\$(PlatformName);$(LIBDIR)\openal-soft-1.17.2-bin\libs\Win64;$(LIBDIR)\wxWidgets-3.1.0\lib\vc_x64_lib;$(LibraryPath)</LibraryPath>
     <IncludePath>$(LIBDIR)\freetype-2.6\include;$(SolutionDir)Support\include;$(ProjectDir)\include;$(LIBDIR)\glew-1.13.0\include;$(LIBDIR)\openal-soft-1.17.2-bin\include;$(LIBDIR)\wxWidgets-3.1.0\include\msvc;$(LIBDIR)\wxWidgets-3.1.0\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
@@ -214,7 +257,24 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libOpenAL32.dll.a;glew32s.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libOpenAL32.dll.a;glew32s.lib;opengl32.lib;Xinput9_1_0.lib;dinput8.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <Profile>true</Profile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug steam|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>libOpenAL32.dll.a;glew32s.lib;opengl32.lib;Xinput9_1_0.lib;dinput8.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
@@ -231,7 +291,24 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libOpenAL32.dll.a;glew32s.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libOpenAL32.dll.a;glew32s.lib;opengl32.lib;Xinput9_1_0.lib;dinput8.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <Profile>true</Profile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug steam|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>libOpenAL32.dll.a;glew32s.lib;opengl32.lib;Xinput9_1_0.lib;dinput8.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
@@ -247,7 +324,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libOpenAL32.dll.a;glew32s.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libOpenAL32.dll.a;glew32s.lib;opengl32.lib;Xinput9_1_0.lib;dinput8.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
@@ -263,7 +340,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libOpenAL32.dll.a;glew32s.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libOpenAL32.dll.a;glew32s.lib;opengl32.lib;Xinput9_1_0.lib;dinput8.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
@@ -279,7 +356,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libOpenAL32.dll.a;glew32s.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libOpenAL32.dll.a;glew32s.lib;opengl32.lib;Xinput9_1_0.lib;dinput8.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -294,7 +371,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libOpenAL32.dll.a;glew32s.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libOpenAL32.dll.a;glew32s.lib;opengl32.lib;Xinput9_1_0.lib;dinput8.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">
@@ -309,7 +386,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libOpenAL32.dll.a;glew32s.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libOpenAL32.dll.a;glew32s.lib;opengl32.lib;Xinput9_1_0.lib;dinput8.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release wx|x64'">
@@ -324,7 +401,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libOpenAL32.dll.a;glew32s.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libOpenAL32.dll.a;glew32s.lib;opengl32.lib;Xinput9_1_0.lib;dinput8.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -361,7 +438,10 @@
     <ClCompile Include="gui\keyBindBox.cpp" />
     <ClCompile Include="gui\MainFrame.cpp" />
     <ClCompile Include="gui\memDebugger.cpp" />
-    <ClCompile Include="keyhandler.cpp" />
+    <ClCompile Include="input\dinput.cpp" />
+    <ClCompile Include="input\input.cpp" />
+    <ClCompile Include="input\inputMaster.cpp" />
+    <ClCompile Include="input\xinput.cpp" />
     <ClCompile Include="resources\resources.c" />
     <ClCompile Include="util\dir.cpp" />
     <ClCompile Include="util\Log.cpp" />
@@ -405,7 +485,10 @@
     <ClInclude Include="gui\MainFrame.h" />
     <ClInclude Include="gui\memDebugger.h" />
     <ClInclude Include="include\emu.h" />
-    <ClInclude Include="keyhandler.h" />
+    <ClInclude Include="input\dinput.h" />
+    <ClInclude Include="input\input.h" />
+    <ClInclude Include="input\inputMaster.h" />
+    <ClInclude Include="input\xinput.h" />
     <ClInclude Include="resources\resources.h" />
     <ClInclude Include="util\dir.h" />
     <ClInclude Include="util\log.h" />
@@ -428,7 +511,9 @@
     <CustomBuild Include="resources\resources.rlst">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -u -o %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug steam|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -u -o %(Filename)</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -u -o %(Filename)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug steam|x64'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -u -o %(Filename)</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -u -o %(Filename)</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug inline|x64'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -u -o %(Filename)</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -u -o %(Filename)</Command>
@@ -436,7 +521,9 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -u -o %(Filename)</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(SolutionDir)tools\resourceCompiler.exe" -p "%(RootDir)%(Directory)\" -l "%(FullPath)" -u -o %(Filename)</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Preproces resources</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug steam|Win32'">Preproces resources</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Preproces resources</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug steam|x64'">Preproces resources</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">Preproces resources</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug inline|x64'">Preproces resources</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release wx|Win32'">Preproces resources</Message>
@@ -444,13 +531,21 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Preproces resources</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Preproces resources</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AlwaysRun</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug steam|Win32'">AlwaysRun</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AlwaysRun</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug steam|x64'">AlwaysRun</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug steam|Win32'">
       </AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug steam|x64'">
+      </AdditionalInputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug steam|Win32'">false</LinkObjects>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug steam|x64'">false</LinkObjects>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">AlwaysRun</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug inline|x64'">AlwaysRun</Outputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug inline|Win32'">

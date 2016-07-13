@@ -50,6 +50,7 @@ public:
 	std::string recentFiles[5];
 	OptionsVid_t videoOptions;
 	OptionsAud_t audioOptions;
+	std::map<std::string, int> dinputMap;
 private:
 	Options();
 	

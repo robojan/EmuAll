@@ -49,12 +49,15 @@
     <Filter Include="Header Files\Emulator\Sound">
       <UniqueIdentifier>{935eea95-0703-4f5a-a20a-8d7d1a94d1aa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\input">
+      <UniqueIdentifier>{2d61c945-dd94-4034-8634-f44f67059c86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\input">
+      <UniqueIdentifier>{65e1b43e-324d-4472-a14b-772e59025c11}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="emuAll.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="keyhandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Emulator\Emulator.cpp">
@@ -168,11 +171,20 @@
     <ClCompile Include="gui\GLContextManager.cpp">
       <Filter>Source Files\gui</Filter>
     </ClCompile>
+    <ClCompile Include="input\xinput.cpp">
+      <Filter>Source Files\input</Filter>
+    </ClCompile>
+    <ClCompile Include="input\dinput.cpp">
+      <Filter>Source Files\input</Filter>
+    </ClCompile>
+    <ClCompile Include="input\inputMaster.cpp">
+      <Filter>Source Files\input</Filter>
+    </ClCompile>
+    <ClCompile Include="input\input.cpp">
+      <Filter>Source Files\input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="keyhandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Emulator\Emulator.h">
       <Filter>Header Files\Emulator</Filter>
     </ClInclude>
@@ -307,6 +319,18 @@
     </ClInclude>
     <ClInclude Include="gui\GLContextManager.h">
       <Filter>Header Files\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="input\xinput.h">
+      <Filter>Header Files\input</Filter>
+    </ClInclude>
+    <ClInclude Include="input\dinput.h">
+      <Filter>Header Files\input</Filter>
+    </ClInclude>
+    <ClInclude Include="input\inputMaster.h">
+      <Filter>Header Files\input</Filter>
+    </ClInclude>
+    <ClInclude Include="input\input.h">
+      <Filter>Header Files\input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

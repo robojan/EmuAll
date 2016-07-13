@@ -1,17 +1,29 @@
 
 
-#include "keyhandler.h"
-#include "util/memDbg.h"
-#include "util/log.h"
-#include "util/Options.h"
+#include "inputMaster.h"
+#include "../util/memDbg.h"
+#include "../util/log.h"
+#include "../util/Options.h"
 
-InputMaster::InputMaster()
+InputMaster::InputMaster(wxWindow *parent) :
+	_dinput(this, (HWND)parent->GetHWND()), _xinput(this)
 {
+	Bind(JOYSTICK_BUTTON_DOWN_EVENT, &InputMaster::OnJoystick, this, wxID_ANY, wxID_ANY, nullptr);
+	Bind(JOYSTICK_BUTTON_UP_EVENT, &InputMaster::OnJoystick, this, wxID_ANY, wxID_ANY, nullptr);
+	Bind(JOYSTICK_AXES_EVENT, &InputMaster::OnJoystick, this, wxID_ANY, wxID_ANY, nullptr);
+	Bind(JOYSTICK_HAT_EVENT, &InputMaster::OnJoystick, this, wxID_ANY, wxID_ANY, nullptr);
 }
 
 InputMaster::~InputMaster()
 {
 
+}
+
+
+void InputMaster::Tick(unsigned int deltaTime)
+{
+	_xinput.Tick(deltaTime);
+	_dinput.Tick(deltaTime);
 }
 
 void InputMaster::ClearAllClients()
@@ -82,4 +94,26 @@ void InputMaster::OnKeyboard(wxKeyEvent &evt)
 	}
 
 	evt.Skip(skip);
+}
+
+void InputMaster::OnJoystick(JoystickEvent &evt)
+{
+	std::string typeStr;
+	wxEventType type = evt.GetEventType();
+	if (type == JOYSTICK_BUTTON_DOWN_EVENT) {
+		typeStr = "Button down";
+	}
+	else if (type == JOYSTICK_BUTTON_UP_EVENT) {
+		typeStr = "Button up";
+	}
+	else if (type == JOYSTICK_AXES_EVENT) {
+		typeStr = "Joystick move";
+	}
+	else if (type == JOYSTICK_HAT_EVENT) {
+		typeStr = "Joystick hat event";
+	}
+	else {
+		typeStr = "Unknown";
+	}
+	Log(Debug, "Joystick event '%s' 0x%08x, %g", typeStr.c_str(), evt.GetID(), evt.GetValue());
 }

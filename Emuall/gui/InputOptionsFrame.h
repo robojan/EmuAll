@@ -3,7 +3,7 @@
 
 #include <wx/wx.h>
 #include <wx/notebook.h>
-#include "../keyhandler.h"
+#include "../input/inputMaster.h"
 #include "keyBindBox.h"
 
 class InputOptionsFrame : public wxFrame

@@ -18,6 +18,7 @@ class Emulator;
 typedef struct {
 	std::string name;
 	int key;
+	int secondaryKey;
 	int defaultKey;
 	int flags;
 } EmulatorInput_t;

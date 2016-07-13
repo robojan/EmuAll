@@ -75,6 +75,9 @@
     <ClCompile Include="memory\cartridgeStorage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="memory\eeprom.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="resources\gbaemu.xml">
@@ -131,6 +134,9 @@
     </ClInclude>
     <ClInclude Include="include\gbaemu\memory\cartridgeStorage.h">
       <Filter>Header Files\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GBAemu\memory\eeprom.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -71,6 +71,16 @@ void Options::LoadOptions()
 	recentFiles[4] = mFileConfig.Read("RecentFiles/file4", "");
 
 	// Key bindings are loaded when the keys are added
+
+	// DInput bindings
+	dinputMap.clear();
+	for (int i = 0; i < 255; i++) {
+		wxString elementId = wxString::Format(_("DInput/device%d"), i);
+		wxString guidString;
+		if (mFileConfig.Read(elementId, &guidString)) {
+			dinputMap[guidString.ToStdString()] = i;
+		}
+	}
 }
 
 void Options::SaveOptions()
@@ -109,6 +119,11 @@ void Options::SaveOptions()
 		}
 	}
 
+	// DInput bindings
+	for (auto &map : dinputMap) {
+		wxString elementId = wxString::Format(_("DInput/device%d"), map.second);
+		mFileConfig.Write(elementId, wxString(map.first));
+	}
 
 	// Create directory
 	wxFileName configFileName(GetConfigFileName());
