@@ -85,6 +85,13 @@ int32_t __stdcall Tick(EMUHANDLE handle, uint32_t time) {
 	return emulator->Tick(time);
 }
 
+void __stdcall Input(EMUHANDLE handle, int32_t key, int32_t pressed) {
+	Gba *emulator = reinterpret_cast<Gba *>(handle);
+	if (emulator == nullptr)
+		return;
+	emulator->OnKey(key, pressed != 0);
+}
+
 void __stdcall Run(EMUHANDLE handle, int32_t run) {
 	Gba *emulator = reinterpret_cast<Gba *>(handle);
 	if (emulator == nullptr)
@@ -157,6 +164,7 @@ uint8_t __stdcall GetMemoryData(EMUHANDLE handle, int32_t memory, uint32_t addre
 		case 2005: return emulator->GetMemory().ReadPRAM8(address);
 		case 2006: return emulator->GetMemory().ReadVRAM8(address);
 		case 2007: return emulator->GetMemory().ReadORAM8(address);
+		case 2008: return emulator->GetMemory().ReadCartridge8(address);
 		case 2010: return emulator->GetMemory().ReadROM8(address);
 		default: return 0;
 		}
@@ -275,6 +283,8 @@ uint32_t __stdcall GetValU(EMUHANDLE handle, int32_t id) {
 				return pc - 4;
 			}
 		}
+	case 2009: // Cartridge storage
+		return emulator->GetMemory().GetCartridgeStorageSize();
 	case 2011: // ROM size
 		return emulator->GetMemory().GetRomSize();
 	case 3000: // BG mode

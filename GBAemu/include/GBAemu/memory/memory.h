@@ -29,6 +29,8 @@ public:
 };
 
 class Memory : public MemoryEventHandler {
+	friend class CartridgeStorage;
+	friend class Eeprom;
 public:
 	Memory(Gba &gba);
 	~Memory();
@@ -47,6 +49,7 @@ public:
 	void ManagedWrite32(uint32_t address, uint32_t value);
 
 	uint32_t GetRomSize();
+	uint32_t GetCartridgeStorageSize();
 	uint8_t ReadBios8(uint32_t address);
 	uint8_t ReadWRAM8(uint32_t address);
 	uint8_t ReadChipWRAM8(uint32_t address);
@@ -55,6 +58,7 @@ public:
 	uint8_t ReadVRAM8(uint32_t address);
 	uint8_t ReadORAM8(uint32_t address);
 	uint8_t ReadROM8(uint32_t address);
+	uint8_t ReadCartridge8(uint32_t address);
 
 	void RegisterEvent(uint32_t address, MemoryEventHandler *evt);
 
@@ -79,6 +83,8 @@ private:
 	uint32_t _memMask[16];
 	// Event callbacks
 	AATree<uint32_t, MemoryEventHandler *> _events;
+	// Tick counter
+	uint32_t _tickCounter;
 	// DMA
 	struct DMAInternalInfo _dma[4];
 	// system

@@ -255,6 +255,7 @@
     <ClCompile Include="emu.cpp" />
     <ClCompile Include="gba.cpp" />
     <ClCompile Include="gpu\gpu.cpp" />
+    <ClCompile Include="input\KeyInput.cpp" />
     <ClCompile Include="memory\cartridgeStorage.cpp" />
     <ClCompile Include="memory\eeprom.cpp" />
     <ClCompile Include="memory\memory.cpp" />
@@ -294,6 +295,7 @@
     <Xml Include="resources\gbaemu.xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\GBAemu\input\KeyInput.h" />
     <ClInclude Include="include\gbaemu\memory\cartridgeStorage.h" />
     <ClInclude Include="include\GBAemu\cpu\armException.h" />
     <ClInclude Include="include\gbaemu\cpu\cpu.h" />

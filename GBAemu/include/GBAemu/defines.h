@@ -165,3 +165,7 @@
 #define DMA3DAD             0x40000D8
 #define DMA3CNT_L           0x40000DC
 #define DMA3CNT_H           0x40000DE
+
+// Key input
+#define KEYINPUT            0x4000130
+#define KEYCNT              0x4000132

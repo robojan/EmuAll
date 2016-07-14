@@ -7,6 +7,7 @@ public:
 	virtual ~CartridgeStorage();
 
 	virtual uint32_t GetSize();
+	virtual uint8_t ReadMemory(uint32_t address);
 	virtual uint32_t Read32(uint32_t address);
 	virtual uint32_t Read16(uint32_t address);
 	virtual uint32_t Read8(uint32_t address);

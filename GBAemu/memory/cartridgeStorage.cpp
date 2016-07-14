@@ -19,6 +19,11 @@ uint32_t CartridgeStorage::GetSize()
 	return 0;
 }
 
+uint8_t CartridgeStorage::ReadMemory(uint32_t address)
+{
+	return 0;
+}
+
 uint32_t CartridgeStorage::Read32(uint32_t address)
 {
 	Log(Warn, "32 Bit read from unimplemented cartridge at address 0x%08x", address);

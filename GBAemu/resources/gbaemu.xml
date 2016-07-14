@@ -13,45 +13,45 @@
     <sources>0</sources>
   </audio>
   <input>
-    <key id="1">
+    <key id="0">
       <name>A</name>
       <defaultKey>88</defaultKey>
     </key>
-    <key id="2">
+    <key id="1">
       <name>B</name>
       <defaultKey>90</defaultKey>
     </key>
+    <key id="2">
+      <name>Select</name>
+      <defaultKey>8</defaultKey>
+    </key>
     <key id="3">
-      <name>Up</name>
-      <defaultKey>315</defaultKey>
+      <name>Start</name>
+      <defaultKey>13</defaultKey>
     </key>
     <key id="4">
-      <name>Down</name>
-      <defaultKey>317</defaultKey>
+      <name>Right</name>
+      <defaultKey>316</defaultKey>
     </key>
     <key id="5">
       <name>Left</name>
       <defaultKey>314</defaultKey>
     </key>
     <key id="6">
-      <name>Right</name>
-      <defaultKey>316</defaultKey>
+      <name>Up</name>
+      <defaultKey>315</defaultKey>
     </key>
     <key id="7">
-      <name>Start</name>
-      <defaultKey>13</defaultKey>
+      <name>Down</name>
+      <defaultKey>317</defaultKey>
     </key>
     <key id="8">
-      <name>Select</name>
-      <defaultKey>8</defaultKey>
+      <name>R</name>
+      <defaultKey>83</defaultKey>
     </key>
     <key id="9">
       <name>L</name>
       <defaultKey>81</defaultKey>
-    </key>
-    <key id="10">
-      <name>R</name>
-      <defaultKey>83</defaultKey>
     </key>
   </input>
   <debugging>
@@ -193,6 +193,10 @@
       <memory id="2007">
         <name>OAM Data</name>
         <size>0x400</size>
+      </memory>
+      <memory id="2008">
+        <name>Storage</name>
+        <size var="true">2009</size>
       </memory>
       <memory id="2010">
         <name>ROM</name>

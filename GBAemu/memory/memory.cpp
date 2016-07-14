@@ -11,10 +11,11 @@
 #include <GBAemu/defines.h>
 #include <GBAemu/gba.h>
 #include <GBAemu/memory/cartridgeStorage.h>
+#include <GBAemu/memory/eeprom.h>
 
 
 Memory::Memory(Gba &gba) :
-	_system(gba), _events(),
+	_system(gba), _events(), _tickCounter(0),
 	_dma{{false, false, 0, 0},{ false, false, 0, 0 },{ false, false, 0, 0 } ,{ false, false, 0, 0 } },
 	_bios(nullptr), _wram(nullptr), _chipWram(nullptr), _ioRegisters(nullptr),
 	_pram(nullptr), _vram(nullptr), _oram(nullptr),
@@ -235,6 +236,7 @@ void Memory::Tick()
 				bool irq = (_dma[i].ctrl & (1 << 30)) != 0;
 				if (!repeat) {
 					_dma[i].ctrl &= ~(1 << 31);
+					IOREG32(_ioRegisters, DMA0CNT_L + 12 * i) &= ~(1 << 31);
 				}
 				else {
 					if (i == 3) {
@@ -254,6 +256,7 @@ void Memory::Tick()
 			}
 		}
 	}
+	_tickCounter++;
 }
 
 bool Memory::IsDMAActive() const
@@ -414,6 +417,15 @@ uint32_t Memory::GetRomSize()
 	return _romLength;
 }
 
+
+uint32_t Memory::GetCartridgeStorageSize()
+{
+	if (_cartridge == nullptr) {
+		return 0;
+	}
+	return _cartridge->GetSize();
+}
+
 uint8_t Memory::ReadBios8(uint32_t address)
 {
 	assert(address < BIOSSIZE);
@@ -460,6 +472,15 @@ uint8_t Memory::ReadROM8(uint32_t address)
 {
 	assert(address < _romLength);
 	return _rom[address];
+}
+
+
+uint8_t Memory::ReadCartridge8(uint32_t address)
+{
+	if (_cartridge == nullptr) {
+		throw DataAbortARMException(address);
+	}
+	return _cartridge->ReadMemory(address);
 }
 
 void Memory::RegisterEvent(uint32_t address, MemoryEventHandler *evt)
@@ -533,6 +554,7 @@ CartridgeStorage *Memory::DetectStorageChip()
 			if (memcmp(&_rom[i + 1], "EPROM_V", 7) == 0) {
 				memorySize = 8 * 1024;
 				Log(Message, "EEPROM storage of 8KB assumed found");
+				return new Eeprom(this);
 				break;
 			}
 			else if (memcmp(&_rom[i + 1], "RAM_V", 5) == 0) {

@@ -37,6 +37,12 @@
     <Filter Include="Source Files\util">
       <UniqueIdentifier>{d9f2fbf2-5602-4199-b910-431ecefdf46d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\input">
+      <UniqueIdentifier>{0a1130b1-c65e-42a4-85e9-5deb2fdf33eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\input">
+      <UniqueIdentifier>{a32e42fc-e957-4a62-a516-30fd48e9de44}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="emu.cpp">
@@ -72,11 +78,14 @@
     <ClCompile Include="resources\resources.c">
       <Filter>Resource Files</Filter>
     </ClCompile>
-    <ClCompile Include="memory\cartridgeStorage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="memory\eeprom.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="memory\cartridgeStorage.cpp">
+      <Filter>Source Files\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="input\KeyInput.cpp">
+      <Filter>Source Files\input</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -136,7 +145,10 @@
       <Filter>Header Files\Memory</Filter>
     </ClInclude>
     <ClInclude Include="include\GBAemu\memory\eeprom.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GBAemu\input\KeyInput.h">
+      <Filter>Header Files\input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

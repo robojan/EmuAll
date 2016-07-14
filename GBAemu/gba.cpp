@@ -4,7 +4,7 @@
 #include <GBAemu/cpu/armException.h>
 
 Gba::Gba() :
-	_memory(*this), _cpu(*this), _gpu(*this), 
+	_memory(*this), _cpu(*this), _gpu(*this), _input(*this), 
 	_if(0), _halted(false), _stopped(false), _running(false), _disassembler(*this)
 {
 	_memory.RegisterEvent(IE, this);
@@ -150,6 +150,12 @@ void Gba::HandleEvent(uint32_t address, int size)
 		}
 		IOREG8(registers, HALTCNT) = 0;
 	}
+}
+
+
+void Gba::OnKey(int id, bool pressed)
+{
+	_input.OnKeyPressed(id, pressed);
 }
 
 void Gba::InitRegisters()
