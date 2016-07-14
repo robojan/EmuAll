@@ -60,6 +60,7 @@ void GenerateObjects(int lineNr) {
 
 		bool hFlip, vFlip;
 		int startX = pos.x;
+		if (startX >= 256) startX -= 512;
 		int endX;
 		if (RSMode) {
 			hFlip = false;

@@ -59,7 +59,10 @@ void main() {
 		int tileId = int(data & 0x3FFu);
 		bool hFlip = (data & (1u << 10u)) != 0u;
 		bool vFlip = (data & (1u << 11u)) != 0u;
-		int paletteId = int((data << 12u) & 0xFu);
+		int paletteId = int((data >> 12u) & 0xFu);
+
+		if (hFlip) innerPos.x = 7 - innerPos.x;
+		if (vFlip) innerPos.y = 7 - innerPos.y;
 		int innerId = innerPos.x + innerPos.y * 8;
 
 		if (fLargePalette != 0) {

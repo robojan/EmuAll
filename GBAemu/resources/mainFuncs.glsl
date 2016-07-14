@@ -218,12 +218,13 @@ bool IsObjectDoubleSize(uint attr0) {
 mat2 GetObjectAffineMatrix(int lineNr, uint attr1) {
 	int idx = int(attr1 >> 9) & 0x1F;
 	int baseAddr = lineNr * 1024 / 2 + 3;
-	uint PA = texelFetch(oamData, baseAddr + (idx * 4 + 0) * 4).r;
-	uint PB = texelFetch(oamData, baseAddr + (idx * 4 + 1) * 4).r;
-	uint PC = texelFetch(oamData, baseAddr + (idx * 4 + 2) * 4).r;
-	uint PD = texelFetch(oamData, baseAddr + (idx * 4 + 3) * 4).r;
-	return mat2(float(PA) / 256.0, float(PB) / 256.0,
-		float(PC) / 256.0, float(PD) / 256.0);
+	uvec4 matvecu = uvec4(texelFetch(oamData, baseAddr + (idx * 4 + 0) * 4).r,
+		texelFetch(oamData, baseAddr + (idx * 4 + 1) * 4).r,
+		texelFetch(oamData, baseAddr + (idx * 4 + 2) * 4).r,
+		texelFetch(oamData, baseAddr + (idx * 4 + 3) * 4).r);
+	bvec4 signExtend = notEqual((matvecu & uvec4(1u << 15u)), uvec4(0));
+	ivec4 matvec = ivec4((uvec4(signExtend) * (0xFFFF0000u)) | matvecu);
+	return mat2(vec2(matvec.xy)/256.0, vec2(matvec.zw) / 256.0);
 }
 
 int GetObjectMode(uint attr0) {

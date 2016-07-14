@@ -40,7 +40,7 @@ uint SetupOutputs(ivec2 tilePos) {
 		uint data = texelFetch(vramData, mapAddr).r;
 		data |= texelFetch(vramData, mapAddr + 1).r << 8;
 		int tileId = int(data & 0x3FFu);
-		fPaletteId = int((data << 12u) & 0xFu);
+		fPaletteId = int((data >> 12u) & 0xFu);
 
 		if (fLargePalette != 0) {
 			fTileAddress = tileBaseAddr + tileId * 64;
@@ -66,17 +66,17 @@ uint SetupOutputs(ivec2 tilePos) {
 		return 0u;
 	}
 	case 3: { // bitmap mode color
-		//mapBaseAddr = GetVRAMaddress(0, lineNr);
+		fTileAddress = GetVRAMaddress(0, lineNr);
 		fMode = 3;
 		break;
 	}
 	case 4: { // bitmap mode palette
-		//mapBaseAddr = GetVRAMaddress(IsFrameSelect(lineNr) ? 0xA000 : 0x0000, lineNr);
+		fTileAddress = GetVRAMaddress(IsFrameSelect(lineNr) ? 0xA000 : 0x0000, lineNr);
 		fMode = 4;
 		break;
 	}
 	case 5: { // bitmap mode color swap
-		//mapBaseAddr = GetVRAMaddress(IsFrameSelect(lineNr) ? 0xA000 : 0x0000, lineNr);
+		fTileAddress = GetVRAMaddress(IsFrameSelect(lineNr) ? 0xA000 : 0x0000, lineNr);
 		fMode = 5;
 		break;
 	}

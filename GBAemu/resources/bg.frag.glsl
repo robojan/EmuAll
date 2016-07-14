@@ -52,10 +52,6 @@ void main() {
 			int pixelAddress = fTileAddress + innerId;
 			uint paletteIdx = texelFetch(vramData, pixelAddress).r;
 			color = getPaletteColor(paletteIdx, lineNr);
-			//int address = pixelAddress % (96 * 1024);
-			//int address = fTemp;
-			//color = vec3(float((address >> 16) & 0xFF) / 255.0, float((address >> 8) & 0xFF) / 255.0, float((address >> 0) & 0xFF) / 255.0);
-			//color = vec3(float(fTilePos.x) / 255.0, float(fTilePos.y) / 255.0, 0.0);
 		}
 		else {
 			int pixelAddress = fTileAddress + innerId / 2;
@@ -66,8 +62,10 @@ void main() {
 			paletteIdx &= 0xFu;
 			color = getPaletteColor(paletteIdx + uint(fPaletteId * 16), lineNr);
 		}
-		//color = vec3(1.0, 1.0, 0.0);
 		break;
+	}
+	case 3: {
+		int innerId = pixelPos.x + pixelPos.y * 8;
 	}
 	}
 	fragColor = vec4(color, 1.0);

@@ -1,0 +1,1 @@
+<Project name="videoObjects"><Folder name="source"><File path="source\main.c"></File></Folder><Folder name="include"></Folder><Folder name="gfx"><File path="gfx\testImage.bmp"></File></Folder><File path="Makefile"></File></Project>
