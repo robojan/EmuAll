@@ -9,6 +9,7 @@
 
 
 #include <map>
+#include <vector>
 #include "../Emulator/Emulator.h"
 
 typedef struct
@@ -37,25 +38,23 @@ public:
 
 	void LoadOptions();
 	void SaveOptions();
-	int GetKeyBinding(std::string name, int key, int defaultKey);
-	int GetInputKeyBinding(std::string name, int key, int defaultKey);
-	const EmulatorInput_t *GetKeyBindingInfo(std::string name, int key);
-	void AddKeyBinding(std::string name, const EmulatorInput_t &keyInfo);
-	void RebindKey(std::string name, int emuKey, int inputKey);
+	void LoadKeyBindings(const std::string &name, const std::vector<EmulatorInput_t> &bindings);
 
 	void SaveRecentFile(std::string file);
 
 	std::string GetConfigFileName() const;
 
+	void RebindKey(std::string name, int id, int keycode, int idx);
+
 	std::string recentFiles[5];
 	OptionsVid_t videoOptions;
 	OptionsAud_t audioOptions;
 	std::map<std::string, int> dinputMap;
+	std::map<std::string, std::vector<EmulatorInput_t>> _keyBindings;
 private:
 	Options();
-	
+
 	static Options _instance;
-	std::map<std::string, std::map<int, EmulatorInput_t>> _keyBindings;
 };
 
 #endif

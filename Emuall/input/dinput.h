@@ -7,6 +7,7 @@
 #include <dinput.h>
 #include <vector>
 #include <string>
+#include <wx/string.h>
 #include <wx/event.h>
 
 class DInput;
@@ -39,6 +40,8 @@ public:
 	int GetDeviceId() const;
 
 	const DeviceObjectInfo &GetObjectInfoList();
+	wxString GetObjectName(int object);
+	bool IsAxis(int object);
 private:
 	struct DeviceState {
 		std::vector<bool> buttons;
@@ -52,7 +55,6 @@ private:
 	void SetDataFormat();
 	void SetBufferSize(int size);
 	void EnumObjects();
-
 	LPDIRECTINPUTDEVICE8 _did;
 	GUID _instanceGuid;
 	GUID _productGuid;
@@ -83,6 +85,8 @@ public:
 	void EnumDevices();
 	void DispatchEvent(wxEventType type, int deviceId, int id, float value);
 	int GetGUIDId(const GUID &guidInstance);
+	wxString GetKeyName(int device, int object);
+	bool IsAxis(int device, int object);
 private:
 	LPDIRECTINPUT8 _di;
 

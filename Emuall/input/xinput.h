@@ -71,6 +71,8 @@ public:
 	void Tick(unsigned int deltaTime);
 
 	void Rumble(int id, float left, float right);
+	wxString GetKeyName(int device, int object);
+	bool IsAxis(int device, int object);
 private:
 	wxEvtHandler *_parent;
 	unsigned int _refreshTimer;

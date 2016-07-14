@@ -53,6 +53,16 @@ void XInput::Rumble(int id, float left, float right)
 	_controllers[id].Rumble(left, right);
 }
 
+wxString XInput::GetKeyName(int device, int object)
+{
+	return wxString::Format("XBOX %d %s", device, XInputController::GetButtonName((XInputController::ObjectId)object));
+}
+
+bool XInput::IsAxis(int device, int object)
+{
+	return object >= 16;
+}
+
 XInput::XInput(wxEvtHandler *parent) :
 	_parent(parent), _refreshTimer(5000), _controllerPresent{false, false, false, false}, 
 	_controllers{ {parent, 0 },{ parent, 1 },{ parent, 2 },{ parent, 3 } }

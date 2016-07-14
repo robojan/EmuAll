@@ -17,9 +17,9 @@ class Emulator;
 
 typedef struct {
 	std::string name;
-	int key;
+	int id;
+	int primaryKey;
 	int secondaryKey;
-	int defaultKey;
 	int flags;
 } EmulatorInput_t;
 
@@ -110,7 +110,7 @@ public:
 	EmulatorInfo_t GetInfo() const;
 	std::string GetFileFilterEntry() const;
 	std::string GetName() const;
-	std::list<EmulatorInput_t> GetEmulatorInputs() const;
+	std::vector<EmulatorInput_t> GetEmulatorInputs() const;
 	CpuDebuggerInfo_t GetCpuDebuggerInfo() const;
 	MemDebuggerInfo_t GetMemDebuggerInfo(EMUHANDLE handle) const;
 	Debugger::DebuggerRoot *GetGpuDebuggerInfo(Emulator *emu) const;

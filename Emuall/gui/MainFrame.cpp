@@ -87,9 +87,8 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
 	CreateLayout();
 
 	_inputHandler = new InputMaster(this);
-
-	// create Options frames
-	_inputOptionsFrame = new InputOptionsFrame(this);
+	_display->Bind(wxEVT_KEY_UP, &InputMaster::OnKeyboard, _inputHandler);
+	_display->Bind(wxEVT_KEY_DOWN, &InputMaster::OnKeyboard, _inputHandler);
 
 	// Set the current context
 	_display->SetCurrentContext();
@@ -107,8 +106,11 @@ MainFrame::MainFrame(const wxString &title, const wxPoint &pos, const wxSize &si
 	std::list<EmulatorInterface *>::iterator it;
 	for (it = _emulators->begin(); it != _emulators->end(); ++it)
 	{
-		_inputHandler->RegisterInputs((*it)->GetEmulatorInputs(), (*it)->GetName());
+		Options::GetSingleton().LoadKeyBindings((*it)->GetName(), (*it)->GetEmulatorInputs());
 	}
+
+	// create Options frames
+	_inputOptionsFrame = new InputOptionsFrame(this, _inputHandler);
 
 	// Load debuggers
 	_cpuDebugger = new CPUDebugger(this, wxID_ANY, _("CPU debugger"));
@@ -154,8 +156,6 @@ void MainFrame::CreateLayout()
 	_display = new EmulatorScreen(this, this, 0, ID_Main_display, wxDefaultPosition,
 		wxDefaultSize, wxFULL_REPAINT_ON_RESIZE, glAttr, ctxAttr);
 
-	_display->Bind(wxEVT_KEY_UP, &InputMaster::OnKeyboard, _inputHandler);
-	_display->Bind(wxEVT_KEY_DOWN, &InputMaster::OnKeyboard, _inputHandler);
 	_display->Connect(ID_Main_display, wxEVT_SIZE, wxSizeEventHandler(MainFrame::OnResize), (wxObject *) NULL, this);
 }
 
@@ -375,7 +375,7 @@ void MainFrame::LoadEmulator(std::string &fileName)
 	_emulator.emu = emu;
 
 	// Register for keybindings
-	_inputHandler->RegisterClient(_emulator);
+	_inputHandler->RegisterClient(&_emulator);
 
 	// Load debuggers
 	_cpuDebugger->SetEmulator(_emulator);
@@ -418,7 +418,7 @@ void MainFrame::CloseEmulator()
 			throw;
 		}
 
-		_inputHandler->ClearClient(_emulator);
+		_inputHandler->RegisterClient(nullptr);
 		SaveData_t saveData;
 		saveData.miscData = saveData.ramData = saveData.romData = NULL;
 		saveData.miscDataLen = saveData.ramDataLen = saveData.romDataLen = 0;

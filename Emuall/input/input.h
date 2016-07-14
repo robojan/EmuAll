@@ -13,7 +13,10 @@ enum class InputSource {
 #define MAKE_JOYSTICK_ID(source, device, input) (((source) << 24) | ((device) << 16) | (input))
 #define JOYSTICK_ELEMENT(id) ((id) & 0xFFFF)
 #define JOYSTICK_DEVICE(id) (((id) >> 16) & 0xFF)
-#define JOYSTICK_SOURCE(id) (((id) >> 24) & 0xFF)
+#define JOYSTICK_SOURCE(id) (((id) >> 24) & 0xF)
+#define JOYSTICK_FLAGS(id) (((id) >> 28) & 0xF)
+
+#define JOYSTICK_FLAG_NEGATIVE 1
 
 class JoystickEvent;
 

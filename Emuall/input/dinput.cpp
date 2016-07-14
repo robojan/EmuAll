@@ -225,6 +225,27 @@ int DInput::GetGUIDId(const GUID &guid)
 	}
 }
 
+wxString DInput::GetKeyName(int device, int object)
+{
+	wxString objStr(wxString::Format("Input %d", object));
+	for (auto &it : _devices) {
+		if (it.GetDeviceId() == device) {
+			objStr = it.GetObjectName(object);
+		}
+	}
+	return wxString::Format("JOY %d %s", device, objStr);
+}
+
+bool DInput::IsAxis(int device, int object)
+{
+	for (auto &it : _devices) {
+		if (it.GetDeviceId() == device) {
+			return it.IsAxis(object);
+		}
+	}
+	return false;
+}
+
 DInputDevice::DInputDevice(DInput *dinput, LPDIRECTINPUT8 di, DIDEVICEINSTANCE &device, HWND hwnd) :
 	_did(nullptr), _instanceGuid(device.guidInstance), _productGuid(device.guidProduct), 
 	_name(device.tszProductName), _instanceName(device.tszInstanceName), _dataPacket(nullptr),
@@ -265,7 +286,7 @@ void DInputDevice::Tick()
 	DeviceState newState;
 
 	GetState(newState);
-
+	
 	for (int i = 0; i < _numButtons; i++) {
 		if (newState.buttons[i] != _lastState.buttons[i]) {
 			if (newState.buttons[i]) {
@@ -277,6 +298,7 @@ void DInputDevice::Tick()
 		}
 	}
 	for (int i = 0; i < _numAxes;i++) {
+		// Normalize axes
 		if (newState.axes[i] != _lastState.axes[i]) {
 			_dinput->DispatchEvent(JOYSTICK_AXES_EVENT, _deviceId, _numButtons + i, newState.axes[i]);
 		}
@@ -409,7 +431,11 @@ void DInputDevice::GetState(struct DeviceState &state)
 			state.buttons.push_back(_dataPacket[i] != 0);
 		}
 		for (int i = 0; i < _numAxes; i++) {
-			state.axes.push_back(((int *)(_dataPacket + AxesOffset))[i]);
+			float axisValue = float(((int *)(_dataPacket + AxesOffset))[i]);
+			int minVal = _infoList.axes[i].min;
+			int maxVal = _infoList.axes[i].max;
+			axisValue = 2.0f * (axisValue - minVal) / float(maxVal - minVal) - 1.0f;
+			state.axes.push_back(axisValue);
 		}
 		for (int i = 0; i < _numPOVs; i++) {
 			state.axes.push_back(((int *)(_dataPacket + POVsOffset))[i]);
@@ -568,4 +594,27 @@ void DInputDevice::EnumObjects()
 	if (result != DI_OK) {
 		Log(Error, "Could not enumerate device \"%s\" objects: 0x%08x", _instanceName.c_str(), result);
 	}
+}
+
+wxString DInputDevice::GetObjectName(int object)
+{
+	if (object < _numButtons) {
+		return _infoList.buttons[object].name;
+	}
+	else if (object < _numAxes + _numButtons) {
+		object -= _numButtons;
+		return _infoList.axes[object].name;
+	}
+	else if (object < _numAxes + _numButtons + _numPOVs) {
+		object -= _numAxes + _numButtons;
+		return _infoList.povs[object].name;
+	}
+	else {
+		return wxString::Format("Input %d", object);
+	}
+}
+
+bool DInputDevice::IsAxis(int object)
+{
+	return object >= _numButtons && object < _numButtons + _numAxes;
 }

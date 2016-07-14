@@ -152,9 +152,9 @@ std::string EmulatorInterface::GetName() const
 	return name;
 }
 
-std::list<EmulatorInput_t> EmulatorInterface::GetEmulatorInputs() const
+std::vector<EmulatorInput_t> EmulatorInterface::GetEmulatorInputs() const
 {
-	std::list<EmulatorInput_t> ret;
+	std::vector<EmulatorInput_t> ret;
 	pugi::xml_node inputs = _root.child("input");
 	if (!inputs)
 	{
@@ -166,11 +166,14 @@ std::list<EmulatorInput_t> EmulatorInterface::GetEmulatorInputs() const
 		if (strcmp(it->name(), "key") == 0)
 		{
 			EmulatorInput_t input;
-			input.key = it->attribute("key").as_int(-1);
-			input.defaultKey = strtol(it->child_value("defaultKey"), NULL, 0);
+			input.id = it->attribute("id").as_int(-1);
+			input.primaryKey = it->child("defaultKey").text().as_int(-1);
+			input.secondaryKey = it->child("defaultSecondaryKey").text().as_int(-1);
 			input.name = it->child_value("name");
 			input.flags = 0;
-			ret.push_back(input);
+			if (input.id >= 0) {
+				ret.push_back(input);
+			}
 		}
 	}
 	return ret;

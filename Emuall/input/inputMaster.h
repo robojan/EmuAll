@@ -19,20 +19,19 @@ public:
 
 	void Tick(unsigned int deltaTime);
 
-	void ClearAllClients();
-	void ClearAllClients(std::string name);
-	void ClearClient(const Emulator &client);
-
-	void RegisterInputs(std::list<EmulatorInput_t> inputs, std::string name);
-	void RegisterClient(const Emulator &client);
+	void RegisterClient(Emulator *client);
 
 	void OnKeyboard(wxKeyEvent &evt);
 	void OnJoystick(JoystickEvent &evt);
 
-private:
-	bool SendKey(std::string name, int key, int pressed);
+	wxString GetKeyName(int id);
 
-	std::map<std::string, std::list<Emulator>> _clients;
+private:
+	bool SendKey(int key, int pressed);
+	wxString GetKeyboardKeyName(int id);
+
+	Emulator *_emu;
+	std::map<int, EmulatorInput_t> _bindings;
 	DInput _dinput;
 	XInput _xinput;
 };

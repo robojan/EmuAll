@@ -111,11 +111,10 @@ void Options::SaveOptions()
 	// Key bindings
 	for (auto &emu : _keyBindings) {
 		wxString groupBase = wxString::Format(_("KeyBindings.%s"), emu.first);
-		for (auto &keybindings : emu.second) {
+		for (auto &keybinding : emu.second) {
 			wxString group = groupBase;
-			group.Append("/");
-			group.Append(keybindings.second.name);
-			mFileConfig.Write(group, keybindings.first);
+			mFileConfig.Write(wxString::Format("%s/%d.primary", groupBase, keybinding.id), keybinding.primaryKey);
+			mFileConfig.Write(wxString::Format("%s/%d.secondary", groupBase, keybinding.id), keybinding.secondaryKey);
 		}
 	}
 
@@ -131,52 +130,31 @@ void Options::SaveOptions()
 	mFileConfig.Flush();
 }
 
+
+void Options::LoadKeyBindings(const std::string &name, const std::vector<EmulatorInput_t> &bindings)
+{
+	wxString appName = wxApp::GetInstance()->GetAppDisplayName();
+	wxFileConfig mFileConfig(appName, wxEmptyString, GetConfigFileName(), wxEmptyString,
+		wxCONFIG_USE_SUBDIR | wxCONFIG_USE_LOCAL_FILE);
+
+	_keyBindings[name].clear();
+	wxString groupBase = "KeyBindings.";
+	groupBase.Append(name);
+	for (auto &binding : bindings) {
+		EmulatorInput_t input = binding;
+		input.primaryKey = mFileConfig.ReadLong(wxString::Format("%s/%d.primary", groupBase, binding.id), binding.primaryKey);
+		input.secondaryKey = mFileConfig.ReadLong(wxString::Format("%s/%d.secondary", groupBase, binding.id), binding.secondaryKey);
+		_keyBindings[name].push_back(input);
+	}
+}
+
 std::string Options::GetConfigFileName() const
 {
 	wxString appName = wxApp::GetInstance()->GetAppDisplayName();
 	return wxFileConfig::GetLocalFileName(appName, wxCONFIG_USE_SUBDIR).ToStdString();
 }
 
-void Options::AddKeyBinding(std::string name, const EmulatorInput_t &keyInfo)
-{
-	wxString appName = wxApp::GetInstance()->GetAppDisplayName();
-	wxFileConfig mFileConfig(appName, wxEmptyString, GetConfigFileName(), wxEmptyString,
-		wxCONFIG_USE_SUBDIR | wxCONFIG_USE_LOCAL_FILE);
-	wxString entry = wxString::Format("KeyBindings.%s/%s", name, keyInfo.name);
-	int key = mFileConfig.ReadLong(entry, keyInfo.defaultKey);
-	_keyBindings[name][key] = keyInfo;
-}
 
-void Options::RebindKey(std::string name, int emuKey, int inputKey)
-{
-	assert(_keyBindings.find(name) != _keyBindings.end());
-	std::map<int, EmulatorInput_t>::iterator it;
-	EmulatorInput_t reboundEmuInput;
-	int oldKey = 0;
-	// Search for the keybinding
-	for (it = _keyBindings[name].begin(); it != _keyBindings[name].end(); ++it)
-	{
-		if (it->second.key == emuKey)
-		{
-			reboundEmuInput = it->second;
-			oldKey = it->first;
-			// Remove binding from the list
-			_keyBindings[name].erase(it);
-			break;
-		}
-	}
-
-	if ((it = _keyBindings[name].find(inputKey)) != _keyBindings[name].end())
-	{
-		// Key already exists in rebindings
-		EmulatorInput_t overWriteInput = it->second;
-		it->second = reboundEmuInput;
-		_keyBindings[name][oldKey] = overWriteInput;
-	}
-	else {
-		_keyBindings[name][inputKey] = reboundEmuInput;
-	}
-}
 
 void Options::SaveRecentFile(std::string file)
 {
@@ -196,37 +174,37 @@ void Options::SaveRecentFile(std::string file)
 	recentFiles[0] = file;	
 }
 
-int Options::GetKeyBinding(std::string name, int key, int defaultKey)
+void Options::RebindKey(std::string name, int id, int keycode, int idx)
 {
-	if (_keyBindings.find(name) == _keyBindings.end() || _keyBindings[name].find(key) == _keyBindings[name].end())
-	{
-		return defaultKey;
+	auto &bindings = _keyBindings.find(name);
+	if (bindings == _keyBindings.end()) {
+		return;
 	}
-	return _keyBindings[name][key].key;
-}
 
-int Options::GetInputKeyBinding(std::string name, int key, int defaultKey)
-{
-	if (_keyBindings.find(name) == _keyBindings.end())
-		return defaultKey;
-
-	std::map<int, EmulatorInput_t>::iterator it;
-	// Search for the keybinding
-	for (it = _keyBindings[name].begin(); it != _keyBindings[name].end(); ++it)
-	{
-		if (it->second.key == key)
-		{
-			return it->first;
+	for (auto &binding : bindings->second) {
+		if (binding.id == id) {
+			switch (idx) {
+			case 0:
+				binding.primaryKey = keycode;
+				if (binding.secondaryKey == keycode) {
+					binding.secondaryKey = -1;
+				}
+				break;
+			case 1:
+				binding.secondaryKey = keycode;
+				if (binding.primaryKey == keycode) {
+					binding.primaryKey = -1;
+				}
+				break;
+			}
+		}
+		else {
+			if (binding.primaryKey == keycode) {
+				binding.primaryKey = -1;
+			}
+			if (binding.secondaryKey == keycode) {
+				binding.secondaryKey = -1;
+			}
 		}
 	}
-	return defaultKey;
-}
-
-const EmulatorInput_t *Options::GetKeyBindingInfo(std::string name, int key)
-{
-	if (_keyBindings.find(name) == _keyBindings.end() || _keyBindings[name].find(key) == _keyBindings[name].end())
-	{
-		return NULL;
-	}
-	return &_keyBindings[name][key];
 }
