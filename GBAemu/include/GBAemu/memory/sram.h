@@ -1,13 +1,14 @@
-#ifndef EEPROM_H_
-#define EEPROM_H_
+#ifndef SRAM_H_
+#define SRAM_H_
 
 #include <GBAemu/memory/cartridgeStorage.h>
-#include <GBAemu/memory/memory.h>
 
-class Eeprom : public CartridgeStorage {
+class Memory;
+
+class Sram : public CartridgeStorage {
 public:
-	explicit Eeprom(Memory &memory);
-	virtual ~Eeprom();
+	explicit Sram(Memory &memory);
+	virtual ~Sram();
 
 	virtual uint32_t GetSize() override;
 	virtual uint8_t ReadMemory(uint32_t address) override;
@@ -18,29 +19,13 @@ public:
 	virtual void Write16(uint32_t address, uint16_t val) override;
 	virtual void Write8(uint32_t address, uint8_t val) override;
 
+
+
 private:
-	enum State {
-		Idle,
-		ReadAddress,
-		ReadData,
-		WriteData,
-		Writing,
-		Reading,
-	};
+	uint8_t Read(uint_least16_t address);
+	void Write(uint_least16_t address, uint8_t val);
 
-	void Write(int bit);
-	int Read();
-	int GetDMAAccessSize();
-
-	State _state;
-	uint16_t _address;
-	int _counter;
-	int _dmaAccessSize;
-	int _addressSize;
-	uint8_t _dataBuffer[8];
-	uint32_t _actionTimeStart;
-
-	uint8_t _dataStorage[0x2000];
+	uint8_t _dataStorage[0x8000];
 
 };
 

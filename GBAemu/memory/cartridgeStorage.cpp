@@ -4,7 +4,8 @@
 #include <GBAemu/memory/cartridgeStorage.h>
 #include <GBAemu/util/log.h>
 
-CartridgeStorage::CartridgeStorage()
+CartridgeStorage::CartridgeStorage(Memory &memory) :
+	_memory(memory)
 {
 	
 }

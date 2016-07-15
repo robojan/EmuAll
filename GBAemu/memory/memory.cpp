@@ -12,6 +12,8 @@
 #include <GBAemu/gba.h>
 #include <GBAemu/memory/cartridgeStorage.h>
 #include <GBAemu/memory/eeprom.h>
+#include <GBAemu/memory/sram.h>
+#include <GBAemu/memory/flash.h>
 
 
 Memory::Memory(Gba &gba) :
@@ -540,46 +542,36 @@ void Memory::InitRegisters()
 CartridgeStorage *Memory::DetectStorageChip()
 {
 	Log(Message, "Detecting storage chip");
-	// Detect storage type from nintendo api id's 
+	// Detect storage type from Nintendo api id's 
 	// EEPROM_Vnnn
 	// SRAM_Vnnn
 	// FLASH_Vnnn
 	// FLASH512_Vnnn
 	// FLASH1M_Vnnn
-	int memorySize = 0;
 	for (unsigned int i = 0; i < _romLength; i++) {
 		char c = (char)_rom[i];
 		if (c == 'E' || c == 'S' || c == 'F') {
 			// check remaining
 			if (memcmp(&_rom[i + 1], "EPROM_V", 7) == 0) {
-				memorySize = 8 * 1024;
 				Log(Message, "EEPROM storage of 8KB assumed found");
-				return new Eeprom(this);
-				break;
+				return new Eeprom(*this);
 			}
 			else if (memcmp(&_rom[i + 1], "RAM_V", 5) == 0) {
-				memorySize = 32 * 1024;
 				Log(Message, "SRAM storage of 32KB found");
-				break;
+				return new Sram(*this);
 			}
-			else if (memcmp(&_rom[i + 1], "LASH_V", 6) == 0) {
-				memorySize = 64 * 1024;
+			else if (memcmp(&_rom[i + 1], "LASH_V", 6) == 0 || 
+				memcmp(&_rom[i + 1], "LASH512_V", 9) == 0) {
 				Log(Message, "FLASH storage of 64KB found");
-				break;
-			}
-			else if (memcmp(&_rom[i + 1], "LASH512_V", 9) == 0) {
-				memorySize = 64 * 1024;
-				Log(Message, "FLASH storage of 64KB found");
-				break;
+				return new Flash(*this, 64 * 1024);
 			}
 			else if (memcmp(&_rom[i + 1], "LASH1M_V", 8) == 0) {
-				memorySize = 128 * 1024;
 				Log(Message, "FLASH storage of 128KB found");
-				break;
+				return new Flash(*this, 128 * 1024);
 			}
 		}
 	}
-	return new CartridgeStorage();
+	return new CartridgeStorage(*this);
 }
 
 void Memory::HandleEvent(uint32_t address, int size)

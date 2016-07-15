@@ -62,7 +62,7 @@ void main() {
 			int pixelId = pixelPos.y * 8 + pixelPos.x;
 			int address = baseAddress + tileId * 32 + pixelId / 2;
 			uint data = texelFetch(vramData, address).r;
-			if ((address & 1) != 0) data >>= 4;
+			if ((pixelId & 1) != 0) data >>= 4;
 			data &= 0xFu;
 			if (objectTiles) {
 				// OBJ palette

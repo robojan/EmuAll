@@ -31,6 +31,7 @@ public:
 class Memory : public MemoryEventHandler {
 	friend class CartridgeStorage;
 	friend class Eeprom;
+	friend class Flash;
 public:
 	Memory(Gba &gba);
 	~Memory();

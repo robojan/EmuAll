@@ -87,6 +87,12 @@
     <ClCompile Include="input\KeyInput.cpp">
       <Filter>Source Files\input</Filter>
     </ClCompile>
+    <ClCompile Include="memory\sram.cpp">
+      <Filter>Source Files\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="memory\flash.cpp">
+      <Filter>Source Files\Memory</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="resources\gbaemu.xml">
@@ -149,6 +155,12 @@
     </ClInclude>
     <ClInclude Include="include\GBAemu\input\KeyInput.h">
       <Filter>Header Files\input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GBAemu\memory\sram.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GBAemu\memory\flash.h">
+      <Filter>Header Files\Memory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -868,7 +868,7 @@ void Gpu::DrawTiles(int idx)
 		int lineNr = _vcount >= SCREEN_HEIGHT ? 0 : _vcount;
 
 		SetupShaderInterface(*_tilesShader);
-		_tilesShader->SetUniform("largePalette", _debugTiles8BitDepth ? 1 : 0);
+		_tilesShader->SetUniform("largePalette", _debugTiles8BitDepth[idx] ? 1 : 0);
 		_tilesShader->SetUniform("baseAddress", 0x8000 * idx);
 		_tilesShader->SetUniform("lineNr", lineNr);
 		_tilesShader->SetUniform("objectTiles", idx == 2 ? 1 : 0);

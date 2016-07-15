@@ -4,8 +4,8 @@
 #include <GBAemu/util/log.h>
 #include <GBAemu/cpu/armException.h>
 
-Eeprom::Eeprom(Memory *memory) : 
-	_memory(memory), _state(Idle), _address(0), _counter(0), _actionTimeStart(0)
+Eeprom::Eeprom(Memory &memory) : 
+	CartridgeStorage(memory), _state(Idle), _address(0), _counter(0), _actionTimeStart(0)
 {
 	memset(_dataStorage, 0xFF, sizeof(_dataStorage));
 }
@@ -150,13 +150,13 @@ void Eeprom::Write(int bit)
 				_dataBuffer[4], _dataBuffer[5], _dataBuffer[6], _dataBuffer[7]);
 			memcpy(_dataStorage + _address, _dataBuffer, 8);
 			_state = Writing;
-			_actionTimeStart = _memory->_tickCounter;
+			_actionTimeStart = _memory._tickCounter;
 		}
 		_counter++;
 		break;
 	}
 	case Writing: {
-		if (_memory->_tickCounter - _actionTimeStart > 10836) {
+		if (_memory._tickCounter - _actionTimeStart > 10836) {
 			_state = Idle;
 			Write(bit);
 		}
@@ -187,7 +187,7 @@ int Eeprom::Read()
 	case ReadData:
 		return 1;
 	case Writing:
-		if (_memory->_tickCounter - _actionTimeStart > 108368) {
+		if (_memory._tickCounter - _actionTimeStart > 108368) {
 			_state = Idle;
 			return 1;
 		}
@@ -208,8 +208,8 @@ int Eeprom::Read()
 
 int Eeprom::GetDMAAccessSize()
 {
-	if (_memory->_dma[3].active && (_memory->_dma[3].dst >> 24) == 0xD) {
-		return _memory->_dma[3].wc;
+	if (_memory._dma[3].active && (_memory._dma[3].dst >> 24) == 0xD) {
+		return _memory._dma[3].wc;
 	}
 	return 0;
 }

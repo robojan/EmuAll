@@ -76,7 +76,7 @@ void main() {
 			int tileAddress = fTileBaseAddr + tileId * 32;
 			int pixelAddress = tileAddress + innerId / 2;
 			uint paletteIdx = texelFetch(vramData, pixelAddress).r;
-			if ((pixelAddress & 0x1) != 0) {
+			if ((innerId & 0x1) != 0) {
 				paletteIdx >>= 4u;
 			}
 			paletteIdx &= 0xFu;
