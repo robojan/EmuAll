@@ -42,6 +42,8 @@ private:
 	void PowerModeStop();
 	void PowerModeHalt();
 
+	void TimerTick();
+
 	Memory _memory;
 	Cpu _cpu;
 	Gpu _gpu;
@@ -53,4 +55,13 @@ private:
 	bool _halted;
 	bool _stopped;
 	Disassembler _disassembler;
+
+	struct {
+		uint_fast16_t prescaler;
+		uint_fast16_t cnt;
+		uint_fast16_t prescalerMatch;
+		uint_fast16_t val;
+		uint_fast16_t reload;
+	} _timerInfo[4];
+
 };
