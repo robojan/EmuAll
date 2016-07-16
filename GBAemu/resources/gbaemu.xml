@@ -159,6 +159,10 @@
         <flag id="1024">
           <name>F</name>
         </flag>
+        <register id="1026">
+          <name>TickCounter</name>
+          <size>32</size>
+        </register>
       </registers>
     </cpu>
     <mem>

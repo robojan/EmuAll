@@ -10,6 +10,7 @@ void Cpu::TickThumb(bool step)
 {
 	uint16_t instruction = _pipelineInstruction;
 	assert((_registers[REGPC] & 1) == 0);
+	assert((_registers[REGPC] >> 24) == 8 || (_registers[REGPC] >> 24) == 3 || (_registers[REGPC] >> 24) == 0);
 	_pipelineInstruction = _system._memory.Read16(_registers[REGPC] & 0xFFFFFFFE);
 	if (step && IsBreakpoint(_registers[REGPC] - 2)) {
 		_pipelineInstruction = _breakpoints.at(_registers[REGPC] - 2);
@@ -696,6 +697,7 @@ void Cpu::TickThumb(bool step)
 		if ((addr & 0x400) != 0) addr |= 0xFFFFF800;
 		addr <<= 12;
 		_registers[REGLR] = _registers[REGPC] + addr;
+		assert((_registers[REGPC] & 1) == 0);
 		break;
 	}
 	case 0xF8:
@@ -708,7 +710,7 @@ void Cpu::TickThumb(bool step)
 	case 0xFF: { // Branch with link
 		uint32_t imm = instruction & 0x7FF;
 		uint32_t pc = _registers[REGPC];
-		_registers[REGPC] = _registers[REGLR] + (imm << 1);
+		_registers[REGPC] = (_registers[REGLR] + (imm << 1)) & ~1;
 		_registers[REGLR] = (pc - 2) | 1;
 		_pipelineInstruction = ARM_NOP;
 		break;

@@ -428,6 +428,35 @@ uint32_t Memory::GetCartridgeStorageSize()
 	return _cartridge->GetSize();
 }
 
+uint8_t Memory::ReadSystem8(uint32_t address)
+{
+	uint8_t index = (address >> 24) & 0xF;
+	if (index >= 0xD) {
+		return _cartridge->Read8(address);
+	}
+	if (_memmap[index] == nullptr) {
+		// Comment from gbxemu source
+		// reads beyond the ROM data seem to be filled with:
+		// 0xx00000: 0000 0001 0002 .. FFFF: 0xx1FFFE
+		// 0xx20000: 0000 0001 0002 .. FFFF: 0xx3FFFE
+		// (Incrementing 16 bit values, mirrored each 128 KiB)
+		// [Verified on EZ-Flash IV]
+		if (index >= 8) {
+			// cartridge 			
+			int value = (address & 0x1FFFE) >> 1;
+			if ((address & 1) != 0) {
+				return (value >> 8) & 0xFF;
+			}
+			else {
+				return value & 0xFF;
+			}
+		}
+		throw DataAbortARMException(address);
+	}
+	return _memmap[index][address & _memMask[index]];
+}
+
+
 uint8_t Memory::ReadBios8(uint32_t address)
 {
 	assert(address < BIOSSIZE);
@@ -571,42 +600,48 @@ CartridgeStorage *Memory::DetectStorageChip()
 			}
 		}
 	}
-	return new CartridgeStorage(*this);
+	Log(Message, "None detected assuming 32KB SRAM");
+	return new Sram(*this);
+}
+
+uint32_t Memory::GetTickCounter()
+{
+	return _tickCounter;
 }
 
 void Memory::HandleEvent(uint32_t address, int size)
 {
 	if (address <= DMA0SAD + 3 && DMA0SAD < address + size) {
 		_dma[0].src = IOREG32(_ioRegisters, DMA0SAD) & 0x07FFFFFF;
-		IOREG32(_ioRegisters, DMA0SAD) = 0xFFFFFFFF;
+		//IOREG32(_ioRegisters, DMA0SAD) = 0xFFFFFFFF;
 	}
 	if (address <= DMA1SAD + 3 && DMA1SAD < address + size) {
 		_dma[1].src = IOREG32(_ioRegisters, DMA1SAD) & 0x07FFFFFF;
-		IOREG32(_ioRegisters, DMA1SAD) = 0xFFFFFFFF;
+		//IOREG32(_ioRegisters, DMA1SAD) = 0xFFFFFFFF;
 	}
 	if (address <= DMA2SAD + 3 && DMA2SAD < address + size) {
 		_dma[2].src = IOREG32(_ioRegisters, DMA2SAD) & 0x07FFFFFF;
-		IOREG32(_ioRegisters, DMA2SAD) = 0xFFFFFFFF;
+		//IOREG32(_ioRegisters, DMA2SAD) = 0xFFFFFFFF;
 	}
 	if (address <= DMA3SAD + 3 && DMA3SAD < address + size) {
 		_dma[3].src = IOREG32(_ioRegisters, DMA3SAD) & 0x0FFFFFFF;
-		IOREG32(_ioRegisters, DMA3SAD) = 0xFFFFFFFF;
+		//IOREG32(_ioRegisters, DMA3SAD) = 0xFFFFFFFF;
 	}
 	if (address <= DMA0DAD + 3 && DMA0DAD < address + size) {
 		_dma[0].dst = IOREG32(_ioRegisters, DMA0DAD) & 0x07FFFFFF;
-		IOREG32(_ioRegisters, DMA0DAD) = 0xFFFFFFFF;
+		//IOREG32(_ioRegisters, DMA0DAD) = 0xFFFFFFFF;
 	}
 	if (address <= DMA1DAD + 3 && DMA1DAD < address + size) {
 		_dma[1].dst = IOREG32(_ioRegisters, DMA1DAD) & 0x07FFFFFF;
-		IOREG32(_ioRegisters, DMA1DAD) = 0xFFFFFFFF;
+		//IOREG32(_ioRegisters, DMA1DAD) = 0xFFFFFFFF;
 	}
 	if (address <= DMA2DAD + 3 && DMA2DAD < address + size) {
 		_dma[2].dst = IOREG32(_ioRegisters, DMA2DAD) & 0x07FFFFFF;
-		IOREG32(_ioRegisters, DMA2DAD) = 0xFFFFFFFF;
+		//IOREG32(_ioRegisters, DMA2DAD) = 0xFFFFFFFF;
 	}
 	if (address <= DMA3DAD + 3 && DMA3DAD < address + size) {
 		_dma[3].dst = IOREG32(_ioRegisters, DMA3DAD) & 0x0FFFFFFF;
-		IOREG32(_ioRegisters, DMA3DAD) = 0xFFFFFFFF;
+		//IOREG32(_ioRegisters, DMA3DAD) = 0xFFFFFFFF;
 	}
 	if (address <= DMA0CNT_L + 3 && DMA0CNT_L < address + size) {
 		uint32_t newCtrl = IOREG32(_ioRegisters, DMA0CNT_L);

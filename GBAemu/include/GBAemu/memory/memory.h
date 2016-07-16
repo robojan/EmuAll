@@ -40,6 +40,7 @@ public:
 	int Load(const SaveData_t *data);
 
 	void Tick();
+	uint32_t GetTickCounter();
 	
 	uint8_t Read8(uint32_t address);
 	uint16_t Read16(uint32_t address);
@@ -51,6 +52,7 @@ public:
 
 	uint32_t GetRomSize();
 	uint32_t GetCartridgeStorageSize();
+	uint8_t ReadSystem8(uint32_t address);
 	uint8_t ReadBios8(uint32_t address);
 	uint8_t ReadWRAM8(uint32_t address);
 	uint8_t ReadChipWRAM8(uint32_t address);
@@ -77,7 +79,6 @@ public:
 private:
 	void InitRegisters();
 	CartridgeStorage *DetectStorageChip();
-
 	// Memory map Should be first in the class memory
 	uint8_t *_memmap[16]; 
 	// Mask for invalid addresses

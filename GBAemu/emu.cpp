@@ -156,7 +156,7 @@ uint8_t __stdcall GetMemoryData(EMUHANDLE handle, int32_t memory, uint32_t addre
 		return 0;
 	try {
 		switch (memory) {
-		case 2000: return emulator->GetMemory().Read8(address);
+		case 2000: return emulator->GetMemory().ReadSystem8(address);
 		case 2001: return emulator->GetMemory().ReadBios8(address);
 		case 2002: return emulator->GetMemory().ReadWRAM8(address);
 		case 2003: return emulator->GetMemory().ReadChipWRAM8(address);
@@ -283,6 +283,8 @@ uint32_t __stdcall GetValU(EMUHANDLE handle, int32_t id) {
 				return pc - 4;
 			}
 		}
+	case 1026: // tickcounter
+		return emulator->GetMemory().GetTickCounter();
 	case 2009: // Cartridge storage
 		return emulator->GetMemory().GetCartridgeStorageSize();
 	case 2011: // ROM size

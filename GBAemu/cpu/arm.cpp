@@ -2969,7 +2969,7 @@ void Cpu::TickARM(bool step) {
 	case 0x05B: { // LDRH <Rd>, [<Rn>], #-<offset_8>
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
-		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
+		uint8_t offset = (instruction & 0xF) | ((instruction >> 4) & 0xF0);
 		uint32_t address = _registers[rn];
 		_registers[rd] = _system._memory.Read16(address);
 		_registers[rn] = address - offset;
@@ -2979,7 +2979,7 @@ void Cpu::TickARM(bool step) {
 	case 0x0DB: { // LDRH <Rd>, [<Rn>], #+<offset_8>
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
-		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
+		uint8_t offset = (instruction & 0xF) | ((instruction >> 4) & 0xF0);
 		uint32_t address = _registers[rn];
 		_registers[rd] = _system._memory.Read16(address);
 		_registers[rn] = address + offset;
@@ -3007,7 +3007,7 @@ void Cpu::TickARM(bool step) {
 	case 0x15B: { // LDRH <Rd>, [<Rn>, #-<offset_8>]
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
-		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
+		uint8_t offset = (instruction & 0xF) | ((instruction >> 4) & 0xF0);
 		uint32_t address = _registers[rn] - offset;
 		_registers[rd] = _system._memory.Read16(address);
 		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
@@ -3016,7 +3016,7 @@ void Cpu::TickARM(bool step) {
 	case 0x1DB: { // LDRH <Rd>, [<Rn>, #+<offset_8>]
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
-		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
+		uint8_t offset = (instruction & 0xF) | ((instruction >> 4) & 0xF0);
 		uint32_t address = _registers[rn] + offset;
 		_registers[rd] = _system._memory.Read16(address);
 		if (rd == REGPC) _pipelineInstruction = ARM_NOP;
@@ -3045,7 +3045,7 @@ void Cpu::TickARM(bool step) {
 	case 0x17B: { // LDRH <Rd>, [<Rn>, #-<offset_8>]!
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
-		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
+		uint8_t offset = (instruction & 0xF) | ((instruction >> 4) & 0xF0);
 		uint32_t address = _registers[rn] - offset;
 		_registers[rd] = _system._memory.Read16(address);
 		_registers[rn] = address;
@@ -3055,7 +3055,7 @@ void Cpu::TickARM(bool step) {
 	case 0x1FB: { // LDRH <Rd>, [<Rn>, #+<offset_8>]!
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
-		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
+		uint8_t offset = (instruction & 0xF) | ((instruction >> 4) & 0xF0);
 		uint32_t address = _registers[rn] + offset;
 		_registers[rd] = _system._memory.Read16(address);
 		_registers[rn] = address;
@@ -3090,7 +3090,7 @@ void Cpu::TickARM(bool step) {
 	case 0x05D: { // LDRSB <Rd>, [<Rn>], #-<offset_8>
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
-		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
+		uint8_t offset = (instruction & 0xF) | ((instruction >> 4) & 0xF0);
 		uint32_t address = _registers[rn];
 		uint32_t value = _system._memory.Read8(address);
 		if ((value & 0x80) != 0) value |= 0xFFFFFF00;
@@ -3102,7 +3102,7 @@ void Cpu::TickARM(bool step) {
 	case 0x0DD: { // LDRSB <Rd>, [<Rn>], #+<offset_8>
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
-		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
+		uint8_t offset = (instruction & 0xF) | ((instruction >> 4) & 0xF0);
 		uint32_t address = _registers[rn];
 		uint32_t value = _system._memory.Read8(address);
 		if ((value & 0x80) != 0) value |= 0xFFFFFF00;
@@ -3136,7 +3136,7 @@ void Cpu::TickARM(bool step) {
 	case 0x15D: { // LDRSB <Rd>, [<Rn>], #-<offset_8>
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
-		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
+		uint8_t offset = (instruction & 0xF) | ((instruction >> 4) & 0xF0);
 		uint32_t address = _registers[rn] - offset;
 		uint32_t value = _system._memory.Read8(address);
 		if ((value & 0x80) != 0) value |= 0xFFFFFF00;
@@ -3147,7 +3147,7 @@ void Cpu::TickARM(bool step) {
 	case 0x1DD: { // LDRSB <Rd>, [<Rn>], #+<offset_8>
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
-		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
+		uint8_t offset = (instruction & 0xF) | ((instruction >> 4) & 0xF0);
 		uint32_t address = _registers[rn] + offset;
 		uint32_t value = _system._memory.Read8(address);
 		if ((value & 0x80) != 0) value |= 0xFFFFFF00;
@@ -3182,7 +3182,7 @@ void Cpu::TickARM(bool step) {
 	case 0x17D: { // LDRSB <Rd>, [<Rn>, #-<offset_8>]
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
-		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
+		uint8_t offset = (instruction & 0xF) | ((instruction >> 4) & 0xF0);
 		uint32_t address = _registers[rn] - offset;
 		uint32_t value = _system._memory.Read8(address);
 		if ((value & 0x80) != 0) value |= 0xFFFFFF00;
@@ -3194,7 +3194,7 @@ void Cpu::TickARM(bool step) {
 	case 0x1FD: { // LDRSB <Rd>, [<Rn>, #+<offset_8>]
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
-		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
+		uint8_t offset = (instruction & 0xF) | ((instruction >> 4) & 0xF0);
 		uint32_t address = _registers[rn] + offset;
 		uint32_t value = _system._memory.Read8(address);
 		if ((value & 0x80) != 0) value |= 0xFFFFFF00;
@@ -3231,7 +3231,7 @@ void Cpu::TickARM(bool step) {
 	case 0x05F: { // LDRSH <Rd>, [<Rn>], #-<offset_8>
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
-		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
+		uint8_t offset = (instruction & 0xF) | ((instruction >> 4) & 0xF0);
 		uint32_t address = _registers[rn];
 		uint32_t value = _system._memory.Read16(address);
 		if ((value & 0x8000) != 0) value |= 0xFFFF0000;
@@ -3243,7 +3243,7 @@ void Cpu::TickARM(bool step) {
 	case 0x0DF: { // LDRSH <Rd>, [<Rn>], #+<offset_8>
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
-		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
+		uint8_t offset = (instruction & 0xF) | ((instruction >> 4) & 0xF0);
 		uint32_t address = _registers[rn];
 		uint32_t value = _system._memory.Read16(address);
 		if ((value & 0x8000) != 0) value |= 0xFFFF0000;
@@ -3277,7 +3277,7 @@ void Cpu::TickARM(bool step) {
 	case 0x15F: { // LDRSH <Rd>, [<Rn>], #-<offset_8>
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
-		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
+		uint8_t offset = (instruction & 0xF) | ((instruction >> 4) & 0xF0);
 		uint32_t address = _registers[rn] - offset;
 		uint32_t value = _system._memory.Read16(address);
 		if ((value & 0x8000) != 0) value |= 0xFFFF0000;
@@ -3288,7 +3288,7 @@ void Cpu::TickARM(bool step) {
 	case 0x1DF: { // LDRSH <Rd>, [<Rn>], #+<offset_8>
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
-		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
+		uint8_t offset = (instruction & 0xF) | ((instruction >> 4) & 0xF0);
 		uint32_t address = _registers[rn] + offset;
 		uint32_t value = _system._memory.Read16(address);
 		if ((value & 0x8000) != 0) value |= 0xFFFF0000;
@@ -3323,7 +3323,7 @@ void Cpu::TickARM(bool step) {
 	case 0x17F: { // LDRSH <Rd>, [<Rn>, #-<offset_8>]
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
-		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
+		uint8_t offset = (instruction & 0xF) | ((instruction >> 4) & 0xF0);
 		uint32_t address = _registers[rn] - offset;
 		uint32_t value = _system._memory.Read16(address);
 		if ((value & 0x8000) != 0) value |= 0xFFFF0000;
@@ -3335,7 +3335,7 @@ void Cpu::TickARM(bool step) {
 	case 0x1FF: { // LDRSH <Rd>, [<Rn>, #+<offset_8>]
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
-		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
+		uint8_t offset = (instruction & 0xF) | ((instruction >> 4) & 0xF0);
 		uint32_t address = _registers[rn] + offset;
 		uint32_t value = _system._memory.Read16(address);
 		if ((value & 0x8000) != 0) value |= 0xFFFF0000;
@@ -6374,7 +6374,7 @@ void Cpu::TickARM(bool step) {
 	case 0x04B: { // STRH <Rd>, [<Rn>], #-<offset_8>
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
-		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
+		uint8_t offset = (instruction & 0xF) | ((instruction >> 4) & 0xF0);
 		uint32_t address = _registers[rn];
 		_system._memory.Write16(address, _registers[rd]);
 		_registers[rn] = address - offset;
@@ -6383,7 +6383,7 @@ void Cpu::TickARM(bool step) {
 	case 0x0CB: { // STRH <Rd>, [<Rn>], #+<offset_8>
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
-		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
+		uint8_t offset = (instruction & 0xF) | ((instruction >> 4) & 0xF0);
 		uint32_t address = _registers[rn];
 		_system._memory.Write16(address, _registers[rd]);
 		_registers[rn] = address + offset;
@@ -6408,7 +6408,7 @@ void Cpu::TickARM(bool step) {
 	case 0x14B: { // STRH <Rd>, [<Rn>], #-<offset_8>
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
-		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
+		uint8_t offset = (instruction & 0xF) | ((instruction >> 4) & 0xF0);
 		uint32_t address = _registers[rn] - offset;
 		_system._memory.Write16(address, _registers[rd]);
 		break;
@@ -6416,7 +6416,7 @@ void Cpu::TickARM(bool step) {
 	case 0x1CB: { // STRH <Rd>, [<Rn>], #+<offset_8>
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
-		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
+		uint8_t offset = (instruction & 0xF) | ((instruction >> 4) & 0xF0);
 		uint32_t address = _registers[rn] + offset;
 		_system._memory.Write16(address, _registers[rd]);
 		break;
@@ -6442,7 +6442,7 @@ void Cpu::TickARM(bool step) {
 	case 0x16B: { // STRH <Rd>, [<Rn>, #-<offset_8>]
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
-		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
+		uint8_t offset = (instruction & 0xF) | ((instruction >> 4) & 0xF0);
 		uint32_t address = _registers[rn] - offset;
 		_system._memory.Write16(address, _registers[rd]);
 		_registers[rn] = address;
@@ -6451,7 +6451,7 @@ void Cpu::TickARM(bool step) {
 	case 0x1EB: { // STRH <Rd>, [<Rn>, #+<offset_8>]
 		uint8_t rn = (instruction >> 16) & 0xF;
 		uint8_t rd = (instruction >> 12) & 0xF;
-		uint8_t offset = (instruction & 0xF) | ((instruction >> 8) & 0xF);
+		uint8_t offset = (instruction & 0xF) | ((instruction >> 4) & 0xF0);
 		uint32_t address = _registers[rn] + offset;
 		_system._memory.Write16(address, _registers[rd]);
 		_registers[rn] = address;

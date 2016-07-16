@@ -42,6 +42,10 @@ void Cpu::Tick(bool step)
 			}
 		}
 
+		if ((_registers[REGPC] & ~0xF) != 0x08061410) {
+			volatile int nothing = 0;
+		}
+
 		if (IsInThumbMode()) {
 			TickThumb(step);
 		}

@@ -161,7 +161,7 @@ const char * Disassembler::DisassembleArm(uint32_t address, uint32_t instruction
 				tempBuffer[tempPos] = '\0';
 				dataStr = tempBuffer + 2;
 			}
-			else if (strncmp(formatStr + formatPos, "imm_24", argLen) == 0) {
+			else if (strncmp(formatStr + formatPos, "immed_24", argLen) == 0) {
 				uint32_t offset = instruction & 0xFFFFFF;
 				HexToString(tempBuffer + 2, offset);
 				dataStr = tempBuffer;
@@ -1353,8 +1353,8 @@ const char * Disassembler::GetThumbFormatString(uint16_t instruction)
 	CASE_RANGE32(0x0C0) return "ADD <R8>, #<immed_8>";
 	CASE_RANGE8(0x060) return "ADD <R0>, <R3>, <R6>";
 	CASE_RANGE4(0x110) return "ADD <Rd>, <Rm>";
-	CASE_RANGE32(0x280) return "ADD <Rd>, PC, #<immed_8> * 4";
-	CASE_RANGE32(0x2A0) return "ADD <Rd>, SP, #<immed_8> * 4";
+	CASE_RANGE32(0x280) return "ADD <R8>, PC, #<immed_8> * 4";
+	CASE_RANGE32(0x2A0) return "ADD <R8>, SP, #<immed_8> * 4";
 	CASE_RANGE2(0x2C0) return "ADD SP, #<immed_7> * 4";
 	case 0x100: return "AND <R0>, <R3>";
 	CASE_RANGE32(0x040) return "ASR <R0>, <R3>, #<immed_5>";
@@ -1374,7 +1374,7 @@ const char * Disassembler::GetThumbFormatString(uint16_t instruction)
 	CASE_RANGE32(0x3E0) return "BL <offset_11>";
 	CASE_RANGE2(0x11C) return "BX <Rm>";
 	case 0x10B: return "CMN <R0>, <R3>";
-	CASE_RANGE32(0x0A0) return "CMP <immed_8>";
+	CASE_RANGE32(0x0A0) return "CMP <R8>, #<immed_8>";
 	case 0x10A: return "CMP <R0>, <R3>";
 	CASE_RANGE4(0x114) return "CMP <Rn>, <Rm>";
 	case 0x101: return "EOR <R0>, <R3>";
