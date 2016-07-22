@@ -142,6 +142,11 @@ std::string EmulatorInterface::GetFileFilterEntry() const
 	return entry;
 }
 
+std::string EmulatorInterface::GetFileFilter() const
+{
+	return _root.child_value("fileFilter");
+}
+
 std::string EmulatorInterface::GetName() const
 {
 	std::string name = _root.child_value("name");
@@ -622,14 +627,23 @@ std::string EmulatorList::GetFileFilters() const
 {
 	std::list<EmulatorInterface *>::const_iterator it = _emulators.cbegin();
 	std::string filter;
+	std::string allFilter = "Supported emulators (";
+	std::string allFilterId;
 	while (it != _emulators.cend())
 	{
 		filter.append((*it)->GetFileFilterEntry());
+		allFilter.append((*it)->GetFileFilter());
+		allFilterId.append((*it)->GetFileFilter());
 		++it;
 		if (it != _emulators.cend())
 		{
+			allFilterId.append(";");
+			allFilter.append(";");
 			filter.append("|");
 		}
 	}
-	return filter;
+	allFilter.append(")|");
+	allFilter.append(allFilterId);
+	allFilter.append("|");
+	return allFilter.append(filter);
 }

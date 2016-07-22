@@ -109,6 +109,7 @@ public:
 
 	EmulatorInfo_t GetInfo() const;
 	std::string GetFileFilterEntry() const;
+	std::string GetFileFilter() const;
 	std::string GetName() const;
 	std::vector<EmulatorInput_t> GetEmulatorInputs() const;
 	CpuDebuggerInfo_t GetCpuDebuggerInfo() const;
